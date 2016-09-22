@@ -1,0 +1,21 @@
+{
+  "name": "visualization",
+  "homepage": "https://github.com/InspectorIncognito/visualization",
+  "authors": [
+    "Pato285 <pisbej@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "GPLv3",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "gentelella": "^1.3.0"
+  }
+}
