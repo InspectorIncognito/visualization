@@ -87,3 +87,12 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# jetbrains
+.idea
+
+# compiled
+*.pyc
+
+#database
+*.sqlite3
