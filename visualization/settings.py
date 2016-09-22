@@ -56,7 +56,7 @@ ROOT_URLCONF = 'visualization.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates'),
+        'DIRS': [os.path.join(BASE_DIR, 'visualization/templates'),
                  os.path.join(BASE_DIR, 'data/templates')]
         ,
         'APP_DIRS': True,
