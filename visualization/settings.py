@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'carrier.apps.CarrierConfig',
     'basedata.apps.BaseDataConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -57,9 +58,7 @@ ROOT_URLCONF = 'visualization.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'visualization/templates'),
-                 os.path.join(BASE_DIR, 'basedata/templates')]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'visualization/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
