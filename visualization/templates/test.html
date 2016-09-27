@@ -21,7 +21,7 @@
     <!-- bootstrap-progressbar -->
     <link href="{% static 'components/gentelella/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css' %}" rel="stylesheet">
     <!-- JQVMap -->
-    <link href="{% static 'components/gentelella/vendors/jqvmap/dist/jqvmap.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'components/jqvmap/dist/jqvmap.min.css' %}" rel="stylesheet"/>
 
     <!-- Custom Theme Style -->
     <link href="{% static 'components/gentelella/build/css/custom.min.css' %}" rel="stylesheet">
@@ -30,7 +30,7 @@
   <body class="nav-md">
     <div class="container body">
       <div class="main_container">
-        <div class="col-md-3 left_col">
+        <div class="col-md-3 left_col menu_fixed">
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
               <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>Gentellela Alela!</span></a>
@@ -53,7 +53,7 @@
             <br />
 
             <!-- sidebar menu -->
-            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu ">
               <div class="menu_section">
                 <h3>General</h3>
                 <ul class="nav side-menu">
@@ -1005,18 +1005,18 @@
     <script src="{% static 'components/gentelella/vendors/Flot/jquery.flot.stack.js' %}"></script>
     <script src="{% static 'components/gentelella/vendors/Flot/jquery.flot.resize.js' %}"></script>
     <!-- Flot plugins -->
-    <script src="{% static 'components/gentelella/vendors/flot.orderbars/js/jquery.flot.orderBars.js' %}"></script>
-    <script src="{% static 'components/gentelella/vendors/flot-spline/js/jquery.flot.spline.min.js' %}"></script>
-    <script src="{% static 'components/gentelella/vendors/flot.curvedlines/curvedLines.js' %}"></script>
+    <script src="{% static 'components/flot.orderbars/js/jquery.flot.orderBars.js' %}"></script>
+    <script src="{% static 'components/flot-spline/js/jquery.flot.spline.min.js' %}"></script>
+    <script src="{% static 'components/flot.curvedlines/curvedLines.js' %}"></script>
     <!-- DateJS -->
-    <script src="{% static 'components/gentelella/vendors/DateJS/build/date.js' %}"></script>
+    <script src="{% static 'components/DateJS/build/date.js' %}"></script>
     <!-- JQVMap -->
-    <script src="{% static 'components/gentelella/vendors/jqvmap/dist/jquery.vmap.js' %}"></script>
-    <script src="{% static 'components/gentelella/vendors/jqvmap/dist/maps/jquery.vmap.world.js' %}"></script>
-    <script src="{% static 'components/gentelella/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js' %}"></script>
+    <script src="{% static 'components/jqvmap/dist/jquery.vmap.js' %}"></script>
+    <script src="{% static 'components/jqvmap/dist/maps/jquery.vmap.world.js' %}"></script>
+    <script src="{% static 'components/jqvmap/examples/js/jquery.vmap.sampledata.js' %}"></script>
     <!-- bootstrap-daterangepicker -->
-    <script src="js/moment/moment.min.js' %}"></script>
-    <script src="js/datepicker/daterangepicker.js' %}"></script>
+    <script src="{% static 'components/gentelella/vendors/moment/min/moment.min.js' %}"></script>
+    <script src="{% static 'components/bootstrap-daterangepicker/daterangepicker.js' %}"></script>
 
     <!-- Custom Theme Scripts -->
     <script src="{% static 'components/gentelella/build/js/custom.min.js' %}"></script>
