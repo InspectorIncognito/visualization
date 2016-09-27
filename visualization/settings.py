@@ -76,7 +76,7 @@ WSGI_APPLICATION = 'visualization.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
-
+# TODO use postgres when deploying
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -122,6 +122,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+# TODO add static_root when deploying
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )

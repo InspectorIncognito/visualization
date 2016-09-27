@@ -8,8 +8,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Página administración Vulve </title>
+    <title>Página administración Vule </title>
 
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.css"/>
     <!-- Bootstrap -->
     <link href="{% static 'components/gentelella/vendors/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
     <!-- Font Awesome -->
@@ -26,6 +28,20 @@
 
     <!-- Custom Theme Style -->
     <link href="{% static 'components/gentelella/build/css/custom.min.css' %}" rel="stylesheet">
+
+    <!-- Leaflet Scripts -->
+    <script src="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.js"></script>
+
+    <!-- jQuery Script -->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+
+
+    <style>
+        .map {
+            height: 300px;
+        }
+    </style>
 </head>
 
 <body class="nav-md">
@@ -192,14 +208,25 @@
                                                 <div class="block">
                                                     <div class="block_content">
                                                         <h2 class="title">
-                                                            <a>{{ report.userId }}</a>
+                                                            <a><span>A las </span><a>{{ report.timeStamp }}</a></a>
                                                         </h2>
-                                                        <div class="byline">
-                                                            <span>A las </span><a>{{ report.timeStamp }}</a>
-                                                        </div>
+                                                        <br>
                                                         <p class="excerpt">
                                                             {{ report.message }}
                                                         </p>
+                                                        <div id="{{ report.message }}" class="map"></div>
+                                                        <span class="pull-right"><button type="button"
+                                                                                         class="btn btn-primary">Responder</button></span>
+
+                                                        <script>
+                                                            var mymap{{ report.message }} = L.map('{{ report.message }}').setView([-33.45, -70.6], 11);
+                                                            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+                                                                attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+                                                                maxZoom: 18,
+                                                                id: 'transapp',
+                                                                accessToken: 'pk.eyJ1IjoidHJhbnNhcHB2aXMiLCJhIjoiY2l0bG9qd3ppMDBiNjJ6bXBpY3J0bm40cCJ9.ajifidV4ypi0cXgiGQwR-A'
+                                                            }).addTo(mymap{{ report.message }});
+                                                        </script>
                                                     </div>
                                                 </div>
                                             </li>
@@ -267,6 +294,7 @@
 
 <!-- Custom Theme Scripts -->
 <script src="{% static 'components/gentelella/build/js/custom.min.js' %}"></script>
+
 
 <!-- Flot -->
 <script>
