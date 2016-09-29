@@ -23,6 +23,7 @@
     "DateJS": "datejs#^1.0.0-rc3",
     "flot.curvedlines": "^1.1.1",
     "bootstrap-daterangepicker": "^2.1.24",
-    "leaflet.markercluster": "Leaflet.markercluster#^0.5.0"
+    "leaflet.markercluster": "Leaflet.markercluster#^0.5.0",
+    "eonasdan-bootstrap-datetimepicker": "^4.17.42"
   }
 }

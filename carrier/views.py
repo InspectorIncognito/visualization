@@ -10,3 +10,8 @@ def index(request):
         'reports' : reports,
     }
     return HttpResponse(template.render(context, request))
+
+def drivers(request):
+    template = loader.get_template('drivers.html')
+    return HttpResponse(template.render())
+
