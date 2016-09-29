@@ -3,5 +3,5 @@ from __future__ import unicode_literals
 from django.apps import AppConfig
 
 
-class BaseDataConfig(AppConfig):
-    name = 'basedata'
+class AndroidRequestsConfig(AppConfig):
+    name = 'AndroidRequests'

@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.template import loader
-from basedata.models import Report
+from AndroidRequests.models import Report
 
 
 def index(request):
@@ -11,7 +11,14 @@ def index(request):
     }
     return HttpResponse(template.render(context, request))
 
-def drivers(request):
+def drivers(request, colorId):
     template = loader.get_template('drivers.html')
     return HttpResponse(template.render())
+
+def getDriversReportByInterval(request):
+    if request.method == 'GET':
+        date_init = request.GET.get('date_init')
+        date_end = request.GET.get('date_end')
+        carrier = request.GET.get('carrier')
+
 

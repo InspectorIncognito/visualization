@@ -18,6 +18,8 @@
     <link href="{% static 'components/gentelella/vendors/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
     <!-- Custom Theme Style -->
     <link href="{% static 'components/gentelella/build/css/custom.min.css' %}" rel="stylesheet">
+    <!-- Marker Cluster Style -->
+    <link href="{% static 'components/leaflet.markercluster/dist/MarkerCluster.css' %}" rel="stylesheet">
 
     <!-- Leaflet Scripts -->
     <script src="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.js"></script>
@@ -25,6 +27,8 @@
     <!-- jQuery Script -->
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 
+    <!-- markercluster Script -->
+    <script src="{% static 'components/leaflet.markercluster/dist/leaflet.markercluster.js' %}"></script>
 
 
     <style>
@@ -203,6 +207,8 @@
                                                         <br>
                                                         <p class="excerpt">
                                                             {{ report.message }}
+                                                            <br>report {{ report.reportInfo }}
+                                                            <br> imagen {{ report.imageName }}
                                                         </p>
                                                         <div id="{{ report.message }}" class="map"></div>
                                                         <span class="pull-right"><button type="button"
@@ -216,7 +222,12 @@
                                                                 id: 'transappvis.1gj7fib9',
                                                                 accessToken: 'pk.eyJ1IjoidHJhbnNhcHB2aXMiLCJhIjoiY2l0bG9qd3ppMDBiNjJ6bXBpY3J0bm40cCJ9.ajifidV4ypi0cXgiGQwR-A'
                                                             }).addTo(mymap{{ report.message }});
+                                                            console.log("hola");
+                                                            var markers = L.markerClusterGroup();
+                                                            markers.addLayer(L.marker([-33.45, -70.6]));
+                                                            mymap{{ report.message }}.addLayer(markers);
                                                         </script>
+                                                        1
                                                     </div>
                                                 </div>
                                             </li>

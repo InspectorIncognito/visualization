@@ -5,5 +5,6 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
-    url(r'^drivers/', views.drivers, name='drivers'),
+    url(r'^(?P<colorId>[1-7])/drivers/$', views.drivers, name='drivers'),
+    url(r'^getDriversData/$', views.getDriversReportByInterval, name='driversReport'),
 ]
