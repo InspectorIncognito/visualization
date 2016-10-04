@@ -137,6 +137,21 @@ class EventForBus(EventRegistration):
     bus = models.ForeignKey('Bus', verbose_name='the bus')
     '''Indicates the bus to which the event refers'''
 
+    def getDictionary(self):
+        '''A dictionary with the event information, just what was of interest to return to the app.'''
+        dictionary = {}
+
+        dictionary['eventConfirm'] = self.eventConfirm
+        dictionary['eventDecline'] = self.eventDecline
+        creation = timezone.localtime(self.timeCreation)
+        stamp = timezone.localtime(self.timeStamp)
+        dictionary['timeCreation'] = creation.strftime("%d-%m-%Y %H:%M:%S")
+        dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
+        dictionary['service'] = self.bus.service
+        dictionary['plate'] = self.bus.registrationPlate
+        dictionary['type'] = self.event.name
+        return dictionary
+
 
 ##
 #
