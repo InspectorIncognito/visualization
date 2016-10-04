@@ -30,6 +30,9 @@
     <link href="{% static 'components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css' %}"
           rel="stylesheet">
 
+    <!-- iCheck -->
+    <link href="{% static 'components/gentelella/vendors/iCheck/skins/flat/blue.css' %}" rel="stylesheet">
+
 
 </head>
 
@@ -179,7 +182,7 @@
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     <div class="x_panel">
                         <div class="x_title">
-                            <h2>Reclamos</h2>
+                            <h2>Reclamos Conducta Conductor</h2>
                             <ul class="nav navbar-right panel_toolbox">
                                 <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                 </li>
@@ -187,35 +190,117 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
-                            <div class="dashboard-widget-content">
-                                <div class="container">
-                                    <div class="row">
-                                        <div class='col-sm-4'>
-                                            <div class="form-group">
-                                                <label for="datetimepicker1">Fecha Inicio</label>
-                                                <input type='text' class="form-control" id='datetimepicker1'/>
-                                            </div>
-                                        </div>
-                                        <div class='col-sm-4'>
-                                            <div class="form-group">
-                                                <label for="datetimepicker2">Fecha Fin</label>
-                                                <input type='text' class="form-control" id='datetimepicker2'/>
-                                            </div>
-                                        </div>
-                                        <div class='col-sm-2'>
-                                            <div class="form-group">
-                                                <label for="datetimepicker3">Desde</label>
-                                                <input type='text' class="form-control" id='datetimepicker3'/>
-                                            </div>
-                                        </div>
-                                        <div class='col-sm-2'>
-                                            <div class="form-group">
-                                                <label for="datetimepicker4">Hasta</label>
-                                                <input type='text' class="form-control" id='datetimepicker4'/>
+                            <div class="x_panel">
+                                <div class="x_title">
+                                    <h2>Filtros</h2>
+                                    <ul class="nav navbar-right panel_toolbox">
+                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                        </li>
+                                    </ul>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div class="dashboard-widget-content">
+                                        <div class="container">
+                                            <div class="form">
+                                                <div class="row form-inline">
+                                                    <div class='col-sm-4'>
+                                                        <div class="form-group">
+                                                            <label for="date_init">Fecha Inicio:</label>
+                                                            <input type='text' class="form-control"
+                                                                   id="date_init"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class='col-sm-4'>
+                                                        <div class="form-group">
+                                                            <label for="date_end">Fecha Fin:</label>
+                                                            <input type='text' class="form-control"
+                                                                   id="date_end"/>
+                                                        </div>
+                                                    </div>
+                                                    <button class="btn" onclick="myFunction()">Actualizar</button>
+
+                                                </div>
+                                                <div class="row">
+                                                    <div class='col-sm-2'>
+                                                        <div class="form-group">
+                                                            <label for="hour1">Desde</label>
+                                                            <input type='text' onchange="myFunction()"
+                                                                   class="form-control" id="hour1"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class='col-sm-2'>
+                                                        <div class="form-group">
+                                                            <label for="hour2">Hasta</label>
+                                                            <input type='text' class="form-control"
+                                                                   id="hour2"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class='col-sm-2'>
+                                                        <div class="form-group">
+                                                            <label for="service">Recorrido</label>
+                                                            <select class="form-control"
+                                                                    id='service'>
+                                                                <option>506</option>
+                                                                <option>507</option>
+                                                                <option>509</option>
+                                                                <option>510</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class='col-sm-2'>
+                                                        <div class="form-group">
+                                                            <label for="plate">Patente</label>
+                                                            <select class="form-control"
+                                                                    id='plate'>
+                                                                <option>506</option>
+                                                                <option>507</option>
+                                                                <option>509</option>
+                                                                <option>510</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <button class="btn">Buscar</button>
+                                </div>
+                            </div>
+                            <div class="dashboard-widget-content">
+                                <div class="container">
+                                    Agrupar por:
+                                    <div class="form-inline">
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="optionsRadios" id="optionsRadios1"
+                                                       value="option1"
+                                                       checked>
+                                                Dia de la semana
+                                            </label>
+                                        </div>
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="optionsRadios" id="optionsRadios2"
+                                                       value="option2">
+                                                Hora
+                                            </label>
+                                        </div>
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="optionsRadios" id="optionsRadios3"
+                                                       value="option3">
+                                                Patente
+                                            </label>
+                                        </div>
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="optionsRadios" id="optionsRadios4"
+                                                       value="option4">
+                                                Servicio
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <hr>
                                     <div id="chart"></div>
                                 </div>
                             </div>
@@ -253,51 +338,9 @@
 <script src="{% static 'components/gentelella/vendors/moment/locale/es.js' %}"></script>
 <script src="{% static 'components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js' %}"></script>
 
-<script type="text/javascript">
-    $(function () {
-        $('#datetimepicker1').datetimepicker({
-            format: 'LL'
-        });
-        $('#datetimepicker2').datetimepicker({
-            format: 'LL'
-        });
-        $('#datetimepicker3').datetimepicker({
-            format: 'LT'
-        });
-        $('#datetimepicker4').datetimepicker({
-            format: 'LT'
-        });
-    });
-    var chart = c3.generate({
-        data: {
-            x: 'x',
-//        xFormat: '%Y%m%d', // 'xFormat' can be used as custom format of 'x'
-            columns: [
-                ['x', '2013-01-01', '2013-01-02', '2013-01-03', '2013-01-04', '2013-01-05', '2013-01-06'],
-//            ['x', '20130101', '20130102', '20130103', '20130104', '20130105', '20130106'],
-                ['data1', 30, 200, 100, 400, 150, 250],
-                ['data2', 130, 340, 200, 500, 250, 350]
-            ],
-            type: 'bar',
-            groups: [
-                ['data1', 'data2']
-            ]
-        },
-        axis: {
-            x: {
-                type: 'timeseries',
-                tick: {
-                    format: '%Y-%m-%d'
-                }
-            }
-        }
-    });
+<!-- iCheck -->
+<script src="{% static 'components/gentelella/vendors/iCheck/icheck.min.js' %}"></script>
 
-    setTimeout(function () {
-        chart.unload({
-            ids: ['data2']
-        });
-    }, 1000);
-</script>
+<script src="{% static 'js/drivers.js' %}"></script>
 </body>
 </html>
