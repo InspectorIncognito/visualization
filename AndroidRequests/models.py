@@ -138,7 +138,7 @@ class EventForBus(EventRegistration):
     '''Indicates the bus to which the event refers'''
 
     def getDictionary(self):
-        '''A dictionary with the event information, just what was of interest to return to the app.'''
+        '''A dictionary with the event information'''
         dictionary = {}
 
         dictionary['eventConfirm'] = self.eventConfirm
@@ -150,8 +150,10 @@ class EventForBus(EventRegistration):
         dictionary['service'] = self.bus.service
         dictionary['plate'] = self.bus.registrationPlate
         dictionary['type'] = self.event.name
+        dictionary['busStop1'] = "" #TODO Model needs to be changed to save it
+        dictionary['busStop2'] = ""
+        dictionary['place'] = ""
         return dictionary
-
 
 ##
 #

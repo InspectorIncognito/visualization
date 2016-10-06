@@ -2,8 +2,9 @@ from django.http import HttpResponse
 from django.template import loader
 from AndroidRequests.models import Report, EventForBus, Service
 from django.http import JsonResponse
-import json
 from django.db.models import Q
+from datetime import datetime
+import json, pytz
 
 
 def index(request):
@@ -19,7 +20,6 @@ def drivers(request):
     template = loader.get_template('drivers.html')
     carrier = 4 #TODO Select carrier depending on who is logged.
     services = Service.objects.filter(color_id = carrier)
-    services = json.dumps([service.service for service in services])
     context = {
         'services': services,
     }
@@ -49,13 +49,17 @@ def getDriversReportByInterval(request):
         # query = query.filter(minuteInterval)
         return JsonResponse([report.getDictionary() for report in query], safe=False)
 
-def getAllDriverReports(request):
+def driversTable(request):
     template = loader.get_template('driversTable.html')
     carrier = 4  # TODO Select carrier depending on who is logged.
     query = EventForBus.objects.filter(
         bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
     query = query.filter(event__category="conductor")
-    data = json.dump([report.getDictionary() for report in query])
+    today = datetime.now(pytz.timezone('Chile/Continental'))
+    #query = query.filter(timeStamp__year=str(today.year),
+    #                     timeStamp__month=str(today.month),
+    #                     timeStamp__day=str(today.day))
+    data = json.dumps([report.getDictionary() for report in query])
     context = {
         'data' : data
     }
