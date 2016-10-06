@@ -18,7 +18,7 @@ def index(request):
 
 def drivers(request):
     template = loader.get_template('drivers.html')
-    carrier = 4 #TODO Select carrier depending on who is logged.
+    carrier = 7 #TODO Select carrier depending on who is logged.
     services = Service.objects.filter(color_id = carrier)
     context = {
         'services': services,
@@ -35,7 +35,7 @@ def getDriversReport(request):
         def change(dict):
             dict["type"] = eventToPos[dict["type"]]
             return dict
-        carrier = 4  # TODO Select carrier depending on who is logged.
+        carrier = 7  # TODO Select carrier depending on who is logged.
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
         hour1 = int(request.GET.get('hour1'))
@@ -65,12 +65,12 @@ def driversTable(request):
     return HttpResponse(template.render(request = request))
 
 def getDriversTable(request):
-    carrier = 4  # TODO Select carrier depending on who is logged.
+    carrier = 7  # TODO Select carrier depending on who is logged.
     query = EventForBus.objects.filter(
         bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
     query = query.filter(event__category="conductor")
     today = datetime.now(pytz.timezone('Chile/Continental'))
-    # query = query.filter(timeStamp__year=str(today.year),
+    #query = query.filter(timeStamp__year=str(today.year),
     #                     timeStamp__month=str(today.month),
     #                     timeStamp__day=str(today.day))
     data = {
