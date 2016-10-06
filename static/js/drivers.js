@@ -53,16 +53,14 @@ setTimeout(function () {
 
 function myFunction() {
     var flickerAPI = "http://localhost:8000/carriers/getDriversData/";
-    $.getJSON(flickerAPI, {
-            date_init: $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD"),
-            date_end: $('#date_end').data("DateTimePicker").date().format("YYYY-MM-DD"),
-            hour1: '1',
-            hour2: '2',
-            minute1: '1',
-            minute2: '2',
-            service: document.getElementById("service").value,
-            plate: document.getElementById("plate").value
-        })
+    var data = {
+        date_init: $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD"),
+        date_end: $('#date_end').data("DateTimePicker").date().format("YYYY-MM-DD"),
+        hour1: '1',
+        hour2: '20'
+    };
+
+    $.getJSON(flickerAPI, data)
         .done(function (data) {
             console.log(data);
         });
