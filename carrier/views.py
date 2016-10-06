@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.template import loader
 from AndroidRequests.models import Report, EventForBus, Service
 from django.http import JsonResponse
+import json
 from django.db.models import Q
 
 
@@ -14,9 +15,15 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 
-def drivers(request, colorId):
+def drivers(request):
     template = loader.get_template('drivers.html')
-    return HttpResponse(template.render())
+    carrier = 4 #TODO Select carrier depending on who is logged.
+    services = Service.objects.filter(color_id = carrier)
+    services = json.dumps([service.service for service in services])
+    context = {
+        'services': services,
+    }
+    return HttpResponse(template.render(context,request))
 
 
 def getDriversReportByInterval(request):
@@ -25,7 +32,7 @@ def getDriversReportByInterval(request):
         date_end = request.GET.get('date_end')
         hour1 = int(request.GET.get('hour1'))
         hour2 = int(request.GET.get('hour2'))
-        carrier = request.GET.get('carrier')
+        carrier = request.GET.get('carrier') #TODO Select carrier depending on who is logged.
         plate = request.GET.get('plate')
         serv = request.GET.get('service')
         hour2 = (hour2 + 24) if hour2 < hour1 else hour2
