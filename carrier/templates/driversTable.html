@@ -204,24 +204,27 @@
 <script src="{% static 'components/gentelella/build/js/custom.min.js' %}"></script>
 
 <script>
-    var dataSet = [
-        {name: "hola"}
-    ];
 
     $(document).ready(function () {
-        $('#example').DataTable({
-            data: dataSet,
+        $('#example').dataTable({
+            "pageLength": 100,
+            ajax: 'http://127.0.0.1:8000/carriers/getDriversTable/',
             columns: [
                 {title: "Reporte", data : 'type'},
                 {title: "Hora", data: 'timeStamp'},
                 {title: "Patente", data: 'plate'},
                 {title: "Servicio", data: 'service'},
                 {title: "Lugar", data: 'place'},
-                {title: "Paradero 1", data: 'busStop1' },
+                {title: "Paradero 1", data: 'busStop1'},
                 {title: "Paradero 2", data: 'busStop2'}
             ]
         });
     });
+
+    setInterval( function () {
+    table.ajax.reload();
+}, 30000 );
+
 </script>
 </body>
 </html>

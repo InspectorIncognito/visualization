@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.template import loader
-from AndroidRequests.models import Report, EventForBus, Service
+from AndroidRequests.models import Report, EventForBus, Service, Event
 from django.http import JsonResponse
 from django.db.models import Q
 from datetime import datetime
@@ -26,9 +26,16 @@ def drivers(request):
     return HttpResponse(template.render(context,request))
 
 
-def getDriversReportByInterval(request):
+def getDriversReport(request):
     if request.method == 'GET':
-        carrier = 2  # TODO Select carrier depending on who is logged.
+        events = Event.objects.filter(category = "conductor")
+        events = [event.name for event in events]
+        pos = range(0, len(events))
+        eventToPos = {name: pos for name,pos in zip(events,pos) }
+        def change(dict):
+            dict["type"] = eventToPos[dict["type"]]
+            return dict
+        carrier = 4  # TODO Select carrier depending on who is logged.
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
         hour1 = int(request.GET.get('hour1'))
@@ -47,20 +54,27 @@ def getDriversReportByInterval(request):
         # minuteInterval = reduce(lambda x, y: x | y, [Q(timeCreation__minute=m) for m in minutes])
         query = query.filter(hourInterval)
         # query = query.filter(minuteInterval)
-        return JsonResponse([report.getDictionary() for report in query], safe=False)
+        data = {
+            "reports": [change(report.getDictionary()) for report in query],
+            "types" : events
+        }
+        return JsonResponse(data, safe=False)
 
 def driversTable(request):
     template = loader.get_template('driversTable.html')
+    return HttpResponse(template.render(request = request))
+
+def getDriversTable(request):
     carrier = 4  # TODO Select carrier depending on who is logged.
     query = EventForBus.objects.filter(
         bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
     query = query.filter(event__category="conductor")
     today = datetime.now(pytz.timezone('Chile/Continental'))
-    #query = query.filter(timeStamp__year=str(today.year),
+    # query = query.filter(timeStamp__year=str(today.year),
     #                     timeStamp__month=str(today.month),
     #                     timeStamp__day=str(today.day))
-    data = json.dumps([report.getDictionary() for report in query])
-    context = {
-        'data' : data
+    data = {
+        'data' : [report.getDictionary() for report in query]
     }
-    return HttpResponse(template.render(context, request))
+    return JsonResponse(data, safe=False)
+
