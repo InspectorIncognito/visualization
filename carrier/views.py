@@ -28,11 +28,11 @@ def drivers(request):
 
 def getDriversReportByInterval(request):
     if request.method == 'GET':
+        carrier = 2  # TODO Select carrier depending on who is logged.
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
         hour1 = int(request.GET.get('hour1'))
         hour2 = int(request.GET.get('hour2'))
-        carrier = request.GET.get('carrier') #TODO Select carrier depending on who is logged.
         plate = request.GET.get('plate')
         serv = request.GET.get('service')
         hour2 = (hour2 + 24) if hour2 < hour1 else hour2
@@ -48,3 +48,15 @@ def getDriversReportByInterval(request):
         query = query.filter(hourInterval)
         # query = query.filter(minuteInterval)
         return JsonResponse([report.getDictionary() for report in query], safe=False)
+
+def getAllDriverReports(request):
+    template = loader.get_template('driversTable.html')
+    carrier = 4  # TODO Select carrier depending on who is logged.
+    query = EventForBus.objects.filter(
+        bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
+    query = query.filter(event__category="conductor")
+    data = json.dump([report.getDictionary() for report in query])
+    context = {
+        'data' : data
+    }
+    return HttpResponse(template.render(context, request))
