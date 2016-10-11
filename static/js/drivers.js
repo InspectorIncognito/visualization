@@ -1,76 +1,169 @@
 $(function () {
-    $('input').iCheck();
     $('#date_init').datetimepicker({
+        defaultDate: moment().subtract(3, 'months'),
         format: 'LL'
     });
     $('#date_end').datetimepicker({
+        defaultDate: moment(),
         format: 'LL'
     });
     $('#hour1').datetimepicker({
+        defaultDate: moment().set({'hour': 0, 'minute': 0}),
         format: 'LT'
     });
     $('#hour2').datetimepicker({
+        defaultDate: moment().set({'hour': 23, 'minute': 59}),
         format: 'LT'
     });
-    $('input').iCheck({
-        checkboxClass: 'icheckbox_flat-blue',
-        radioClass: 'iradio_flat-blue'
+    $("#group :input").change(function () {
+        updatechart();
     });
 });
 
-var test = 0;
-
-var chart = c3.generate({
-    data: {
-        x: 'x',
+var resp = 0;
+var types = 0;
+var chartdata = {
+    'weekday': 0,
+    'plate': 0,
+    'service': 0,
+    'daily': 0,
+    'monthly': 0
+};
+var chart;
+function reloadchart() {
+    chartdata = {
+        'weekday': 0,
+        'plate': 0,
+        'service': 0,
+        'daily': 0,
+        'monthly': 0
+    };
+}
+function updatecharhgrethert() {
+    chart = c3.generate({
+        data: {
+            x: 'x',
 //        xFormat: '%Y%m%d', // 'xFormat' can be used as custom format of 'x'
-        columns: [
-            ['x', '2013-01-01', '2013-01-02', '2013-01-03', '2013-01-04', '2013-01-05', '2013-01-06'],
+            columns: [
+                ['x', '2013-01-01', '2013-01-02', '2013-01-03', '2013-01-04', '2013-01-05', '2013-01-06'],
 //            ['x', '20130101', '20130102', '20130103', '20130104', '20130105', '20130106'],
-            ['data1', 30, 200, 100, 400, 150, 250],
-            ['data2', 130, 340, 200, 500, 250, 350]
-        ],
-        type: 'bar',
-        groups: [
-            ['data1', 'data2']
-        ]
-    },
-    axis: {
-        x: {
-            type: 'timeseries',
-            tick: {
-                format: '%Y-%m-%d'
+                ['data1', 100, 200, 100, 400, 150, 250],
+                ['data2', 130, 340, 200, 100, 250, 350]
+            ],
+            type: 'bar',
+            groups: [
+                ['data1', 'data2']
+            ]
+        },
+        axis: {
+            x: {
+                type: 'timeseries',
+                tick: {
+                    format: '%Y-%m-%d'
+                }
             }
         }
-    }
-});
-
-setTimeout(function () {
-    chart.unload({
-        ids: ['data2']
     });
-}, 1000);
+}
+function updatechart() {
+    if (true) {
+        switch ($('input:checked', '#group').val()) {
+            case "weekday":
+                if (chartdata['weekday'] == 0) {
+                    chartdata['weekday'] = [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]];
+                    console.log(chartdata['weekday']);
+                    for (i = 0; i < resp.length; i++) {
+                        var type = resp[i]['type'];
+                        console.log(type);
+                        var day = (moment(resp[i]['timeCreation'], "DD-MM-YYYY HH:mm:SS").day() + 6) % 7;
+                        chartdata['weekday'][type][day]++;
+                    }
+                }
+                chart = c3.generate({
+                    data: {
+                        columns: [
+                            [types[0]].concat(chartdata['weekday'][0]),
+                            [types[1]].concat(chartdata['weekday'][1]),
+                            [types[2]].concat(chartdata['weekday'][2]),
+                            [types[3]].concat(chartdata['weekday'][3])
+                        ],
+                        type: 'bar',
 
+                    },
+                    axis: {
+                        x: {
+                            type: 'category',
+                            categories: ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo']
+                        },
+                        y: {
+                            tick: {
+                                outer: false
+                            }
+                        }
+                    }
+                });
+                break;
+
+            case "plate":
+                if (chartdata['plate'] == 0) {
+                    chartdata['plate'] = [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]];
+                    console.log(chartdata['weekday']);
+                    for (i = 0; i < resp.length; i++) {
+                        var type = resp[i]['type'];
+                        console.log(type);
+                        var day = (moment(resp[i]['timeCreation'], "DD-MM-YYYY HH:mm:SS").day() + 6) % 7;
+                        chartdata['weekday'][type][day]++;
+                    }
+                }
+                chart = c3.generate({
+                    data: {
+                        columns: [
+                            [types[0]].concat(chartdata['weekday'][0]),
+                            [types[1]].concat(chartdata['weekday'][1]),
+                            [types[2]].concat(chartdata['weekday'][2]),
+                            [types[3]].concat(chartdata['weekday'][3])
+                        ],
+                        type: 'bar',
+
+                    },
+                    axis: {
+                        x: {
+                            type: 'category',
+                            categories: ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo']
+                        },
+                        y: {
+                            tick: {
+                                outer: false
+                            }
+                        }
+                    }
+                });
+                break;
+        }
+    }
+}
 function myFunction() {
-    var flickerAPI = "http://localhost:8000/carriers/getDriversData/";
+    var Dataurl = "http://localhost:8000/carriers/getDriversData/";
     var data = {
+        carrier: '3',
         date_init: $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD"),
         date_end: $('#date_end').data("DateTimePicker").date().format("YYYY-MM-DD"),
-        hour1: '1',
-        hour2: '20'
+        hour1: $('#hour1').data("DateTimePicker").date().format("HH"),
+        hour2: $('#hour2').data("DateTimePicker").date().format("HH"),
+        minute1: $('#hour1').data("DateTimePicker").date().format("mm"),
+        minute2: $('#hour2').data("DateTimePicker").date().format("mm")
     };
+    var service = document.getElementById("service").value;
+    var plate = document.getElementById("plate").value;
+    if (service != '') data['service'] = service;
+    if (plate != '') data['plate'] = plate;
 
-    $.getJSON(flickerAPI, data)
+    $.getJSON(Dataurl, data)
         .done(function (data) {
+            reloadchart();
             console.log(data);
+            resp = data.reports;
+            types = data.types;
+            updatechart();
         });
-
-
-    console.log($('#date_init').data("DateTimePicker").date().toDate());
-
-    console.log(document.getElementById("date_end").value);
-    console.log(document.getElementById("hour1").value);
-    console.log(document.getElementById("hour2").value);
-    console.log(document.getElementById("service").value);
-    console.log(document.getElementById("plate").value);
 }

@@ -241,23 +241,17 @@
                                                             <label for="service">Recorrido</label>
                                                             <select class="form-control"
                                                                     id='service'>
-                                                                <option>506</option>
-                                                                <option>507</option>
-                                                                <option>509</option>
-                                                                <option>510</option>
+                                                                <option value="">Todos
+                                                                {% for service in services %}
+                                                                <option>{{service.service}}</option>
+                                                                {% endfor %}
                                                             </select>
                                                         </div>
                                                     </div>
                                                     <div class='col-sm-2'>
                                                         <div class="form-group">
                                                             <label for="plate">Patente</label>
-                                                            <select class="form-control"
-                                                                    id='plate'>
-                                                                <option>506</option>
-                                                                <option>507</option>
-                                                                <option>509</option>
-                                                                <option>510</option>
-                                                            </select>
+                                                            <input type="text" class="form-control" id="plate" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -269,34 +263,24 @@
                             <div class="dashboard-widget-content">
                                 <div class="container">
                                     Agrupar por:
-                                    <div class="form-inline">
-                                        <div class="radio">
-                                            <label>
-                                                <input type="radio" name="optionsRadios" id="optionsRadios1"
-                                                       value="option1"
-                                                       checked>
-                                                Dia de la semana
+                                    <div id="group" class="btn-toolbar" role="toolbar" data-toggle="buttons">
+                                        <div class="btn-group">
+                                            <label class="btn btn-default active">
+                                                <input type="radio" name="groups" value="weekday" checked> Dia semana
+                                            </label>
+                                            <label class="btn btn-default ">
+                                                <input type="radio" name="groups" value="plate"> Patente
+                                            </label>
+                                            <label class="btn btn-default ">
+                                                <input type="radio" name="groups" value="service"> Recorrido
                                             </label>
                                         </div>
-                                        <div class="radio">
-                                            <label>
-                                                <input type="radio" name="optionsRadios" id="optionsRadios2"
-                                                       value="option2">
-                                                Hora
+                                        <div class="btn-group">
+                                            <label class="btn btn-default ">
+                                                <input type="radio" name="groups" value="daily"> Dia
                                             </label>
-                                        </div>
-                                        <div class="radio">
-                                            <label>
-                                                <input type="radio" name="optionsRadios" id="optionsRadios3"
-                                                       value="option3">
-                                                Patente
-                                            </label>
-                                        </div>
-                                        <div class="radio">
-                                            <label>
-                                                <input type="radio" name="optionsRadios" id="optionsRadios4"
-                                                       value="option4">
-                                                Servicio
+                                            <label class="btn btn-default ">
+                                                <input type="radio" name="groups" value="monthly"> Mes
                                             </label>
                                         </div>
                                     </div>
