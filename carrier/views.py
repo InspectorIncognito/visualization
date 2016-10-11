@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*
+
 from django.http import HttpResponse
 from django.template import loader
 from AndroidRequests.models import Report, EventForBus, Service, Event
@@ -78,3 +80,36 @@ def getDriversTable(request):
     }
     return JsonResponse(data, safe=False)
 
+def getPhysicalReport(request):
+    if request.method == 'GET':
+        events = Event.objects.filter(category = "estado físico")
+        events = [event.name for event in events]
+        pos = range(0, len(events))
+        eventToPos = {name: pos for name,pos in zip(events,pos) }
+        def change(dict):
+            dict["type"] = eventToPos[dict["type"]]
+            return dict
+        carrier = 7  # TODO Select carrier depending on who is logged.
+        date_init = request.GET.get('date_init')
+        date_end = request.GET.get('date_end')
+        hour1 = int(request.GET.get('hour1'))
+        hour2 = int(request.GET.get('hour2'))
+        plate = request.GET.get('plate')
+        serv = request.GET.get('service')
+        hour2 = (hour2 + 24) if hour2 < hour1 else hour2
+        hours = [hour % 24 for hour in range(hour1, hour2 + 1)]
+        query = EventForBus.objects.filter(
+            bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
+        query = query.filter(event__category="estado físico")
+        query = query.filter(timeCreation__range=[date_init, date_end])
+        query = (query.filter(bus__registrationPlate=plate) if plate else query)
+        query = (query.filter(bus__service=serv) if serv else query)
+        hourInterval = reduce(lambda x, y: x | y, [Q(timeCreation__hour=h) for h in hours])
+        # minuteInterval = reduce(lambda x, y: x | y, [Q(timeCreation__minute=m) for m in minutes])
+        query = query.filter(hourInterval)
+        # query = query.filter(minuteInterval)
+        data = {
+            "reports": [change(report.getDictionary()) for report in query],
+            "types" : events
+        }
+        return JsonResponse(data, safe=False)

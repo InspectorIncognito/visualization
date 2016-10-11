@@ -28,8 +28,10 @@
     <script src="{% static 'components/gentelella/vendors/jquery/dist/jquery.min.js' %}"></script>
 
     <!-- DataTables -->
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.2.2/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="https://cdn.datatables.net/responsive/2.1.0/css/responsive.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/buttons/1.2.2/css/buttons.dataTables.min.css">
 
 
 </head>
@@ -55,25 +57,14 @@
                             <li><a><i class="fa fa-desktop"></i> Monitoreo de eventos <span
                                     class="fa fa-chevron-down"></span></a>
                                 <ul class="nav child_menu">
-                                    <li><a href="general_elements.html">General Elements</a></li>
-                                    <li><a href="media_gallery.html">Media Gallery</a></li>
-                                    <li><a href="typography.html">Typography</a></li>
-                                    <li><a href="icons.html">Icons</a></li>
-                                    <li><a href="glyphicons.html">Glyphicons</a></li>
-                                    <li><a href="widgets.html">Widgets</a></li>
-                                    <li><a href="invoice.html">Invoice</a></li>
-                                    <li><a href="inbox.html">Inbox</a></li>
-                                    <li><a href="calendar.html">Calendar</a></li>
+                                    <li><a href={% url 'index' %}>Reportes Libres</a></li>
+                                    <li><a href={% url 'driversTable' %}>Reportes de Conductor</a></li>
                                 </ul>
                             </li>
                             <li><a><i class="fa fa-bar-chart-o"></i> Visualizaciones <span
                                     class="fa fa-chevron-down"></span></a>
                                 <ul class="nav child_menu">
-                                    <li><a href="chartjs.html">Chart JS</a></li>
-                                    <li><a href="chartjs2.html">Chart JS2</a></li>
-                                    <li><a href="morisjs.html">Moris JS</a></li>
-                                    <li><a href="echarts.html">ECharts</a></li>
-                                    <li><a href="other_charts.html">Other Charts</a></li>
+                                    <li><a href="{% url 'drivers' %}">Visualización de Conductores</a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -180,7 +171,7 @@
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     <div class="x_panel">
                         <div class="x_title">
-                            <h2>Tabla de Reclamos relacionados al conductor</h2>
+                            <h2>Reclamos diarios</h2>
                             <ul class="nav navbar-right panel_toolbox">
                                 <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                 </li>
@@ -188,7 +179,8 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
-                            <table id="example" class="display" cellspacing="0" width="100%"></table>
+                            <table id="example" class="table table-striped table-bordered dt-responsive nowrap"
+                                   cellspacing="0" width="100%">
                         </div>
                     </div>
                 </div>
@@ -202,6 +194,8 @@
 <script src="{% static 'components/gentelella/vendors/bootstrap/dist/js/bootstrap.min.js' %}"></script>
 <!-- Custom Theme Scripts -->
 <script src="{% static 'components/gentelella/build/js/custom.min.js' %}"></script>
+
+<!-- Datatables -->
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.js"></script>
 <script type="text/javascript" charser="utf8"
         src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
@@ -215,7 +209,14 @@
         src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"></script>
 <script type="text/javascript" charser="utf8" src="//cdn.datatables.net/buttons/1.2.2/js/buttons.html5.min.js"></script>
 <script type="text/javascript" charser="utf8" src="//cdn.datatables.net/buttons/1.2.2/js/buttons.print.min.js"></script>
+<script type="text/javascript" charser="utf8"
+        src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" charser="utf8"
+        src="//cdn.datatables.net/responsive/2.1.0/js/dataTables.responsive.js"></script>
+<script type="text/javascript" charser="utf8"
+        src="https://cdn.datatables.net/responsive/2.1.0/js/responsive.bootstrap.min.js"></script>
 <script>
+
 
     $(document).ready(function () {
         $('#example').dataTable({
@@ -224,10 +225,11 @@
             buttons: [
                 'copy', 'csv', 'excel', 'pdf', 'print'
             ],
+            responsive: true,
             ajax: 'http://127.0.0.1:8000/carriers/getDriversTable/',
             columns: [
                 {title: "Reporte", data: 'type'},
-                {title: "Hora", data: 'timeStamp'},
+                {title: "Fecha", data: 'timeStamp'},
                 {title: "Patente", data: 'plate'},
                 {title: "Servicio", data: 'service'},
                 {title: "Lugar", data: 'place'},
