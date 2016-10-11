@@ -106,22 +106,30 @@ function updatechart() {
 
             case "plate":
                 if (chartdata['plate'] == 0) {
-                    chartdata['plate'] = [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]];
-                    console.log(chartdata['weekday']);
+                    var plates = [];
+                    platetype = [[], [], [], []];
                     for (i = 0; i < resp.length; i++) {
                         var type = resp[i]['type'];
-                        console.log(type);
-                        var day = (moment(resp[i]['timeCreation'], "DD-MM-YYYY HH:mm:SS").day() + 6) % 7;
-                        chartdata['weekday'][type][day]++;
+                        var plate = resp[i]['plate'];
+                        console.log(plate)
+                        if (plates.indexOf(plate) == -1) {
+                            plates.push(plate)
+                            platetype[0].push(0);
+                            platetype[1].push(0);
+                            platetype[2].push(0);
+                            platetype[3].push(0);
+                        }
+                        var p = plates.indexOf(plate);
+                        platetype[type][p]++;
                     }
                 }
                 chart = c3.generate({
                     data: {
                         columns: [
-                            [types[0]].concat(chartdata['weekday'][0]),
-                            [types[1]].concat(chartdata['weekday'][1]),
-                            [types[2]].concat(chartdata['weekday'][2]),
-                            [types[3]].concat(chartdata['weekday'][3])
+                            [types[0]].concat(platetype[0]),
+                            [types[1]].concat(platetype[1]),
+                            [types[2]].concat(platetype[2]),
+                            [types[3]].concat(platetype[3])
                         ],
                         type: 'bar',
 
@@ -129,7 +137,11 @@ function updatechart() {
                     axis: {
                         x: {
                             type: 'category',
-                            categories: ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo']
+                            tick: {
+                                rotate: 90,
+                                multiline: false
+                            },
+                            categories: plates
                         },
                         y: {
                             tick: {
@@ -143,7 +155,7 @@ function updatechart() {
     }
 }
 function myFunction() {
-    var Dataurl = "http://127.0.0.1:8000/carriers/getDriversData/";
+    var Dataurl = "http://localhost:8000/carriers/getDriversData/";
     var data = {
         carrier: '3',
         date_init: $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD"),
