@@ -151,6 +151,54 @@ function updatechart() {
                     }
                 });
                 break;
+
+            case "service":
+                if (chartdata['service'] == 0) {
+                    var services = [];
+                    servicetype = [[], [], [], []];
+                    for (i = 0; i < resp.length; i++) {
+                        var type = resp[i]['type'];
+                        var service = resp[i]['service'];
+                        console.log(service)
+                        if (services.indexOf(service) == -1) {
+                            services.push(service)
+                            servicetype[0].push(0);
+                            servicetype[1].push(0);
+                            servicetype[2].push(0);
+                            servicetype[3].push(0);
+                        }
+                        var p = services.indexOf(service);
+                        servicetype[type][p]++;
+                    }
+                }
+                chart = c3.generate({
+                    data: {
+                        columns: [
+                            [types[0]].concat(servicetype[0]),
+                            [types[1]].concat(servicetype[1]),
+                            [types[2]].concat(servicetype[2]),
+                            [types[3]].concat(servicetype[3])
+                        ],
+                        type: 'bar',
+
+                    },
+                    axis: {
+                        x: {
+                            type: 'category',
+                            tick: {
+                                rotate: 90,
+                                multiline: false
+                            },
+                            categories: services
+                        },
+                        y: {
+                            tick: {
+                                outer: false
+                            }
+                        }
+                    }
+                });
+                break;
         }
     }
 }
