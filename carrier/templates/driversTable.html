@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Página administración Vule </title>
+    <title>Página administración METBUS </title>
 
     <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.css"/>
@@ -29,8 +29,8 @@
 
     <!-- DataTables -->
     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.2.2/css/buttons.dataTables.min.css">
 
-    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.js"></script>
 
 </head>
 
@@ -113,7 +113,7 @@
                         <li class="">
                             <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
                                aria-expanded="false">
-                                <img src="{% static 'images/img.jpg' %}" alt="">Buses Vule S.A
+                                <img src="{% static 'images/img.jpg' %}" alt="">METBUS S.A
                                 <span class=" fa fa-angle-down"></span>
                             </a>
                             <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -180,7 +180,7 @@
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     <div class="x_panel">
                         <div class="x_title">
-                            <h2>Reclamos de conductor diarios</h2>
+                            <h2>Tabla de Reclamos relacionados al conductor</h2>
                             <ul class="nav navbar-right panel_toolbox">
                                 <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                 </li>
@@ -202,28 +202,45 @@
 <script src="{% static 'components/gentelella/vendors/bootstrap/dist/js/bootstrap.min.js' %}"></script>
 <!-- Custom Theme Scripts -->
 <script src="{% static 'components/gentelella/build/js/custom.min.js' %}"></script>
-
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.js"></script>
+<script type="text/javascript" charser="utf8"
+        src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" charser="utf8"
+        src="https://cdn.datatables.net/buttons/1.2.2/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" charser="utf8" src="//cdn.datatables.net/buttons/1.2.2/js/buttons.flash.min.js"></script>
+<script type="text/javascript" charser="utf8" src="//cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+<script type="text/javascript" charser="utf8"
+        src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js"></script>
+<script type="text/javascript" charser="utf8"
+        src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"></script>
+<script type="text/javascript" charser="utf8" src="//cdn.datatables.net/buttons/1.2.2/js/buttons.html5.min.js"></script>
+<script type="text/javascript" charser="utf8" src="//cdn.datatables.net/buttons/1.2.2/js/buttons.print.min.js"></script>
 <script>
 
     $(document).ready(function () {
         $('#example').dataTable({
             "pageLength": 100,
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ],
             ajax: 'http://127.0.0.1:8000/carriers/getDriversTable/',
             columns: [
-                {title: "Reporte", data : 'type'},
+                {title: "Reporte", data: 'type'},
                 {title: "Hora", data: 'timeStamp'},
                 {title: "Patente", data: 'plate'},
                 {title: "Servicio", data: 'service'},
                 {title: "Lugar", data: 'place'},
                 {title: "Paradero 1", data: 'busStop1'},
                 {title: "Paradero 2", data: 'busStop2'}
-            ]
+            ],
         });
     });
 
-    setInterval( function () {
-    table.ajax.reload();
-}, 30000 );
+    setInterval(function () {
+        table.ajax.reload();
+    }, 30000);
+
 
 </script>
 </body>
