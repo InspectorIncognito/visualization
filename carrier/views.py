@@ -11,11 +11,7 @@ import json, pytz
 
 def index(request):
     template = loader.get_template('reports.html')
-    reports = Report.objects.order_by('-timeStamp')
-    context = {
-        'reports': reports,
-    }
-    return HttpResponse(template.render(context, request))
+    return HttpResponse(template.render(request = request))
 
 
 def drivers(request):
@@ -27,6 +23,10 @@ def drivers(request):
     }
     return HttpResponse(template.render(context,request))
 
+def getFreeReport(request): #TODO Change model to support filtering by carrier
+    reports = Report.objects.order_by('-timeStamp')
+    response = [report.getDictionary() for report in reports]
+    return JsonResponse(response, safe=False)
 
 def getDriversReport(request):
     if request.method == 'GET':

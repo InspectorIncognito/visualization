@@ -52,14 +52,6 @@ class Event(models.Model):
     eventType = models.CharField('Event Type', max_length=7, choices=REPORT_TYPE)
     """ Represents the element to which the event refers """
 
-    def getDictionary(self):
-        """ Return a dictionary with the event information """
-        dictionary = {}
-        dictionary['name'] = self.name
-        dictionary['description'] = self.description
-        dictionary['eventcode'] = self.id
-        return dictionary
-
     def __str__(self):
         return "category %s and description %s" % (self.category, self.description)
 
@@ -150,10 +142,11 @@ class EventForBus(EventRegistration):
         dictionary['service'] = self.bus.service
         dictionary['plate'] = self.bus.registrationPlate
         dictionary['type'] = self.event.name
-        dictionary['busStop1'] = "" #TODO Model needs to be changed to save it
+        dictionary['busStop1'] = ""  # TODO Model needs to be changed to save it
         dictionary['busStop2'] = ""
         dictionary['place'] = ""
         return dictionary
+
 
 ##
 #
@@ -432,6 +425,16 @@ class Report(models.Model):
     """ Aditinal information regarding the report. For example the user location."""
     userId = models.UUIDField()
     """ To identify the AndroidRequests owner """
+
+    def getDictionary(self):
+        """ Return a dictionary with the event information """
+        dictionary = {}
+        dictionary['message'] = self.message
+        dictionary['imageName'] = self.imageName
+        dictionary['reportInfo'] = self.reportInfo
+        stamp = timezone.localtime(self.timeStamp)
+        dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
+        return dictionary
 
 
 ##

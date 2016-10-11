@@ -9,4 +9,5 @@ urlpatterns = [
     url(r'^driversTable/$', views.driversTable, name='driversTable'),
     url(r'^getDriversData/$', views.getDriversReport, name='getDriversReport'),
     url(r'^getDriversTable/$', views.getDriversTable, name='getDriversTable'),
+    url(r'^getFreeReport/$', views.getFreeReport, name='getFreeReport'),
 ]
