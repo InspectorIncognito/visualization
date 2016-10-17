@@ -20,6 +20,9 @@
     <!-- Custom Theme Style -->
     <link href="{% static 'components/gentelella/build/css/custom.min.css' %}" rel="stylesheet">
 
+    <!-- Select2 -->
+    <link href="{% static 'components/gentelella/vendors/select2/dist/css/select2.min.css' %}" rel="stylesheet">
+
     <!-- jQuery Script -->
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 
@@ -225,13 +228,12 @@
                                                                    id="hour2"/>
                                                         </div>
                                                     </div>
-                                                    <div class='col-sm-2'>
+                                                    <div class='col-sm-4'>
                                                         <div class="form-group">
                                                             <label for="service">Recorrido</label>
-                                                            <select class="form-control"
-                                                                    id='service'>
-                                                                <option value="">Todos
-                                                                {% for service in services %}
+                                                            <select class="select2_multiple form-control"
+                                                                    id='service' multiple="multiple">
+                                                                    {% for service in services %}
                                                                 <option>{{service.service}}</option>
                                                                 {% endfor %}
                                                             </select>
@@ -240,7 +242,7 @@
                                                     <div class='col-sm-2'>
                                                         <div class="form-group">
                                                             <label for="plate">Patente</label>
-                                                            <input type="text" class="form-control" id="plate" />
+                                                            <input type="text" class="form-control" id="plate"/>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -304,6 +306,9 @@
 
 <!-- iCheck -->
 <script src="{% static 'components/gentelella/vendors/iCheck/icheck.min.js' %}"></script>
+
+<!-- Select2 -->
+<script src="{% static 'components/gentelella/vendors/select2/dist/js/select2.full.min.js' %}"></script>
 
 <script src="{% static 'js/drivers.js' %}"></script>
 </body>

@@ -19,7 +19,11 @@ $(function () {
         updatechart();
     });
 });
-
+$(document).ready(function() {
+        $(".select2_single").select2({});
+        $(".select2_group").select2({});
+        $(".select2_multiple").select2({});
+      });
 var resp = null;
 var types = 0;
 var chartdata = {
@@ -82,33 +86,36 @@ function updatechart() {
 
             case "plate":
                 if (chartdata['plate'] == null) {
-                    var plates = [];
-                    var platetype = [[], [], [], []];
+                    chartdata['plate'] = {
+                        'plates': [],
+                        'platetype': []
+                    }
+                    chartdata['plate']['plates'] = [];
+                    chartdata['plate']['platetype'] = [];
+                    for (i = 0; i < types.length; i++) {
+                        chartdata['plate']['platetype'].push([]);
+                    }
                     for (i = 0; i < resp.length; i++) {
                         var type = resp[i]['type'];
                         var plate = resp[i]['plate'];
-                        console.log(plate)
-                        if (plates.indexOf(plate) == -1) {
-                            plates.push(plate)
-                            platetype[0].push(0);
-                            platetype[1].push(0);
-                            platetype[2].push(0);
-                            platetype[3].push(0);
+                        if (chartdata['plate']['plates'].indexOf(plate) == -1) {
+                            chartdata['plate']['plates'].push(plate)
+                            for (var j = 0; j < types.length; j++) {
+                                chartdata['plate']['platetype'][j].push(0);
+                            }
                         }
-                        var p = plates.indexOf(plate);
-                        platetype[type][p]++;
+                        var p = chartdata['plate']['plates'].indexOf(plate);
+                        chartdata['plate']['platetype'][type][p]++;
                     }
+                }
+                var cols = [];
+                for (i = 0; i < types.length; i++) {
+                    cols.push([types[i]].concat(chartdata['plate']['platetype'][i]));
                 }
                 chart = c3.generate({
                     data: {
-                        columns: [
-                            [types[0]].concat(platetype[0]),
-                            [types[1]].concat(platetype[1]),
-                            [types[2]].concat(platetype[2]),
-                            [types[3]].concat(platetype[3])
-                        ],
+                        columns: cols,
                         type: 'bar',
-
                     },
                     axis: {
                         x: {
@@ -117,7 +124,7 @@ function updatechart() {
                                 rotate: 90,
                                 multiline: false
                             },
-                            categories: plates
+                            categories: chartdata['plate']['plates']
                         },
                         y: {
                             tick: {
@@ -129,34 +136,34 @@ function updatechart() {
                 break;
 
             case "service":
-                if (chartdata['service'] == 0) {
+                if (chartdata['service'] == null) {
                     var services = [];
-                    servicetype = [[], [], [], []];
+                    var servicetype = [];
+                    for (i = 0; i < types.length; i++) {
+                        servicetype.push([]);
+                    }
                     for (i = 0; i < resp.length; i++) {
                         var type = resp[i]['type'];
                         var service = resp[i]['service'];
                         console.log(service)
                         if (services.indexOf(service) == -1) {
                             services.push(service)
-                            servicetype[0].push(0);
-                            servicetype[1].push(0);
-                            servicetype[2].push(0);
-                            servicetype[3].push(0);
+                            for (var j = 0; j < types.length; j++) {
+                                servicetype[j].push(0);
+                            }
                         }
                         var p = services.indexOf(service);
                         servicetype[type][p]++;
                     }
                 }
+                var cols = [];
+                for (i = 0; i < types.length; i++) {
+                    cols.push([types[i]].concat(servicetype[i]));
+                }
                 chart = c3.generate({
                     data: {
-                        columns: [
-                            [types[0]].concat(servicetype[0]),
-                            [types[1]].concat(servicetype[1]),
-                            [types[2]].concat(servicetype[2]),
-                            [types[3]].concat(servicetype[3])
-                        ],
-                        type: 'bar',
-
+                        columns: cols,
+                        type: 'bar'
                     },
                     axis: {
                         x: {
@@ -189,9 +196,10 @@ function myFunction() {
         minute1: $('#hour1').data("DateTimePicker").date().format("mm"),
         minute2: $('#hour2').data("DateTimePicker").date().format("mm")
     };
-    var service = document.getElementById("service").value;
+    var service = $(".select2_multiple").val();
+    console.log(service)
     var plate = document.getElementById("plate").value;
-    if (service != '') data['service'] = JSON.stringify([service]);
+    if (service != null) data['service'] = JSON.stringify(service);
     if (plate != '') data['plate'] = plate;
 
     $.getJSON(Dataurl, data)
