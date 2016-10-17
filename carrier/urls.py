@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^getPhysicalData/$', views.getPhysicalReport, name='gePhysicalReport'),
     url(r'^getDriversTable/$', views.getDriversTable, name='getDriversTable'),
     url(r'^getFreeReport/$', views.getFreeReport, name='getFreeReport'),
+    url(r'^getPhysicalHeader/$', views.getPhysicalHeaders, name='getPhysicalHeaders'),
 ]

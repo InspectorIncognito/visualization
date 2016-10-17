@@ -5,7 +5,7 @@ from django.template import loader
 from AndroidRequests.models import Report, EventForBus, Service, Event
 from django.http import JsonResponse
 from django.db.models import Q
-from datetime import datetime
+from datetime import datetime, date
 import json, pytz
 
 
@@ -28,9 +28,28 @@ def physical(request):
     carrier = 7 #TODO Select carrier depending on who is logged.
     services = Service.objects.filter(color_id = carrier)
     context = {
-        'services': services,
+        'services': services
     }
     return HttpResponse(template.render(context,request))
+
+def getPhysicalHeaders(request):
+    carrier = 7  # TODO Select carrier depending on who is logged.
+    events = Event.objects.filter(category="estado físico")
+    events = [event.name for event in events]
+    headerInfo = EventForBus.objects.filter(event__category='estado físico')
+    headerInfo = headerInfo.filter(
+        bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
+    today = date.today()
+    year = today.year
+    if today.month == 1:
+        last_month = 12
+        year = year - 1
+    else:
+        last_month = today.month - 1
+    headerInfo = headerInfo.filter(timeStamp__gte=date(year, last_month, today.day)).exclude(bus__registrationPlate = "dummyLPt")
+    for ev in events:
+        headerInfo.filter(event__name = ev)
+    return JsonResponse(2)
 
 def getFreeReport(request): #TODO Change model to support filtering by carrier
     reports = Report.objects.order_by('-timeStamp')
@@ -61,11 +80,11 @@ def getDriversReport(request):
         query = query.filter(timeCreation__range=[date_init, date_end])
         if plates:
             platesFilter = reduce(lambda x, y: x | y, [Q(bus__registrationPlate=plate) for plate in plates])
+            query = query.filter(platesFilter)
         query = (query.filter(bus__service=serv) if serv else query)
         hourFilter = reduce(lambda x, y: x | y, [Q(timeCreation__hour=h) for h in hours])
         # minuteFilter = reduce(lambda x, y: x | y, [Q(timeCreation__minute=m) for m in minutes])
         query = query.filter(hourFilter)
-        query = query.filter (platesFilter)
         # query = query.filter(minuteInterval)
         data = {
             "reports": [change(report.getDictionary()) for report in query],
