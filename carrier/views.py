@@ -70,7 +70,7 @@ def getDriversReport(request):
         date_end = request.GET.get('date_end')
         hour1 = int(request.GET.get('hour1'))
         hour2 = int(request.GET.get('hour2'))
-        plates = request.GET.get('plate')
+        plate = request.GET.get('plate')
         serv = request.GET.get('service')
         hour2 = (hour2 + 24) if hour2 < hour1 else hour2
         hours = [hour % 24 for hour in range(hour1, hour2 + 1)]
@@ -78,9 +78,10 @@ def getDriversReport(request):
             bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
         query = query.filter(event__category="conductor")
         query = query.filter(timeCreation__range=[date_init, date_end])
-        if plates:
-            platesFilter = reduce(lambda x, y: x | y, [Q(bus__registrationPlate=plate) for plate in plates])
-            query = query.filter(platesFilter)
+        query = (query.filter(bus_registrationPlate = plate) if plate else query)
+        if serv:
+            serviceFilter = reduce(lambda x, y: x | y, [Q(bus__service=ser) for ser in serv])
+            query = query.filter(serviceFilter)
         query = (query.filter(bus__service=serv) if serv else query)
         hourFilter = reduce(lambda x, y: x | y, [Q(timeCreation__hour=h) for h in hours])
         # minuteFilter = reduce(lambda x, y: x | y, [Q(timeCreation__minute=m) for m in minutes])
