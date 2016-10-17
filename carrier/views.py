@@ -78,7 +78,7 @@ def getDriversReport(request):
             bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
         query = query.filter(event__category="conductor")
         query = query.filter(timeCreation__range=[date_init, date_end])
-        query = (query.filter(bus_registrationPlate = plate) if plate else query)
+        query = (query.filter(bus__registrationPlate = plate) if plate else query)
         if serv:
             serviceFilter = reduce(lambda x, y: x | y, [Q(bus__service=ser) for ser in serv])
             query = query.filter(serviceFilter)
