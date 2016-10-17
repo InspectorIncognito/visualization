@@ -23,6 +23,15 @@ def drivers(request):
     }
     return HttpResponse(template.render(context,request))
 
+def physical(request):
+    template = loader.get_template('physical.html')
+    carrier = 7 #TODO Select carrier depending on who is logged.
+    services = Service.objects.filter(color_id = carrier)
+    context = {
+        'services': services,
+    }
+    return HttpResponse(template.render(context,request))
+
 def getFreeReport(request): #TODO Change model to support filtering by carrier
     reports = Report.objects.order_by('-timeStamp')
     response = [report.getDictionary() for report in reports]
@@ -42,7 +51,7 @@ def getDriversReport(request):
         date_end = request.GET.get('date_end')
         hour1 = int(request.GET.get('hour1'))
         hour2 = int(request.GET.get('hour2'))
-        plate = request.GET.get('plate')
+        plates = request.GET.get('plate')
         serv = request.GET.get('service')
         hour2 = (hour2 + 24) if hour2 < hour1 else hour2
         hours = [hour % 24 for hour in range(hour1, hour2 + 1)]
@@ -50,11 +59,13 @@ def getDriversReport(request):
             bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
         query = query.filter(event__category="conductor")
         query = query.filter(timeCreation__range=[date_init, date_end])
-        query = (query.filter(bus__registrationPlate=plate) if plate else query)
+        if plates:
+            platesFilter = reduce(lambda x, y: x | y, [Q(bus__registrationPlate=plate) for plate in plates])
         query = (query.filter(bus__service=serv) if serv else query)
-        hourInterval = reduce(lambda x, y: x | y, [Q(timeCreation__hour=h) for h in hours])
-        # minuteInterval = reduce(lambda x, y: x | y, [Q(timeCreation__minute=m) for m in minutes])
-        query = query.filter(hourInterval)
+        hourFilter = reduce(lambda x, y: x | y, [Q(timeCreation__hour=h) for h in hours])
+        # minuteFilter = reduce(lambda x, y: x | y, [Q(timeCreation__minute=m) for m in minutes])
+        query = query.filter(hourFilter)
+        query = query.filter (platesFilter)
         # query = query.filter(minuteInterval)
         data = {
             "reports": [change(report.getDictionary()) for report in query],
@@ -94,7 +105,7 @@ def getPhysicalReport(request):
         date_end = request.GET.get('date_end')
         hour1 = int(request.GET.get('hour1'))
         hour2 = int(request.GET.get('hour2'))
-        plate = request.GET.get('plate')
+        plates = request.GET.get('plate')
         serv = request.GET.get('service')
         hour2 = (hour2 + 24) if hour2 < hour1 else hour2
         hours = [hour % 24 for hour in range(hour1, hour2 + 1)]
@@ -102,14 +113,16 @@ def getPhysicalReport(request):
             bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
         query = query.filter(event__category="estado físico")
         query = query.filter(timeCreation__range=[date_init, date_end])
-        query = (query.filter(bus__registrationPlate=plate) if plate else query)
+        if plates:
+            platesFilter = reduce(lambda x, y: x | y, [Q(bus__registrationPlate=plate) for plate in plates])
         query = (query.filter(bus__service=serv) if serv else query)
-        hourInterval = reduce(lambda x, y: x | y, [Q(timeCreation__hour=h) for h in hours])
-        # minuteInterval = reduce(lambda x, y: x | y, [Q(timeCreation__minute=m) for m in minutes])
-        query = query.filter(hourInterval)
+        hourFilter = reduce(lambda x, y: x | y, [Q(timeCreation__hour=h) for h in hours])
+        # minuteFilter = reduce(lambda x, y: x | y, [Q(timeCreation__minute=m) for m in minutes])
+        query = query.filter(hourFilter)
+        query = query.filter(platesFilter)
         # query = query.filter(minuteInterval)
         data = {
             "reports": [change(report.getDictionary()) for report in query],
-            "types" : events
+            "types": events
         }
         return JsonResponse(data, safe=False)
