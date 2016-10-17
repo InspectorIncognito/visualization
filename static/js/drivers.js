@@ -20,57 +20,35 @@ $(function () {
     });
 });
 
-var resp = 0;
+var resp = null;
 var types = 0;
 var chartdata = {
-    'weekday': 0,
-    'plate': 0,
-    'service': 0,
-    'daily': 0,
-    'monthly': 0
+    'weekday': null,
+    'plate': null,
+    'service': null,
+    'daily': null,
+    'monthly': null
 };
 var chart;
 function reloadchart() {
     chartdata = {
-        'weekday': 0,
-        'plate': 0,
-        'service': 0,
-        'daily': 0,
-        'monthly': 0
+        'weekday': null,
+        'plate': null,
+        'service': null,
+        'daily': null,
+        'monthly': null
     };
 }
-function updatecharhgrethert() {
-    chart = c3.generate({
-        data: {
-            x: 'x',
-//        xFormat: '%Y%m%d', // 'xFormat' can be used as custom format of 'x'
-            columns: [
-                ['x', '2013-01-01', '2013-01-02', '2013-01-03', '2013-01-04', '2013-01-05', '2013-01-06'],
-//            ['x', '20130101', '20130102', '20130103', '20130104', '20130105', '20130106'],
-                ['data1', 100, 200, 100, 400, 150, 250],
-                ['data2', 130, 340, 200, 100, 250, 350]
-            ],
-            type: 'bar',
-            groups: [
-                ['data1', 'data2']
-            ]
-        },
-        axis: {
-            x: {
-                type: 'timeseries',
-                tick: {
-                    format: '%Y-%m-%d'
-                }
-            }
-        }
-    });
-}
+
 function updatechart() {
-    if (true) {
+    if (resp != null) {
         switch ($('input:checked', '#group').val()) {
             case "weekday":
-                if (chartdata['weekday'] == 0) {
-                    chartdata['weekday'] = [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]];
+                if (chartdata['weekday'] == null) {
+                    chartdata['weekday'] = [];
+                    for (i = 0; i < types.length; i++) {
+                        chartdata['weekday'].push([0, 0, 0, 0, 0, 0, 0]);
+                    }
                     console.log(chartdata['weekday']);
                     for (i = 0; i < resp.length; i++) {
                         var type = resp[i]['type'];
@@ -79,16 +57,14 @@ function updatechart() {
                         chartdata['weekday'][type][day]++;
                     }
                 }
+                var cols = [];
+                for (i = 0; i < types.length; i++) {
+                    cols.push([types[i]].concat(chartdata['weekday'][i]));
+                }
                 chart = c3.generate({
                     data: {
-                        columns: [
-                            [types[0]].concat(chartdata['weekday'][0]),
-                            [types[1]].concat(chartdata['weekday'][1]),
-                            [types[2]].concat(chartdata['weekday'][2]),
-                            [types[3]].concat(chartdata['weekday'][3])
-                        ],
-                        type: 'bar',
-
+                        columns: cols,
+                        type: 'bar'
                     },
                     axis: {
                         x: {
@@ -105,9 +81,9 @@ function updatechart() {
                 break;
 
             case "plate":
-                if (chartdata['plate'] == 0) {
+                if (chartdata['plate'] == null) {
                     var plates = [];
-                    platetype = [[], [], [], []];
+                    var platetype = [[], [], [], []];
                     for (i = 0; i < resp.length; i++) {
                         var type = resp[i]['type'];
                         var plate = resp[i]['plate'];
@@ -215,7 +191,7 @@ function myFunction() {
     };
     var service = document.getElementById("service").value;
     var plate = document.getElementById("plate").value;
-    if (service != '') data['service'] = service;
+    if (service != '') data['service'] = [service];
     if (plate != '') data['plate'] = plate;
 
     $.getJSON(Dataurl, data)
