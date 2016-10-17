@@ -191,7 +191,7 @@ function myFunction() {
     };
     var service = document.getElementById("service").value;
     var plate = document.getElementById("plate").value;
-    if (service != '') data['service'] = [service];
+    if (service != '') data['service'] = JSON.stringify([service]);
     if (plate != '') data['plate'] = plate;
 
     $.getJSON(Dataurl, data)
