@@ -168,13 +168,12 @@
 <!-- Custom Theme Scripts -->
 <script src="{% static 'components/gentelella/build/js/custom.min.js' %}"></script>
 
-<script src="{% static 'js/server.js' %}"></script>
 </body>
 </html>
 
 
 <script>
-    var Dataurl = "http://localhost:8000/carriers/getFreeReport/"
+    var Dataurl = "http://"+location.host+"/carriers/getFreeReport/"
     $.getJSON(Dataurl)
             .done(function (data) {
                 var html = ''

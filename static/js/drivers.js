@@ -243,7 +243,7 @@ function updatechart() {
     }
 }
 function myFunction() {
-    var Dataurl = "http://" + server + "/carriers/getDriversData/";
+    var Dataurl = "http://"+location.host+"/carriers/getDriversData/";
     var data = {
         carrier: '3',
         date_init: $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD"),
