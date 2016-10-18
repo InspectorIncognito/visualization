@@ -18,10 +18,11 @@ $(function () {
     $("#group :input").change(function () {
         updatechart();
     });
+    $("#filters :input").change(function () {
+        myFunction();
+    });
 });
 $(document).ready(function() {
-        $(".select2_single").select2({});
-        $(".select2_group").select2({});
         $(".select2_multiple").select2({});
       });
 var resp = null;
