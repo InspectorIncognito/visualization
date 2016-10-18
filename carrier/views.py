@@ -130,7 +130,7 @@ def getPhysicalTable(request):
     carrier = 7  # TODO Select carrier depending on who is logged.
     query = EventForBus.objects.filter(
         bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
-    query = query.filter(event__category="estado físico")
+    query = query.filter(event__category="estado físico").exclude(event__id = "evn00225")
     query = query.distinct("event__name")
     data = {
         'data': [report.getDictionary() for report in query]

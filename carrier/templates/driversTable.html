@@ -28,11 +28,8 @@
     <script src="{% static 'components/gentelella/vendors/jquery/dist/jquery.min.js' %}"></script>
 
     <!-- DataTables -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css">
-    <link rel="stylesheet" type="https://cdn.datatables.net/responsive/2.1.0/css/responsive.bootstrap.min.css">
     <link rel="stylesheet" type="text/css"
-          href="https://cdn.datatables.net/buttons/1.2.2/css/buttons.dataTables.min.css">
-
+          href="https://cdn.datatables.net/v/bs-3.3.6/jq-2.2.3/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.12/b-1.2.2/b-flash-1.2.2/b-html5-1.2.2/b-print-1.2.2/r-2.1.0/datatables.min.css"/>
 
 </head>
 
@@ -70,7 +67,6 @@
                             </li>
                         </ul>
                     </div>
-
                 </div>
                 <!-- /sidebar menu -->
 
@@ -160,30 +156,12 @@
 <script src="{% static 'components/gentelella/vendors/bootstrap/dist/js/bootstrap.min.js' %}"></script>
 <!-- Custom Theme Scripts -->
 <script src="{% static 'components/gentelella/build/js/custom.min.js' %}"></script>
+<!-- DataTables -->
+<script type="text/javascript"
+            src="https://cdn.datatables.net/v/bs-3.3.6/jq-2.2.3/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.12/b-1.2.2/b-flash-1.2.2/b-html5-1.2.2/b-print-1.2.2/r-2.1.0/datatables.min.js"></script>
 
-<!-- Datatables -->
-<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.js"></script>
-<script type="text/javascript" charser="utf8"
-        src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" charser="utf8"
-        src="https://cdn.datatables.net/buttons/1.2.2/js/dataTables.buttons.min.js"></script>
-<script type="text/javascript" charser="utf8" src="//cdn.datatables.net/buttons/1.2.2/js/buttons.flash.min.js"></script>
-<script type="text/javascript" charser="utf8" src="//cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
-<script type="text/javascript" charser="utf8"
-        src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js"></script>
-<script type="text/javascript" charser="utf8"
-        src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"></script>
-<script type="text/javascript" charser="utf8" src="//cdn.datatables.net/buttons/1.2.2/js/buttons.html5.min.js"></script>
-<script type="text/javascript" charser="utf8" src="//cdn.datatables.net/buttons/1.2.2/js/buttons.print.min.js"></script>
-<script type="text/javascript" charser="utf8"
-        src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
-<script type="text/javascript" charser="utf8"
-        src="//cdn.datatables.net/responsive/2.1.0/js/dataTables.responsive.js"></script>
-<script type="text/javascript" charser="utf8"
-        src="https://cdn.datatables.net/responsive/2.1.0/js/responsive.bootstrap.min.js"></script>
+
 <script>
-
-
     $(document).ready(function () {
         $('#example').dataTable({
             "pageLength": 100,
@@ -192,7 +170,7 @@
                 'copy', 'csv', 'excel', 'pdf', 'print'
             ],
             responsive: true,
-            ajax: 'http://'+location.host+'/carriers/getDriversTable/',
+            ajax: 'http://' + location.host + '/carriers/getDriversTable/',
             columns: [
                 {title: "Reporte", data: 'type'},
                 {title: "Fecha", data: 'timeStamp'},
