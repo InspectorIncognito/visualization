@@ -192,8 +192,8 @@ function updatechart() {
                 });
                 break;
 
-            case "day":
-                if (chartdata['day'] == null) {
+            case "daily":
+                if (chartdata['daily'] == null) {
                     var days = [];
                     var daystype = [];
                     for (i = 0; i < types.length; i++) {
@@ -201,40 +201,106 @@ function updatechart() {
                     }
                     for (i = 0; i < resp.length; i++) {
                         var type = resp[i]['type'];
-                        var service = resp[i]['service'];
-                        console.log(service)
-                        if (services.indexOf(service) == -1) {
-                            services.push(service)
+                        var day = moment(resp[i]['timeStamp'], "DD-MM-YYYY HH:mm:SS").format("DD-MM-YYYY")
+                        console.log(day);
+
+                        if (days.indexOf(day) == -1) {
+                            days.push(day)
                             for (var j = 0; j < types.length; j++) {
-                                servicetype[j].push(0);
+                                daystype[j].push(0);
                             }
                         }
-                        var p = services.indexOf(service);
-                        servicetype[type][p]++;
+                        var p = days.indexOf(day);
+                        daystype[type][p]++;
                     }
                 }
-                var cols = [];
+                var cols = days;
+                cols.unshift("x");
+                cols = [cols];
+                console.log(cols)
                 for (i = 0; i < types.length; i++) {
-                    cols.push([types[i]].concat(servicetype[i]));
+                    cols.push([types[i]].concat(daystype[i]));
                 }
+                console.log(cols)
                 chart = c3.generate({
+                    size: {
+                        height: 600,
+                    },
                     data: {
+                        x: 'x',
+                        xFormat: '%d-%m-%Y',
                         columns: cols,
-                        type: 'bar'
+                        type: 'bar',
+                        groups: [types]
                     },
                     axis: {
                         x: {
-                            type: 'category',
+                            type: 'timeseries',
                             tick: {
+                                culling: false,
                                 rotate: 90,
-                                multiline: false
-                            },
-                            categories: services
-                        },
-                        y: {
-                            tick: {
-                                outer: false
+                                format: '%d-%m-%Y'
                             }
+
+                        }
+                    },
+                    subchart: {
+                        show: true
+                    }
+                });
+                break;
+            case "monthly":
+                if (chartdata['monthly'] == null) {
+                    var months = [];
+                    var monthstype = [];
+                    for (i = 0; i < types.length; i++) {
+                        monthstype.push([]);
+                    }
+                    for (i = 0; i < resp.length; i++) {
+                        var type = resp[i]['type'];
+                        var month = moment(resp[i]['timeStamp'], "DD-MM-YYYY HH:mm:SS").format("MM-YYYY")
+                        console.log(month);
+
+                        if (months.indexOf(month) == -1) {
+                            months.push(month)
+                            for (var j = 0; j < types.length; j++) {
+                                monthstype[j].push(0);
+                            }
+                        }
+                        var p = months.indexOf(month);
+                        monthstype[type][p]++;
+                    }
+                }
+                var cols = months;
+                cols.unshift("x");
+                cols = [cols];
+                console.log(cols)
+                for (i = 0; i < types.length; i++) {
+                    cols.push([types[i]].concat(monthstype[i]));
+                }
+                console.log(cols)
+                chart = c3.generate({
+                    data: {
+                        x: 'x',
+                        xFormat: '%m-%Y',
+                        columns: cols,
+                        type: 'bar',
+                        groups: [types]
+                    },
+                    bar: {
+                        width: {
+                            ratio: 0.4
+                        }
+                    },
+                    axis: {
+                        x: {
+                            type: 'timeseries',
+                            tick: {
+                                culling: false,
+                                rotate: 90,
+                                format: '%m-%Y'
+                            }
+
                         }
                     }
                 });
