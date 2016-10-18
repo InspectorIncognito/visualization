@@ -181,6 +181,7 @@
         src="//cdn.datatables.net/responsive/2.1.0/js/dataTables.responsive.js"></script>
 <script type="text/javascript" charser="utf8"
         src="https://cdn.datatables.net/responsive/2.1.0/js/responsive.bootstrap.min.js"></script>
+<script src="{% static 'js/server.js' %}"></script>
 <script>
 
 
@@ -192,7 +193,7 @@
                 'copy', 'csv', 'excel', 'pdf', 'print'
             ],
             responsive: true,
-            ajax: 'http://localhost:8000/carriers/getDriversTable/',
+            ajax: 'http://" + server + "/carriers/getDriversTable/',
             columns: [
                 {title: "Reporte", data: 'type'},
                 {title: "Fecha", data: 'timeStamp'},
