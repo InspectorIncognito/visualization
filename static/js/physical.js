@@ -23,11 +23,11 @@ $(function () {
     });
     myFunction();
 });
-$(document).ready(function() {
-        $(".select2_single").select2({});
-        $(".select2_group").select2({});
-        $(".select2_multiple").select2({});
-      });
+$(document).ready(function () {
+    $(".select2_single").select2({});
+    $(".select2_group").select2({});
+    $(".select2_multiple").select2({});
+});
 var resp = null;
 var types = 0;
 var chartdata = {
@@ -186,19 +186,132 @@ function updatechart() {
                     }
                 });
                 break;
+            case "daily":
+                if (chartdata['daily'] == null) {
+                    var days = [];
+                    var daystype = [];
+                    for (i = 0; i < types.length; i++) {
+                        daystype.push([]);
+                    }
+                    for (i = 0; i < resp.length; i++) {
+                        var type = resp[i]['type'];
+                        var day = moment(resp[i]['timeStamp'], "DD-MM-YYYY HH:mm:SS").format("DD-MM-YYYY")
+                        console.log(day);
+
+                        if (days.indexOf(day) == -1) {
+                            days.push(day)
+                            for (var j = 0; j < types.length; j++) {
+                                daystype[j].push(0);
+                            }
+                        }
+                        var p = days.indexOf(day);
+                        daystype[type][p]++;
+                    }
+                }
+                var cols = days;
+                cols.unshift("x");
+                cols = [cols];
+                console.log(cols)
+                for (i = 0; i < types.length; i++) {
+                    cols.push([types[i]].concat(daystype[i]));
+                }
+                console.log(cols)
+                chart = c3.generate({
+                    size: {
+                        height: 600,
+                    },
+                    data: {
+                        x: 'x',
+                        xFormat: '%d-%m-%Y',
+                        columns: cols,
+                        type: 'bar',
+                        groups: [types]
+                    },
+                    axis: {
+                        x: {
+                            type: 'timeseries',
+                            tick: {
+                                culling: false,
+                                rotate: 90,
+                                format: '%d-%m-%Y'
+                            }
+
+                        }
+                    },
+                    subchart: {
+                        show: true
+                    }
+                });
+                break;
+            case "monthly":
+                if (chartdata['monthly'] == null) {
+                    var months = [];
+                    var monthstype = [];
+                    for (i = 0; i < types.length; i++) {
+                        monthstype.push([]);
+                    }
+                    for (i = 0; i < resp.length; i++) {
+                        var type = resp[i]['type'];
+                        var month = moment(resp[i]['timeStamp'], "DD-MM-YYYY HH:mm:SS").format("MM-YYYY")
+                        console.log(month);
+
+                        if (months.indexOf(month) == -1) {
+                            months.push(month)
+                            for (var j = 0; j < types.length; j++) {
+                                monthstype[j].push(0);
+                            }
+                        }
+                        var p = months.indexOf(month);
+                        monthstype[type][p]++;
+                    }
+                }
+                var cols = months;
+                cols.unshift("x");
+                cols = [cols];
+                console.log(cols)
+                for (i = 0; i < types.length; i++) {
+                    cols.push([types[i]].concat(monthstype[i]));
+                }
+                console.log(cols)
+                chart = c3.generate({
+                    data: {
+                        x: 'x',
+                        xFormat: '%m-%Y',
+                        columns: cols,
+                        type: 'bar',
+                        groups: [types]
+                    },
+                    bar: {
+                        width: {
+                            ratio: 0.4
+                        }
+                    },
+                    axis: {
+                        x: {
+                            type: 'timeseries',
+                            tick: {
+                                culling: false,
+                                rotate: 90,
+                                format: '%m-%Y'
+                            }
+
+                        }
+                    }
+                });
+                break;
         }
     }
 }
 function myFunction() {
-    var Dataurl = "http://"+location.host+"/carriers/getPhysicalData/";
+    var Dataurl = "http://" + location.host + "/carriers/getPhysicalData/";
     var data = {
         carrier: '3',
         date_init: $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD"),
         date_end: $('#date_end').data("DateTimePicker").date().format("YYYY-MM-DD"),
-        hour1: $('#hour1').data("DateTimePicker").date().format("HH"),
-        hour2: $('#hour2').data("DateTimePicker").date().format("HH"),
-        minute1: $('#hour1').data("DateTimePicker").date().format("mm"),
-        minute2: $('#hour2').data("DateTimePicker").date().format("mm")
+        hour1: 00,
+        hour2: 23,
+        minute1: 00,
+        minute2: 59
     };
     var service = $(".select2_multiple").val();
     console.log(service)
