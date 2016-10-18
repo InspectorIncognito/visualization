@@ -36,7 +36,7 @@ def physical(request):
 
 def getPhysicalHeaders(request):
     carrier = 7  # TODO Select carrier depending on who is logged.
-    events = Event.objects.filter(category="estado físico")
+    events = Event.objects.filter(category="estado físico", eventType="bus")
     events = [event.name for event in events]
     headerInfo = EventForBus.objects.filter(event__category='estado físico')
     headerInfo = headerInfo.filter(
@@ -54,7 +54,7 @@ def getPhysicalHeaders(request):
     for ev in events:
         q = headerInfo.filter(event__name=ev)
         q = q.distinct('bus__registrationPlate')
-        response[ev] = len(q)
+        response[ev] = q.count()
     return JsonResponse(response, safe=False)
 
 
@@ -115,6 +115,7 @@ def getDriversTable(request):
     query = EventForBus.objects.filter(
         bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
     query = query.filter(event__category="conductor")
+    query = query.exclude(bus__registrationPlate__icontains="dummylpt")
     today = datetime.now(pytz.timezone('Chile/Continental'))
     # query = query.filter(timeStamp__year=str(today.year),
     #                     timeStamp__month=str(today.month),
@@ -130,7 +131,7 @@ def getPhysicalTable(request):
     query = EventForBus.objects.filter(
         bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
     query = query.filter(event__category="estado físico")
-    query = query.distinct("event__name", )
+    query = query.distinct("event__name")
     data = {
         'data': [report.getDictionary() for report in query]
     }
@@ -139,7 +140,7 @@ def getPhysicalTable(request):
 
 def getPhysicalReport(request):
     if request.method == 'GET':
-        events = Event.objects.filter(category="estado físico")
+        events = Event.objects.filter(category="estado físico", eventType="bus")
         events = [event.name for event in events]
         pos = range(0, len(events))
         eventToPos = {name: pos for name, pos in zip(events, pos)}

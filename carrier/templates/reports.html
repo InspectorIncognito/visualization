@@ -173,9 +173,9 @@
 
 
 <script>
-    var Dataurl = "http://localhost:8000/carriers/getFreeReport/"
+    var Dataurl = "http://"+location.host+"/carriers/getFreeReport/"
     $.getJSON(Dataurl)
-            .done(function (data){
+            .done(function (data) {
                 var html = ''
                 $.each(data, function (index, el) {
                     html += '<li> <div class="block"> <div class="block_content"> <h2 class="title">';

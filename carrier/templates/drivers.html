@@ -197,8 +197,8 @@
                                                             <label for="service">Recorrido</label>
                                                             <select class="select2_multiple form-control"
                                                                     id='service' multiple="multiple">
-                                                                    {% for service in services %}
-                                                                <option>{{service.service}}</option>
+                                                                {% for service in services %}
+                                                                    <option>{{ service.service }}</option>
                                                                 {% endfor %}
                                                             </select>
                                                         </div>

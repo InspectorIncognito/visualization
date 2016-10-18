@@ -279,7 +279,7 @@
 </html>
 
 <script>
-    var Dataurl = "http://localhost:8000/carriers/getPhysicalHeaders/"
+    var Dataurl = "http://"+location.host+"/carriers/getPhysicalHeaders/";
     $.getJSON(Dataurl)
             .done(function (data) {
                 var html = ''
