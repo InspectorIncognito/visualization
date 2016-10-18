@@ -190,7 +190,7 @@ function updatechart() {
     }
 }
 function myFunction() {
-    var Dataurl = "http://127.0.0.1:8000/carriers/getPhysicalData/";
+    var Dataurl = "http://localhost:8000/carriers/getPhysicalData/";
     var data = {
         carrier: '3',
         date_init: $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD"),

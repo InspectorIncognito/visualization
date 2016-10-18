@@ -1,6 +1,6 @@
 $(function () {
     $('#date_init').datetimepicker({
-        defaultDate: moment().subtract(3, 'months'),
+        defaultDate: moment().subtract(1, 'months'),
         format: 'LL'
     });
     $('#date_end').datetimepicker({
@@ -21,11 +21,18 @@ $(function () {
     $("#filters :input").change(function () {
         myFunction();
     });
+    $("#filters").on("dp.change", function (e) {
+        myFunction();
+    });
+    $("#filters :input").keyup(function () {
+        myFunction();
+    });
     myFunction();
 });
-$(document).ready(function() {
-        $(".select2_multiple").select2({});
-      });
+$(document).ready(function () {
+    $(".select2_multiple").select2({});
+
+});
 var resp = null;
 var types = 0;
 var chartdata = {
@@ -184,11 +191,59 @@ function updatechart() {
                     }
                 });
                 break;
+
+            case "day":
+                if (chartdata['day'] == null) {
+                    var days = [];
+                    var daystype = [];
+                    for (i = 0; i < types.length; i++) {
+                        daystype.push([]);
+                    }
+                    for (i = 0; i < resp.length; i++) {
+                        var type = resp[i]['type'];
+                        var service = resp[i]['service'];
+                        console.log(service)
+                        if (services.indexOf(service) == -1) {
+                            services.push(service)
+                            for (var j = 0; j < types.length; j++) {
+                                servicetype[j].push(0);
+                            }
+                        }
+                        var p = services.indexOf(service);
+                        servicetype[type][p]++;
+                    }
+                }
+                var cols = [];
+                for (i = 0; i < types.length; i++) {
+                    cols.push([types[i]].concat(servicetype[i]));
+                }
+                chart = c3.generate({
+                    data: {
+                        columns: cols,
+                        type: 'bar'
+                    },
+                    axis: {
+                        x: {
+                            type: 'category',
+                            tick: {
+                                rotate: 90,
+                                multiline: false
+                            },
+                            categories: services
+                        },
+                        y: {
+                            tick: {
+                                outer: false
+                            }
+                        }
+                    }
+                });
+                break;
         }
     }
 }
 function myFunction() {
-    var Dataurl = "http://127.0.0.1:8000/carriers/getDriversData/";
+    var Dataurl = "http://localhost:8000/carriers/getDriversData/";
     var data = {
         carrier: '3',
         date_init: $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD"),
