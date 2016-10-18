@@ -140,7 +140,7 @@ class EventForBus(EventRegistration):
         dictionary['timeCreation'] = creation.strftime("%d-%m-%Y %H:%M:%S")
         dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
         dictionary['service'] = self.bus.service
-        dictionary['plate'] = self.bus.registrationPlate
+        dictionary['plate'] = self.bus.registrationPlate.upper()
         dictionary['type'] = self.event.name
         dictionary['busStop1'] = ""  # TODO Model needs to be changed to save it
         dictionary['busStop2'] = ""

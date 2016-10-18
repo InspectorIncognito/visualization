@@ -24,6 +24,8 @@ $(function () {
     myFunction();
 });
 $(document).ready(function() {
+        $(".select2_single").select2({});
+        $(".select2_group").select2({});
         $(".select2_multiple").select2({});
       });
 var resp = null;
@@ -188,7 +190,7 @@ function updatechart() {
     }
 }
 function myFunction() {
-    var Dataurl = "http://127.0.0.1:8000/carriers/getDriversData/";
+    var Dataurl = "http://127.0.0.1:8000/carriers/getPhysicalData/";
     var data = {
         carrier: '3',
         date_init: $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD"),
