@@ -119,6 +119,7 @@ def getDriversTable(request):
         bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
     query = query.filter(event__category="conductor")
     query = query.exclude(bus__registrationPlate__icontains="dummylpt")
+    query = query.exclude(event__id = 'evn00233')
     today = datetime.now(pytz.timezone('Chile/Continental'))
     # query = query.filter(timeStamp__year=str(today.year),
     #                     timeStamp__month=str(today.month),
