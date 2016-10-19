@@ -335,6 +335,7 @@ $.getJSON(Dataurl)
 $(document).ready(function () {
     $('#example').dataTable({
         "pageLength": 100,
+        order: [[2, "desc"]],
         responsive: true,
         ajax: 'http://' + location.host + '/carriers/getPhysicalTable/',
         columns: [
