@@ -43,11 +43,11 @@ def getPhysicalHeaders(request):
         bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
     today = date.today()
     year = today.year
-    if today.month == 1:
-        last_month = 12
+    if today.month <= 3:
+        last_month = today.month + 12 - 3
         year = year - 1
     else:
-        last_month = today.month - 1
+        last_month = today.month - 3
     headerInfo = headerInfo.filter(timeStamp__gte=date(year, last_month, today.day)).exclude(
         bus__registrationPlate="dummyLPt")
     response = {}
@@ -131,7 +131,8 @@ def getPhysicalTable(request):
     query = EventForBus.objects.filter(
         bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
     query = query.filter(event__category="estado físico").exclude(event__id = "evn00225")
-    query = query.distinct("event__name")
+    query = query.exclude(bus__registrationPlate__icontains = "dummyLPt")
+    query = query.distinct("event__name", "bus__registrationPlate")
     data = {
         'data': [report.getDictionary() for report in query]
     }

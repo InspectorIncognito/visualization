@@ -145,7 +145,9 @@ class EventForBus(EventRegistration):
         dictionary['busStop1'] = ""  # TODO Model needs to be changed to save it
         dictionary['busStop2'] = ""
         dictionary['place'] = ""
+        dictionary['fixed'] = "No"
         return dictionary
+
 
 
 ##
