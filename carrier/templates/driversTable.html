@@ -50,13 +50,13 @@
             src="https://cdn.datatables.net/v/bs/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.12/b-1.2.2/b-colvis-1.2.2/b-flash-1.2.2/b-html5-1.2.2/b-print-1.2.2/r-2.1.0/datatables.min.js"></script>
 
     <script>
-        var table = $(document).ready(function () {
-            $('#example').dataTable({
+        var table;
+        $(document).ready(function () {
+            table = $('#example').dataTable({
                 "pageLength": 100,
                 dom: 'Bfrtip',
                 buttons: [
-                    {extend: 'copy', text: 'Copiar'},
-                    , 'csv', 'excel', 'pdf', { extend: 'print', text: 'Imprimir' }
+                    {extend: 'copy', text: 'Copiar'}, 'csv', 'excel', 'pdf', {extend: 'print', text: 'Imprimir'}
 
                 ],
                 responsive: true,
