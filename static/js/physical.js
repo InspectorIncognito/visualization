@@ -57,10 +57,8 @@ function updatechart() {
                     for (i = 0; i < types.length; i++) {
                         chartdata['weekday'].push([0, 0, 0, 0, 0, 0, 0]);
                     }
-                    console.log(chartdata['weekday']);
                     for (i = 0; i < resp.length; i++) {
                         var type = resp[i]['type'];
-                        console.log(type);
                         var day = (moment(resp[i]['timeCreation'], "DD-MM-YYYY HH:mm:SS").day() + 6) % 7;
                         chartdata['weekday'][type][day]++;
                     }
@@ -149,7 +147,6 @@ function updatechart() {
                     for (i = 0; i < resp.length; i++) {
                         var type = resp[i]['type'];
                         var service = resp[i]['service'];
-                        console.log(service)
                         if (services.indexOf(service) == -1) {
                             services.push(service)
                             for (var j = 0; j < types.length; j++) {
@@ -196,7 +193,6 @@ function updatechart() {
                     for (i = 0; i < resp.length; i++) {
                         var type = resp[i]['type'];
                         var day = moment(resp[i]['timeStamp'], "DD-MM-YYYY HH:mm:SS").format("DD-MM-YYYY")
-                        console.log(day);
 
                         if (days.indexOf(day) == -1) {
                             days.push(day)
@@ -211,11 +207,9 @@ function updatechart() {
                 var cols = days;
                 cols.unshift("x");
                 cols = [cols];
-                console.log(cols)
                 for (i = 0; i < types.length; i++) {
                     cols.push([types[i]].concat(daystype[i]));
                 }
-                console.log(cols)
                 chart = c3.generate({
                     size: {
                         height: 600,
@@ -253,7 +247,6 @@ function updatechart() {
                     for (i = 0; i < resp.length; i++) {
                         var type = resp[i]['type'];
                         var month = moment(resp[i]['timeStamp'], "DD-MM-YYYY HH:mm:SS").format("MM-YYYY")
-                        console.log(month);
 
                         if (months.indexOf(month) == -1) {
                             months.push(month)
@@ -268,11 +261,9 @@ function updatechart() {
                 var cols = months;
                 cols.unshift("x");
                 cols = [cols];
-                console.log(cols)
                 for (i = 0; i < types.length; i++) {
                     cols.push([types[i]].concat(monthstype[i]));
                 }
-                console.log(cols)
                 chart = c3.generate({
                     data: {
                         x: 'x',
@@ -313,16 +304,14 @@ function myFunction() {
         minute1: 00,
         minute2: 59
     };
-    var service = $(".select2_multiple").val();
-    console.log(service)
+    /*var service = $(".select2_multiple").val();
     var plate = document.getElementById("plate").value;
     if (service != null) data['service'] = JSON.stringify(service);
-    if (plate != '') data['plate'] = plate;
+    if (plate != '') data['plate'] = plate;*/
 
     $.getJSON(Dataurl, data)
         .done(function (data) {
             reloadchart();
-            console.log(data);
             resp = data.reports;
             types = data.types;
             updatechart();
