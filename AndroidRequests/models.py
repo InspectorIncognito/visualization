@@ -96,6 +96,8 @@ class EventRegistration(models.Model):
     """ amount of declinations for this event """
     userId = models.UUIDField()
     """ To identify the AndroidRequests owner """
+    fixed = models.BooleanField('Fixed', default=False)
+    """ To know if the event is 'fixed' and stop showing it"""
 
     class Meta:
         abstract = True
@@ -145,9 +147,8 @@ class EventForBus(EventRegistration):
         dictionary['busStop1'] = ""  # TODO Model needs to be changed to save it
         dictionary['busStop2'] = ""
         dictionary['place'] = ""
-        dictionary['fixed'] = "No"
+        dictionary['fixed'] = "Si" if self.fixed else "No"
         return dictionary
-
 
 
 ##
