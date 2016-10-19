@@ -2,7 +2,7 @@
 
 from django.http import HttpResponse
 from django.template import loader
-from AndroidRequests.models import Report, EventForBus, Service, Event
+from AndroidRequests.models import Report, EventForBus, Service, Event, Bus
 from django.http import JsonResponse
 from django.db.models import Q
 from datetime import datetime, date
@@ -18,8 +18,11 @@ def drivers(request):
     template = loader.get_template('drivers.html')
     carrier = 7  # TODO Select carrier depending on who is logged.
     services = Service.objects.filter(color_id=carrier)
+    buses = Bus.objects.filter(service__in=[service.service for service in services])
+    plates = [bus.registrationPlate for bus in buses]
     context = {
         'services': services,
+        'plates' : plates,
     }
     return HttpResponse(template.render(context, request))
 
