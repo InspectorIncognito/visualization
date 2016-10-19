@@ -1,6 +1,6 @@
 $(function () {
     $('#date_init').datetimepicker({
-        defaultDate: moment().subtract(1, 'months'),
+        defaultDate: moment().subtract(3, 'months'),
         format: 'LL'
     });
     $('#date_end').datetimepicker({

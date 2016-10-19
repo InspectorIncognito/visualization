@@ -1,22 +1,4 @@
-{% extends 'visualization/dashboard.html' %}
 {% load staticfiles %}
-{% block title %}
-<title>Visualizador Transapp</title>
-{% endblock title %}
-
-{% block topimports %}
-{% endblock topimports %}
-
-{% block toptiles %}
-{% endblock toptiles %}
-
-{% block maincontent %}
-{% endblock maincontent %}
-
-{% block bottomimports %}
-
-
-{% endblock bottomimports %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,43 +8,24 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Página administración METBUS </title>
-
-    <!-- Leaflet -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.css"/>
+    {% block title %}{% endblock %}
+    <link rel="shortcut icon" href="http://www.transapp.cl/wp-content/iso.png">
     <!-- Bootstrap -->
     <link href="{% static 'components/gentelella/vendors/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="{% static 'components/gentelella/vendors/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
     <!-- Custom Theme Style -->
     <link href="{% static 'components/gentelella/build/css/custom.min.css' %}" rel="stylesheet">
-    <!-- Marker Cluster Style -->
-    <link href="{% static 'components/leaflet.markercluster/dist/MarkerCluster.css' %}" rel="stylesheet">
-
-    <!-- Leaflet Scripts -->
-    <script src="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.js"></script>
-
-    <!-- jQuery Script -->
-    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-
-    <!-- markercluster Script -->
-    <script src="{% static 'components/leaflet.markercluster/dist/leaflet.markercluster.js' %}"></script>
-
-
-    <style>
-        .map {
-            height: 400px;
-        }
-    </style>
+    {% block topimports %}{% endblock %}
 </head>
 
 <body class="nav-md">
 <div class="container body">
     <div class="main_container">
-        <div class="col-md-3 left_col">
+        <div class="col-md-3 left_col menu_fixed">
             <div class="left_col scroll-view">
                 <div class="navbar nav_title" style="border: 0;">
-                    <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>Administración</span></a>
+                    <a href="/" class="site_title"></i> <span>Menu</span></a>
                 </div>
 
                 <div class="clearfix"></div>
@@ -95,20 +58,6 @@
                 <!-- /sidebar menu -->
 
                 <!-- /menu footer buttons -->
-                <div class="sidebar-footer hidden-small">
-                    <a data-toggle="tooltip" data-placement="top" title="Settings">
-                        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-                    </a>
-                    <a data-toggle="tooltip" data-placement="top" title="FullScreen">
-                        <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
-                    </a>
-                    <a data-toggle="tooltip" data-placement="top" title="Lock">
-                        <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
-                    </a>
-                    <a data-toggle="tooltip" data-placement="top" title="Logout">
-                        <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
-                    </a>
-                </div>
                 <!-- /menu footer buttons -->
             </div>
         </div>
@@ -125,7 +74,7 @@
                         <li class="">
                             <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
                                aria-expanded="false">
-                                <img src="{% static 'images/img.jpg' %}" alt="">METBUS S.A
+                                <img src="{% static 'images/bus07.png' %}" alt="">METBUS S.A
                                 <span class=" fa fa-angle-down"></span>
                             </a>
                             <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -149,33 +98,16 @@
         <!-- page content -->
         <div class="right_col" role="main">
             <!-- top tiles -->
-            <div id="headers" class="row tile_count">
-            </div>
+            {% block toptiles %}{% endblock %}
             <!-- /top tiles -->
+            {% block maincontent %}{% endblock %}
 
-            <div class="row">
-                <div class="col-md-12 col-sm-12 col-xs-12">
-                    <div class="x_panel">
-                        <div class="x_title">
-                            <h2>Reportes</h2>
-                            <ul class="nav navbar-right panel_toolbox">
-                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                </li>
-                            </ul>
-                            <div class="clearfix"></div>
-                        </div>
-                        <div class="x_content">
-                            <div class="dashboard-widget-content">
-
-                                <ul id="reports" class="list-unstyled timeline widget">
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
         <!-- /page content -->
+
+        <!-- footer content -->
+
+        <!-- /footer content -->
     </div>
 </div>
 
@@ -185,23 +117,6 @@
 <script src="{% static 'components/gentelella/vendors/bootstrap/dist/js/bootstrap.min.js' %}"></script>
 <!-- Custom Theme Scripts -->
 <script src="{% static 'components/gentelella/build/js/custom.min.js' %}"></script>
-
+{% block bottomimports %}{% endblock %}
 </body>
 </html>
-
-
-<script>
-    var Dataurl = "http://"+location.host+"/carriers/getFreeReport/"
-    $.getJSON(Dataurl)
-            .done(function (data) {
-                var html = ''
-                $.each(data, function (index, el) {
-                    html += '<li> <div class="block"> <div class="block_content"> <h2 class="title">';
-                    html += '<a><span>A las </span><a>' + el.timeStamp + '</a></a>  </h2> <br> <p class="excerpt">';
-                    html += el.message + '<br>' + el.reportInfo + '<br>' + el.imageName;
-                    html += '<span class="pull-right"><button type="button" class="btn btn-primary">Responder</button></span>';
-                    html += '</div> </div> </li>'
-                });
-                $("#reports").html(html);
-            });
-</script>
