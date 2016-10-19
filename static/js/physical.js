@@ -328,3 +328,34 @@ function myFunction() {
             updatechart();
         });
 }
+
+var Dataurl = "http://" + location.host + "/carriers/getPhysicalHeaders/";
+$.getJSON(Dataurl)
+    .done(function (data) {
+        var html = ''
+        $.each(data, function (key, number) {
+            html += '<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">';
+            html += '<span class="count_top"><i class="fa fa-user"></i>' + key + '</span>';
+            html += '<div class="count" style="text-align:center">' + number + '</div>'
+            html += '</div>'
+        });
+        $("#headers").html(html);
+    });
+
+$(document).ready(function () {
+    $('#example').dataTable({
+        "pageLength": 100,
+        responsive: true,
+        ajax: 'http://' + location.host + '/carriers/getPhysicalTable/',
+        columns: [
+            {title: "Reporte", data: 'type'},
+            {title: "Patente", data: 'plate'},
+            {title: "Fecha", data: 'timeStamp'},
+            {title: "Arreglado", data: 'fixed'},
+        ],
+        language: {
+            "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json"
+        }
+    });
+
+});

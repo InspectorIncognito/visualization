@@ -28,7 +28,8 @@
     <script src="{% static 'components/gentelella/vendors/jquery/dist/jquery.min.js' %}"></script>
 
     <!-- DataTables -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.12/b-1.2.2/b-colvis-1.2.2/b-flash-1.2.2/b-html5-1.2.2/b-print-1.2.2/r-2.1.0/datatables.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/v/bs/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.12/b-1.2.2/b-colvis-1.2.2/b-flash-1.2.2/b-html5-1.2.2/b-print-1.2.2/r-2.1.0/datatables.min.css"/>
 
 </head>
 
@@ -165,7 +166,9 @@
             "pageLength": 100,
             dom: 'Bfrtip',
             buttons: [
-                'copy', 'csv', 'excel', 'pdf', 'print'
+                {extend: 'copy', text: 'Copiar'}
+                , 'csv', 'excel', 'pdf', { extend: 'print', text: 'Imprimir' }
+
             ],
             responsive: true,
             ajax: 'http://' + location.host + '/carriers/getDriversTable/',
@@ -178,6 +181,16 @@
                 {title: "Paradero 1", data: 'busStop1'},
                 {title: "Paradero 2", data: 'busStop2'}
             ],
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json",
+                buttons: {
+                    copyTitle: 'Copiar al portapapeles',
+                    copySuccess: {
+                        _: 'Copiadas %d filas',
+                        1: 'Copiada 1 fila'
+                    }
+                }
+            }
         });
     });
 
