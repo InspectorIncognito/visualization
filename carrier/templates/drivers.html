@@ -84,7 +84,7 @@
                                         </div>
                                         <div class='col-sm-4'>
                                             <div class="form-group">
-                                                <label for="service">Recorrido</label>
+                                                <label for="service">Recorrido(s)</label>
                                                 <select class="select2_multiple form-control"
                                                         id='service' multiple="multiple">
                                                     {% for service in services %}
@@ -93,10 +93,15 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class='col-sm-2'>
+                                        <div class='col-sm-4'>
                                             <div class="form-group">
                                                 <label for="plate">Patente</label>
-                                                <input type="text" class="form-control" id="plate"/>
+                                                <select class="select2_plate form-control"
+                                                        id='plate'  multiple="multiple">
+                                                    {% for plate in plates %}
+                                                    <option>{{ plate}}</option>
+                                                    {% endfor %}
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
