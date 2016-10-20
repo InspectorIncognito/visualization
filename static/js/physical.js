@@ -21,6 +21,12 @@ $(function () {
     $("#filters :input").change(function () {
         myFunction();
     });
+    $("#filters").on("dp.change", function (e) {
+        myFunction();
+    });
+    $("#filters :input").keyup(function () {
+        myFunction();
+    });
     myFunction();
 });
 $(document).ready(function () {
@@ -311,6 +317,7 @@ function myFunction() {
 
     $.getJSON(Dataurl, data)
         .done(function (data) {
+            console.log(data)
             reloadchart();
             resp = data.reports;
             types = data.types;
@@ -355,7 +362,6 @@ $(document).ready(function () {
 
     $('#example tbody').on('click', 'button', function () {
         var data = table.row($(this).parents('tr')).data();
-        console.log(data)
         console.log($(this).attr("id"))
 
     });
