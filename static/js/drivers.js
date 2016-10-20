@@ -83,7 +83,7 @@ function updatechart() {
                     for (i = 0; i < resp.length; i++) {
                         var type = resp[i]['type'];
                         var day = (moment(resp[i]['timeCreation'], "DD-MM-YYYY HH:mm:SS").day() + 6) % 7;
-                        chartdata['weekday'][type][day]++;
+                        chartdata['weekday'][type][day]+=resp[i]['eventConfirm'];
                     }
                 }
                 var cols = [];
@@ -130,7 +130,7 @@ function updatechart() {
                             }
                         }
                         var p = chartdata['plate']['plates'].indexOf(plate);
-                        chartdata['plate']['platetype'][type][p]++;
+                        chartdata['plate']['platetype'][type][p]+=resp[i]['eventConfirm'];
                     }
                 }
                 var cols = [];
@@ -177,7 +177,7 @@ function updatechart() {
                             }
                         }
                         var p = services.indexOf(service);
-                        servicetype[type][p]++;
+                        servicetype[type][p]+=resp[i]['eventConfirm'];
                     }
                 }
                 var cols = [];
@@ -225,7 +225,7 @@ function updatechart() {
                             }
                         }
                         var p = days.indexOf(day);
-                        daystype[type][p]++;
+                        daystype[type][p]+=resp[i]['eventConfirm'];
                     }
                 }
                 var cols = days;
@@ -285,7 +285,7 @@ function updatechart() {
                             }
                         }
                         var p = months.indexOf(month);
-                        monthstype[type][p]++;
+                        monthstype[type][p]+=resp[i]['eventConfirm'];
                     }
                 }
                 var cols = months;
@@ -341,6 +341,7 @@ function myFunction() {
 
     $.getJSON(Dataurl, data)
         .done(function (data) {
+            console.log(data)
             reloadchart();
             resp = data.reports;
             types = data.types;
