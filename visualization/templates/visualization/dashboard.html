@@ -41,18 +41,20 @@
                                     class="fa fa-chevron-down"></span></a>
                                 <ul class="nav child_menu">
                                     <li><a href={% url 'index' %}>Reportes Libres</a></li>
-                                    <li><a href={% url 'driversTable' %}>Reportes de Comportamiento de Conductor</a></li>
+                                    <li><a href={% url 'driversTable' %}>Reportes de Comportamiento de Conductor</a>
+                                    </li>
                                     <li><a href={% url 'physicalTable' %}>Reportes de Estado Físico del Bus </a></li>
                                 </ul>
                             </li>
                             <li><a><i class="fa fa-bar-chart-o"></i> Visualizaciones <span
                                     class="fa fa-chevron-down"></span></a>
                                 <ul class="nav child_menu">
-                                    <li><a href="{% url 'drivers' %}">Visualizaciones de Comportamiento de Conductor</a></li>
+                                    <li><a href="{% url 'drivers' %}">Visualizaciones de Comportamiento de Conductor</a>
+                                    </li>
                                     <li><a href="{% url 'physical' %}">Visualización de Estado Físico del Bus</a></li>
                                 </ul>
                             </li>
-                             <li><a><i class="fa fa-download"></i> Descarga de Archivos <span
+                            <li><a><i class="fa fa-download"></i> Descarga de Archivos <span
                                     class="fa fa-chevron-down"></span></a>
                                 <ul class="nav child_menu">
                                     <li><a href="{% url 'fullTable' %}">Todos los reportes</a></li>
@@ -81,7 +83,8 @@
                         <li class="">
                             <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
                                aria-expanded="false">
-                                <img src="{% static 'images/bus07.png' %}" alt="">METBUS S.A
+                                <img src="{% static 'images/bus07.png' %}" alt=""  style="border-radius: 0px; width: 50px">
+                                METBUS S.A
                                 <span class=" fa fa-angle-down"></span>
                             </a>
                             <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -125,5 +128,6 @@
 <!-- Custom Theme Scripts -->
 <script src="{% static 'components/gentelella/build/js/custom.min.js' %}"></script>
 {% block bottomimports %}{% endblock %}
+
 </body>
 </html>
