@@ -199,4 +199,8 @@ def getPhysicalReport(request):
 def updatePhysical(request):
     if request.method == 'GET':
         id = request.GET.get('id')
-        return JsonResponse("work", safe=False)
+        event = EventForBus.objects.get(id = id)
+        event.fixed = True
+        event.save()
+        ans = "True"
+        return JsonResponse(ans, safe=False)

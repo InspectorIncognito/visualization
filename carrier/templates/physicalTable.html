@@ -74,6 +74,7 @@
                 {title: "Reporte", data: 'type'},
                 {title: "Patente", data: 'plate'},
                 {title: "Fecha", data: 'timeCreation'},
+                {title: "miau", data: 'fixed'},
                 {
                     title: "Arreglar",
                     data: null,
@@ -91,8 +92,8 @@
             var url = "http://" + location.host + "/carriers/updatePhysical/";
             $.getJSON(url, {"id": id})
                     .done(function (data) {
-                        if (data == true) {
-                            console.log("yay");
+                        if (data == 'True') {
+                            table.ajax.reload();    
                         }
                     });
 
