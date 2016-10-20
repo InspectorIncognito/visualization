@@ -239,7 +239,7 @@ function updatechart() {
                         }
                     },
                     subchart: {
-                        show: true
+                        show: $('#date_end').data("DateTimePicker").date().diff($('#date_init').data("DateTimePicker").date(), 'months') > 2
                     }
                 });
                 break;
@@ -310,10 +310,12 @@ function myFunction() {
         minute1: 00,
         minute2: 59
     };
-    /*var service = $(".select2_multiple").val();
-     var plate = document.getElementById("plate").value;
+    /*
+     var service = $(".select2_multiple").val();
+     var plate = $(".select2_plate").val();
      if (service != null) data['service'] = JSON.stringify(service);
-     if (plate != '') data['plate'] = plate;*/
+     if (plate != null) data['plate'] = JSON.stringify(plate);
+     */
 
     $.getJSON(Dataurl, data)
         .done(function (data) {
