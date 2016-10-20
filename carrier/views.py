@@ -137,6 +137,7 @@ def getPhysicalTable(request):
     query = query.filter(event__category="estado físico").exclude(event__id = "evn00225")
     query = query.exclude(bus__registrationPlate__icontains = "dummyLPt")
     query = query.distinct("event__name", "bus__registrationPlate")
+    query = query.exclude(fixed = True)
     data = {
         'data': [report.getDictionary() for report in query]
     }

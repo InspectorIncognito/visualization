@@ -48,15 +48,29 @@
     <!-- DataTables -->
     <script type="text/javascript"
             src="https://cdn.datatables.net/v/bs/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.12/b-1.2.2/b-colvis-1.2.2/b-flash-1.2.2/b-html5-1.2.2/b-print-1.2.2/r-2.1.0/datatables.min.js"></script>
+    <!-- Moment -->
+    <script src="{% static 'components/gentelella/vendors/moment/min/moment.min.js' %}"></script>
+    <script src="{% static 'components/gentelella/vendors/moment/locale/es.js' %}"></script>
 
     <script>
         var table;
+        var date = moment();
+        var dateString = date.format("DD-MM-YYYY");
+        var fileName = "Reportes diarios " + dateString + " Comportamiento del Conductor";
         $(document).ready(function () {
             table = $('#example').dataTable({
-                "pageLength": 100,
+                pageLength: 100,
+                order: [[1, "desc"]],
                 dom: 'Bfrtip',
                 buttons: [
-                    {extend: 'copy', text: 'Copiar'}, 'csv', 'excel', 'pdf', {extend: 'print', text: 'Imprimir'}
+                    {extend: 'copy', text: 'Copiar'}, {
+                        extend: 'csv',
+                        filename: fileName
+                    }, {extend: 'excel', filename: fileName}, {extend: 'pdf', filename: fileName, title: fileName}, {
+                        extend: 'print',
+                        text: 'Imprimir',
+                        title: fileName
+                    }
 
                 ],
                 responsive: true,
