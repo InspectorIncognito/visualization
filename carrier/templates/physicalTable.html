@@ -20,6 +20,7 @@
 {% endblock topimports %}
 
 {% block toptiles %}
+<h4>Eventos último mes</h4>
 <div id="headers" class="row tile_count">
 </div>
 {% endblock toptiles %}
@@ -64,47 +65,47 @@
 {% endblock maincontent %}
 
 {% block bottomimports %}
-    <!-- DataTables -->
-    <script type="text/javascript" src="https://cdn.datatables.net/v/bs/dt-1.10.12/r-2.1.0/datatables.min.js"></script>
+<!-- DataTables -->
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs/dt-1.10.12/r-2.1.0/datatables.min.js"></script>
 
-    <script>
-        function headers() {
-            var Dataurl = "http://" + location.host + "/carriers/getPhysicalHeaders/";
-            $.getJSON(Dataurl)
-                    .done(function (data) {
-                        var html = ''
-                        $.each(data, function (key, number) {
-                            html += '<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">';
-                            html += '<span class="count_top"><i class="fa fa-user"></i>' + key + '</span>';
-                            html += '<div class="count" style="text-align:center">' + number + '</div>'
-                            html += '</div>'
-                        });
-                        $("#headers").html(html);
+<script>
+    function headers() {
+        var Dataurl = "http://" + location.host + "/carriers/getPhysicalHeaders/";
+        $.getJSON(Dataurl)
+                .done(function (data) {
+                    var html = ''
+                    $.each(data, function (key, number) {
+                        html += '<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">';
+                        html += '<span class="count_top">' + key + '</span>';
+                        html += '<div class="count" style="text-align:center">' + number + '</div>'
+                        html += '</div>'
                     });
-        }
-        headers();
-        var id;
-        var text;
-        var table;
-        $(document).ready(function () {
-            table = $('#example').DataTable({
-                "pageLength": 100,
-                responsive: true,
-                ajax: 'http://' + location.host + '/carriers/getPhysicalTable/',
-                columns: [
-                    {title: "Reporte", data: 'type'},
-                    {title: "Patente", data: 'plate'},
-                    {title: "Fecha", data: 'timeCreation'},
-                    {
-                        title: "Arreglar",
-                        data: null,
-                        "defaultContent": "<button type='button' class='btn-xs btn-primary' id='si'>Arreglar</button>"
-                    },
-                ],
-                language: {
-                    "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json"
-                }
-            });
+                    $("#headers").html(html);
+                });
+    }
+    headers();
+    var id;
+    var text;
+    var table;
+    $(document).ready(function () {
+        table = $('#example').DataTable({
+            "pageLength": 100,
+            responsive: true,
+            ajax: 'http://' + location.host + '/carriers/getPhysicalTable/',
+            columns: [
+                {title: "Reporte", data: 'type'},
+                {title: "Patente", data: 'plate'},
+                {title: "Fecha", data: 'timeCreation'},
+                {
+                    title: "Arreglar",
+                    data: null,
+                    "defaultContent": "<button type='button' class='btn-xs btn-primary' id='si'>Arreglar</button>"
+                },
+            ],
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json"
+            }
+        });
 
         $('#example tbody').on('click', 'button', function () {
             var data = table.row($(this).parents('tr')).data();
@@ -125,5 +126,9 @@
                     }
                 });
     }
+    setInterval(function () {
+        headers();
+        table.ajax.reload();
+    }, 30000);
 </script>
 {% endblock bottomimports %}

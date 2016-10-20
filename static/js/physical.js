@@ -326,16 +326,21 @@ function myFunction() {
             updatechart();
         });
 }
-
-var Dataurl = "http://" + location.host + "/carriers/getPhysicalHeaders/";
-$.getJSON(Dataurl)
-    .done(function (data) {
-        var html = ''
-        $.each(data, function (key, number) {
-            html += '<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">';
-            html += '<span class="count_top"><i class="fa fa-user"></i>' + key + '</span>';
-            html += '<div class="count" style="text-align:center">' + number + '</div>'
-            html += '</div>'
+function headers() {
+    var Dataurl = "http://" + location.host + "/carriers/getPhysicalHeaders/";
+    $.getJSON(Dataurl)
+        .done(function (data) {
+            var html = ''
+            $.each(data, function (key, number) {
+                html += '<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">';
+                html += '<span class="count_top">' + key + '</span>';
+                html += '<div class="count" style="text-align:center">' + number + '</div>'
+                html += '</div>'
+            });
+            $("#headers").html(html);
         });
-        $("#headers").html(html);
-    });
+};
+headers();
+setInterval(function () {
+            headers();
+        }, 30000);
