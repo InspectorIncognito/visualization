@@ -52,7 +52,7 @@ def getPhysicalHeaders(request):
         year = year - 1
     else:
         last_month = today.month - 3
-    headerInfo = headerInfo.filter(timeStamp__gte=date(year, last_month, today.day)).exclude(
+    headerInfo = headerInfo.filter(timeCreation__gte=date(year, last_month, today.day)).exclude(
         bus__registrationPlate="dummyLPt")
     headerInfo = headerInfo.filter(fixed=False)
     response = {}
@@ -64,7 +64,7 @@ def getPhysicalHeaders(request):
 
 
 def getFreeReport(request):  # TODO Change model to support filtering by carrier
-    reports = Report.objects.order_by('-timeStamp')
+    reports = Report.objects.order_by('-timeCreation')
     response = [report.getDictionary() for report in reports]
     return JsonResponse(response, safe=False)
 
@@ -126,9 +126,11 @@ def getDriversTable(request):
     query = query.exclude(bus__registrationPlate__icontains="dummylpt")
     query = query.exclude(event__id='evn00233')
     today = datetime.now(pytz.timezone('Chile/Continental'))
-    # query = query.filter(timeStamp__year=str(today.year),
-    #                     timeStamp__month=str(today.month),
-    #                     timeStamp__day=str(today.day))
+    query = query.filter(timeCreation__year=str(today.year),
+                          timeCreation__month=str(today.month),
+                          timeCreation__day=str(today.day))
+    print (len(query))
+    print ("\n\n\n\n")
     data = {
         'data': [report.getDictionary() for report in query]
     }
@@ -221,3 +223,18 @@ def getFullTable(request):
         'data': [report.getDictionary() for report in query]
     }
     return JsonResponse(data, safe=False)
+
+
+# from AndroidRequests.models import EventForBus, Service
+# from datetime import datetime, date, timedelta
+# from random import randint
+# import pytz
+#
+# query = EventForBus.objects.filter(bus__service__in=[service.service for service in Service.objects.filter(color_id=7)])
+# events = query.filter(event__category='conductor')[:12]
+# for event in events:
+#     time = datetime.now(pytz.timezone('Chile/Continental'))
+#     delta = timedelta(seconds=randint(0, 3600 * 5))
+#     time = time - delta
+#     event.timeCreation = time
+#     event.save()
