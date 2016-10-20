@@ -64,7 +64,7 @@ def getPhysicalHeaders(request):
 
 
 def getFreeReport(request):  # TODO Change model to support filtering by carrier
-    reports = Report.objects.order_by('-timeCreation')
+    reports = Report.objects.order_by('-timeStamp')
     response = [report.getDictionary() for report in reports]
     return JsonResponse(response, safe=False)
 
