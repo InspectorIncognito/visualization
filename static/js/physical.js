@@ -337,33 +337,3 @@ $.getJSON(Dataurl)
         });
         $("#headers").html(html);
     });
-
-var table;
-$(document).ready(function () {
-    table = $('#example').DataTable({
-        "pageLength": 100,
-        order: [[2, "desc"]],
-        responsive: true,
-        ajax: 'http://' + location.host + '/carriers/getPhysicalTable/',
-        columns: [
-            {title: "Reporte", data: 'type'},
-            {title: "Patente", data: 'plate'},
-            {title: "Fecha", data: 'timeCreation'},
-            {
-                title: "Arreglar",
-                data: null,
-                "defaultContent": "<button type='button' class='btn-xs btn-primary' id='si'>Arreglar</button>"
-            },
-        ],
-        language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json"
-        }
-    });
-
-    $('#example tbody').on('click', 'button', function () {
-        var data = table.row($(this).parents('tr')).data();
-        console.log($(this).attr("id"))
-
-    });
-
-});

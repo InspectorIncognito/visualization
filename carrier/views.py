@@ -22,7 +22,7 @@ def drivers(request):
     plates = [bus.registrationPlate for bus in buses]
     context = {
         'services': services,
-        'plates' : plates,
+        'plates': plates,
     }
     return HttpResponse(template.render(context, request))
 
@@ -119,7 +119,7 @@ def getDriversTable(request):
         bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
     query = query.filter(event__category="conductor")
     query = query.exclude(bus__registrationPlate__icontains="dummylpt")
-    query = query.exclude(event__id = 'evn00233')
+    query = query.exclude(event__id='evn00233')
     today = datetime.now(pytz.timezone('Chile/Continental'))
     # query = query.filter(timeStamp__year=str(today.year),
     #                     timeStamp__month=str(today.month),
@@ -130,14 +130,19 @@ def getDriversTable(request):
     return JsonResponse(data, safe=False)
 
 
+def physicalTable(request):
+    template = loader.get_template('physicalTable.html')
+    return HttpResponse(template.render(request=request))
+
+
 def getPhysicalTable(request):
     carrier = 7  # TODO Select carrier depending on who is logged.
     query = EventForBus.objects.filter(
         bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
-    query = query.filter(event__category="estado físico").exclude(event__id = "evn00225")
-    query = query.exclude(bus__registrationPlate__icontains = "dummyLPt")
+    query = query.filter(event__category="estado físico").exclude(event__id="evn00225")
+    query = query.exclude(bus__registrationPlate__icontains="dummyLPt")
     query = query.distinct("event__name", "bus__registrationPlate")
-    query = query.exclude(fixed = True)
+    query = query.exclude(fixed=True)
     data = {
         'data': [report.getDictionary() for report in query]
     }
@@ -183,3 +188,9 @@ def getPhysicalReport(request):
             "types": events
         }
         return JsonResponse(data, safe=False)
+
+
+def updatePhysical(request):
+    if request.method == 'GET':
+        id = request.GET.get('id')
+        return JsonResponse("work", safe=False)

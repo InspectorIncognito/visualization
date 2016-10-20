@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^drivers/$', views.drivers, name='drivers'),
     url(r'^physical/$', views.physical, name='physical'),
     url(r'^driversTable/$', views.driversTable, name='driversTable'),
+    url(r'^physicalTable/$', views.physicalTable, name='physicalTable'),
     url(r'^getDriversData/$', views.getDriversReport, name='getDriversReport'),
     url(r'^getPhysicalData/$', views.getPhysicalReport, name='gePhysicalReport'),
     url(r'^getDriversTable/$', views.getDriversTable, name='getDriversTable'),

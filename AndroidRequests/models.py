@@ -148,6 +148,7 @@ class EventForBus(EventRegistration):
         dictionary['busStop2'] = ""
         dictionary['place'] = ""
         dictionary['fixed'] = "Si" if self.fixed else "No"
+        dictionary['id'] = self.id
         return dictionary
 
 
