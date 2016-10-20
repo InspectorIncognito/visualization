@@ -76,7 +76,7 @@
                     var html = ''
                     $.each(data, function (key, number) {
                         html += '<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">';
-                        html += '<span class="count_top">' + key + '</span>';
+                        html += '<span class="count_top" title="' + key + '">' + key + '</span>';
                         html += '<div class="count" style="text-align:center">' + number + '</div>'
                         html += '</div>'
                     });
