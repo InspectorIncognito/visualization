@@ -149,6 +149,12 @@ class EventForBus(EventRegistration):
         dictionary['place'] = ""
         dictionary['fixed'] = "Si" if self.fixed else "No"
         dictionary['id'] = self.id
+        dictionary['category'] = self.event.category
+        dictionary['zone777'] = ""
+        dictionary['commune'] = ""
+        dictionary['typeOfDay'] = ""
+        dictionary['periodHour'] = ""
+        dictionary['periodTransantiago'] = ""
         return dictionary
 
 

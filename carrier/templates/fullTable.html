@@ -28,7 +28,7 @@
         <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="x_panel">
                 <div class="x_title">
-                    <h2>Reportes del día de hoy</h2>
+                    <h2>Todos los reportes</h2>
                     <ul class="nav navbar-right panel_toolbox">
                         <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                         </li>
@@ -48,19 +48,14 @@
     <!-- DataTables -->
     <script type="text/javascript"
             src="https://cdn.datatables.net/v/bs/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.12/b-1.2.2/b-colvis-1.2.2/b-flash-1.2.2/b-html5-1.2.2/b-print-1.2.2/r-2.1.0/datatables.min.js"></script>
-    <!-- Moment -->
-    <script src="{% static 'components/gentelella/vendors/moment/min/moment.min.js' %}"></script>
-    <script src="{% static 'components/gentelella/vendors/moment/locale/es.js' %}"></script>
 
     <script>
         var table;
-        var date = moment();
-        var dateString = date.format("DD-MM-YYYY");
-        var fileName = "Reportes diarios " + dateString + " Comportamiento del Conductor";
+        var fileName = "Todos los reportes";
         $(document).ready(function () {
             table = $('#example').dataTable({
-                pageLength: 100,
-                order: [[1, "desc"]],
+                pageLength: 50,
+                order: [[2, "desc"]],
                 dom: 'Bfrtip',
                 buttons: [
                     {extend: 'copy', text: 'Copiar'}, {
@@ -74,15 +69,22 @@
 
                 ],
                 responsive: true,
-                ajax: 'http://' + location.host + '/carriers/getDriversTable/',
+                ajax: 'http://' + location.host + '/carriers/getFullTable/',
                 columns: [
-                    {title: "Reporte", data: 'type'},
+                    {title: "Tipo de Reporte ", data: 'category'},
                     {title: "Fecha", data: 'timeCreation'},
-                    {title: "Patente", data: 'plate'},
+                    {title: "Reporte ", data: 'type'},
+                    {title: "Verdaderos", data: 'eventConfirm'},
+                    {title: "Falsos", data: 'eventDecline'},
+                    {title: "Tipo de día", data: 'plate'},
+                    {title: "Período media hora", data: 'periodHour'},
                     {title: "Servicio", data: 'service'},
-                    {title: "Lugar", data: 'place'},
+                    {title: "Patente", data: 'plate'},
+                    {title: "Comuna", data: 'commune'},
                     {title: "Paradero 1", data: 'busStop1'},
-                    {title: "Paradero 2", data: 'busStop2'}
+                    {title: "Paradero 2", data: 'busStop2'},
+                    {title: "Zona 777-lugar", data: 'zone777'},
+                    {title: "Período Transantiago", data: 'periodTransantiago'},
                 ],
                 language: {
                     "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json",
