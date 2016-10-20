@@ -87,6 +87,7 @@
                                                 <label for="service">Recorrido(s)</label>
                                                 <select class="select2_multiple form-control"
                                                         id='service' multiple="multiple">
+                                                    <option>Todos los recorridos</option>
                                                     {% for service in services %}
                                                     <option>{{ service.service }}</option>
                                                     {% endfor %}
@@ -98,6 +99,7 @@
                                                 <label for="plate">Patente</label>
                                                 <select class="select2_plate form-control"
                                                         id='plate'  multiple="multiple">
+                                                    <option>Todas las patentes</option>
                                                     {% for plate in plates %}
                                                     <option>{{ plate}}</option>
                                                     {% endfor %}
@@ -118,9 +120,9 @@
                                 <label class="btn btn-default active">
                                     <input type="radio" name="groups" value="weekday" checked> Dia semana
                                 </label>
-                                <label class="btn btn-default ">
+                                <!--<label class="btn btn-default ">
                                     <input type="radio" name="groups" value="plate"> Patente
-                                </label>
+                                </label>-->
                                 <label class="btn btn-default ">
                                     <input type="radio" name="groups" value="service"> Recorrido
                                 </label>

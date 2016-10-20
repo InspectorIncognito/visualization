@@ -27,6 +27,16 @@ $(function () {
     $("#filters :input").keyup(function () {
         myFunction();
     });
+    $('#service').on("select2:select", function () {
+        if ($(".select2_multiple").val()[0] == "Todos los recorridos") {
+            $("#service").select2("val", "");
+        }
+    });
+    $('#plate').on("select2:select", function () {
+        if ($(".select2_plate").val()[0] == "Todas las patentes") {
+            $("#plate").select2("val", "");
+        }
+    });
     myFunction();
 });
 $(document).ready(function () {
@@ -235,6 +245,12 @@ function updatechart() {
                         type: 'bar',
                         groups: [types]
                     },
+
+                    bar: {
+                        width: {
+                            ratio: 0.3
+                        }
+                    },
                     axis: {
                         x: {
                             type: 'timeseries',
@@ -247,7 +263,7 @@ function updatechart() {
                         }
                     },
                     subchart: {
-                        show: true
+                        show: $('#date_end').data("DateTimePicker").date().diff($('#date_init').data("DateTimePicker").date(), 'months') > 2
                     }
                 });
                 break;
@@ -319,9 +335,9 @@ function myFunction() {
         minute2: $('#hour2').data("DateTimePicker").date().format("mm")
     };
     var service = $(".select2_multiple").val();
-    var plate = document.getElementById("plate").value;
+    var plate = $(".select2_plate").val();
     if (service != null) data['service'] = JSON.stringify(service);
-    if (plate != '') data['plate'] = plate;
+    if (plate != null) data['plate'] = JSON.stringify(plate);
 
     $.getJSON(Dataurl, data)
         .done(function (data) {
