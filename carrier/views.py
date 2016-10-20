@@ -83,7 +83,7 @@ def getDriversReport(request):
         date_end = request.GET.get('date_end')
         hour1 = int(request.GET.get('hour1'))
         hour2 = int(request.GET.get('hour2'))
-        plate = request.GET.get('plate')
+        plates = request.GET.get('plate')
         serv = request.GET.get('service')
         hour2 = (hour2 + 24) if hour2 < hour1 else hour2
         hours = [hour % 24 for hour in range(hour1, hour2 + 1)]
@@ -91,8 +91,11 @@ def getDriversReport(request):
             bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
         query = query.filter(event__category="conductor")
         query = query.filter(timeCreation__range=[date_init, date_end])
-        query = (query.filter(bus__registrationPlate__icontains=plate) if plate else query)
         query = query.exclude(bus__registrationPlate__icontains="dummyLPt")
+        if plates:
+            plates = json.loads(plates)
+            plateFilter = reduce(lambda x, y: x | y, [Q(bus__registrationPlate=plate) for plate in plates])
+            query = query.filter(plateFilter)
         if serv:
             serv = json.loads(serv)
             serviceFilter = reduce(lambda x, y: x | y, [Q(bus__service=ser) for ser in serv])
@@ -165,7 +168,7 @@ def getPhysicalReport(request):
         date_end = request.GET.get('date_end')
         hour1 = int(request.GET.get('hour1'))
         hour2 = int(request.GET.get('hour2'))
-        plate = request.GET.get('plate')
+        plates = request.GET.get('plate')
         serv = request.GET.get('service')
         hour2 = (hour2 + 24) if hour2 < hour1 else hour2
         hours = [hour % 24 for hour in range(hour1, hour2 + 1)]
@@ -173,8 +176,11 @@ def getPhysicalReport(request):
             bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
         query = query.filter(event__category="estado físico")
         query = query.filter(timeCreation__range=[date_init, date_end])
-        query = (query.filter(bus__registrationPlate__icontains=plate) if plate else query)
         query = query.exclude(bus__registrationPlate__icontains="dummyLPt")
+        if plates:
+            plates = json.loads(plates)
+            plateFilter = reduce(lambda x, y: x | y, [Q(bus__registrationPlate=plate) for plate in plates])
+            query = query.filter(plateFilter)
         if serv:
             serv = json.loads(serv)
             serviceFilter = reduce(lambda x, y: x | y, [Q(bus__service=ser) for ser in serv])
