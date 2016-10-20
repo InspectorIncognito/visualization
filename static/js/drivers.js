@@ -47,7 +47,8 @@ var chartdata = {
     'plate': null,
     'service': null,
     'daily': null,
-    'monthly': null
+    'monthly': null,
+    'yearly': null,
 };
 var chart;
 function reloadchart() {
@@ -135,7 +136,7 @@ function updatechart() {
                         x: {
                             type: 'category',
                             tick: {
-                                rotate: 90,
+                                rotate: 45,
                                 multiline: false
                             },
                             categories: chartdata['plate']['plates']
@@ -182,7 +183,7 @@ function updatechart() {
                         x: {
                             type: 'category',
                             tick: {
-                                rotate: 90,
+                                rotate: 45,
                                 multiline: false
                             },
                             categories: services
@@ -205,7 +206,7 @@ function updatechart() {
                     }
                     for (i = 0; i < resp.length; i++) {
                         var type = resp[i]['type'];
-                        var day = moment(resp[i]['timeStamp'], "DD-MM-YYYY HH:mm:SS").format("DD-MM-YYYY")
+                        var day = moment(resp[i]['timeCreation'], "DD-MM-YYYY HH:mm:SS").format("DD-MM-YYYY")
 
                         if (days.indexOf(day) == -1) {
                             days.push(day)
@@ -239,7 +240,7 @@ function updatechart() {
                             type: 'timeseries',
                             tick: {
                                 culling: false,
-                                rotate: 90,
+                                rotate: 45,
                                 format: '%d-%m-%Y'
                             }
 
@@ -259,7 +260,7 @@ function updatechart() {
                     }
                     for (i = 0; i < resp.length; i++) {
                         var type = resp[i]['type'];
-                        var month = moment(resp[i]['timeStamp'], "DD-MM-YYYY HH:mm:SS").format("MM-YYYY")
+                        var month = moment(resp[i]['timeCreation'], "DD-MM-YYYY HH:mm:SS").format("MM-YYYY")
 
                         if (months.indexOf(month) == -1) {
                             months.push(month)
@@ -295,7 +296,7 @@ function updatechart() {
                             type: 'timeseries',
                             tick: {
                                 culling: false,
-                                rotate: 90,
+                                rotate: 45,
                                 format: '%m-%Y'
                             }
 

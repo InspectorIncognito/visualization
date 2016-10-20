@@ -192,7 +192,7 @@ function updatechart() {
                     }
                     for (i = 0; i < resp.length; i++) {
                         var type = resp[i]['type'];
-                        var day = moment(resp[i]['timeStamp'], "DD-MM-YYYY HH:mm:SS").format("DD-MM-YYYY")
+                        var day = moment(resp[i]['timeCreation'], "DD-MM-YYYY HH:mm:SS").format("DD-MM-YYYY")
 
                         if (days.indexOf(day) == -1) {
                             days.push(day)
@@ -246,7 +246,7 @@ function updatechart() {
                     }
                     for (i = 0; i < resp.length; i++) {
                         var type = resp[i]['type'];
-                        var month = moment(resp[i]['timeStamp'], "DD-MM-YYYY HH:mm:SS").format("MM-YYYY")
+                        var month = moment(resp[i]['timeCreation'], "DD-MM-YYYY HH:mm:SS").format("MM-YYYY")
 
                         if (months.indexOf(month) == -1) {
                             months.push(month)
@@ -305,9 +305,9 @@ function myFunction() {
         minute2: 59
     };
     /*var service = $(".select2_multiple").val();
-    var plate = document.getElementById("plate").value;
-    if (service != null) data['service'] = JSON.stringify(service);
-    if (plate != '') data['plate'] = plate;*/
+     var plate = document.getElementById("plate").value;
+     if (service != null) data['service'] = JSON.stringify(service);
+     if (plate != '') data['plate'] = plate;*/
 
     $.getJSON(Dataurl, data)
         .done(function (data) {
@@ -331,21 +331,32 @@ $.getJSON(Dataurl)
         $("#headers").html(html);
     });
 
-
+var table;
 $(document).ready(function () {
-    $('#example').dataTable({
+    table = $('#example').DataTable({
         "pageLength": 100,
         responsive: true,
         ajax: 'http://' + location.host + '/carriers/getPhysicalTable/',
         columns: [
             {title: "Reporte", data: 'type'},
             {title: "Patente", data: 'plate'},
-            {title: "Fecha", data: 'timeStamp'},
-            {title: "Arreglado", data: 'fixed'},
+            {title: "Fecha", data: 'timeCreation'},
+            {
+                title: "Arreglar",
+                data: null,
+                "defaultContent": "<button type='button' class='btn-xs btn-primary' id='si'>Arreglar</button>"
+            },
         ],
         language: {
             "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json"
         }
+    });
+
+    $('#example tbody').on('click', 'button', function () {
+        var data = table.row($(this).parents('tr')).data();
+        console.log(data)
+        console.log($(this).attr("id"))
+
     });
 
 });
