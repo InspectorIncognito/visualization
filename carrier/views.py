@@ -19,6 +19,7 @@ def drivers(request):
     carrier = 7  # TODO Select carrier depending on who is logged.
     services = Service.objects.filter(color_id=carrier)
     buses = Bus.objects.filter(service__in=[service.service for service in services])
+    buses = buses.exclude(registrationPlate__icontains = 'dummyLPt')
     plates = [bus.registrationPlate for bus in buses]
     context = {
         'services': services,
@@ -53,6 +54,7 @@ def getPhysicalHeaders(request):
         last_month = today.month - 3
     headerInfo = headerInfo.filter(timeStamp__gte=date(year, last_month, today.day)).exclude(
         bus__registrationPlate="dummyLPt")
+    headerInfo = headerInfo.filter(fixed = False)
     response = {}
     for ev in events:
         q = headerInfo.filter(event__name=ev)
