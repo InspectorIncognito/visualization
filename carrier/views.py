@@ -181,6 +181,7 @@ def getPhysicalReport(request):
         query = query.filter(event__category="estado físico")
         query = query.filter(timeCreation__range=[date_init, date_end])
         query = query.exclude(bus__registrationPlate__icontains="dummyLPt")
+        query = query.exclude(fixed = True)
         if plates:
             plates = json.loads(plates)
             plateFilter = reduce(lambda x, y: x | y, [Q(bus__registrationPlate=plate) for plate in plates])
