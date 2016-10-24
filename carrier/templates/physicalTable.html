@@ -16,6 +16,8 @@
 <!-- DataTables -->
 <link rel="stylesheet" type="text/css"
       href="https://cdn.datatables.net/v/bs/dt-1.10.12/r-2.1.0/datatables.min.css"/>
+<script src="{% static 'components/gentelella/vendors/moment/min/moment.min.js' %}"></script>
+<script src="{% static 'components/gentelella/vendors/moment/locale/es.js' %}"></script>
 
 {% endblock topimports %}
 
@@ -67,7 +69,8 @@
 {% block bottomimports %}
 <!-- DataTables -->
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs/dt-1.10.12/r-2.1.0/datatables.min.js"></script>
-
+<script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script>
+//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js
 <script>
     function headers() {
         var Dataurl = "http://" + location.host + "/carriers/getPhysicalHeaders/";
@@ -88,6 +91,7 @@
     var text;
     var table;
     $(document).ready(function () {
+        $.fn.dataTable.moment( 'DD-MM-YYYY HH:mm:ss' );
         table = $('#example').DataTable({
             "pageLength": 100,
             responsive: true,
