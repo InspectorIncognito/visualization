@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'visualization',
     'carrier.apps.CarrierConfig',
     'AndroidRequests.apps.AndroidRequestsConfig',
     'django.contrib.admin',
