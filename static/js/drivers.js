@@ -222,7 +222,7 @@ function makechart(columns, categories, height, x, xformat, groups, type, tickfo
             xFormat: xformat,
             columns: columns,
             type: 'bar',
-            groups: groups //o nada
+            groups: groups
         },
         bar: {
             width: {
