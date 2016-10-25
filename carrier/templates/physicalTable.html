@@ -64,7 +64,6 @@
 <!-- DataTables -->
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs/dt-1.10.12/r-2.1.0/datatables.min.js"></script>
 <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script>
-//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js
 <script>
     function headers() {
         var Dataurl = "http://" + location.host + "/carriers/getPhysicalHeaders/";
@@ -88,6 +87,7 @@
         $.fn.dataTable.moment( 'DD-MM-YYYY HH:mm:ss' );
         table = $('#example').DataTable({
             "pageLength": 100,
+            order: [[2, 'desc']],
             responsive: true,
             ajax: 'http://' + location.host + '/carriers/getPhysicalTable/',
             columns: [
