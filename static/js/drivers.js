@@ -216,9 +216,9 @@ function makechart(columns, categories, height, x, xformat, groups, type, tickfo
     chart = c3.generate({
         size: {
             height: height,
-        },// o nada
+        },
         data: {
-            x: x, // o nada
+            x: x,
             xFormat: xformat,
             columns: columns,
             type: 'bar',
@@ -267,4 +267,13 @@ function myFunction() {
             types = data.types;
             updatechart();
         });
+    $.getJSON("http://nominatim.openstreetmap.org/search", {format: 'json', q: "-33.3505,-70.5484"})
+        .done(function (data) {
+            console.log(data)
+        });
+     $.getJSON("http://nominatim.openstreetmap.org/search", {format: 'json', q: "-33.4570377,-70.6644547"})
+        .done(function (data) {
+            console.log(data)
+        });
+
 }
