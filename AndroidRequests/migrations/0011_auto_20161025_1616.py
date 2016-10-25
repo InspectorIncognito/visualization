@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 
 def fill_tables(apps, schema_editor):
-	timeperiods = apps.get_model('visualization', 'timeperiod')
+	timeperiods = apps.get_model('AndroidRequests', 'timeperiod')
 	timeperiods(day_type = 'Laboral', name = 'Pre nocturno', initial_time = '00:00:00', end_time = '00:59:59').save()
 	timeperiods(day_type = 'Laboral', name = 'Nocturno', initial_time = '01:00:00', end_time = '05:29:59').save()
 	timeperiods(day_type = 'Laboral', name = 'Transicion nocturno', initial_time = '05:30:00', end_time = '06:29:59').save()
@@ -39,12 +39,9 @@ def fill_tables(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
+    	('AndroidRequests', '0010_auto_20161013_1308'),
     ]
 
-    # Posibles operaciones que querriamos realizar:
-    # 1. Borrar tablas innecesarias para visualizacion
-    # 2. Dejar solo los modelos V2
-    # 3. Cambiar nombres de tablas
     operations = [
         migrations.CreateModel(
             name='TimePeriod',

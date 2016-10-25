@@ -12,7 +12,7 @@ def fill_tables(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('visualization', '0001_initial'),
+        ('AndroidRequests', '0011_auto_20161025_1616'),
     ]
 
     operations = [
@@ -22,5 +22,5 @@ class Migration(migrations.Migration):
         #     field=models.ForeignKey(verbose_name=b'Time Period', to='visualization.EventForBusv2', null = True),
         #     preserve_default=False,
         # ),
-        migrations.RunPython(fill_tables, reverse_code=migrations.RunPython.noop),
+        migrations.RunPython(fill_tables, reverse_code=migrations.RunPython.noop, hints={'target_db': 'visualization'}),
     ]
