@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 
 def fill_tables(apps, schema_editor):
-	timeperiods = apps.get_model('visualization', 'time_period')
+	timeperiods = apps.get_model('visualization', 'timeperiod')
 	timeperiods(day_type = 'Laboral', name = 'Pre nocturno', initial_time = '00:00:00', end_time = '00:59:59').save()
 	timeperiods(day_type = 'Laboral', name = 'Nocturno', initial_time = '01:00:00', end_time = '05:29:59').save()
 	timeperiods(day_type = 'Laboral', name = 'Transicion nocturno', initial_time = '05:30:00', end_time = '06:29:59').save()
@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
     # 2. Dejar solo los modelos V2
     # 3. Cambiar nombres de tablas
     operations = [
-            migrations.CreateModel(
+        migrations.CreateModel(
             name='TimePeriod',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
@@ -55,5 +55,6 @@ class Migration(migrations.Migration):
                 ('initial_time', models.TimeField(auto_now=False, auto_now_add=False)),
                 ('end_time', models.TimeField(auto_now=False, auto_now_add=False)),
             ],
-        )
+        ),
+        migrations.RunPython(fill_tables, reverse_code=migrations.RunPython.noop),
     ]
