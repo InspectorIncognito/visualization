@@ -179,7 +179,7 @@ def getPhysicalReport(request):
         query = query.filter(event__category="estado físico")
         query = query.filter(timeCreation__range=[date_init, date_end])
         query = query.exclude(bus__registrationPlate__icontains="dummyLPt")
-        query = query.exclude(fixed = True)
+        query = query.exclude(fixed=True)
         if plates:
             plates = json.loads(plates)
             plateFilter = reduce(lambda x, y: x | y, [Q(bus__registrationPlate=plate) for plate in plates])
@@ -211,17 +211,33 @@ def updatePhysical(request):
 
 def fullTable(request):
     template = loader.get_template('fullTable.html')
-    return HttpResponse(template.render(request=request))
+    events = Event.objects.filter(eventType="bus").distinct("category")
+    types = [event.category for event in events]
+    context = {
+        'types': types,
+    }
+    return HttpResponse(template.render(context, request))
+
 
 def getFullTable(request):
-    carrier = 7  # TODO Select carrier depending on who is logged.
-    query = EventForBus.objects.filter(
-        bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
-    query = query.exclude(bus__registrationPlate__icontains="dummyLPt")
-    data = {
-        'data': [report.getDictionary() for report in query]
-    }
-    return JsonResponse(data, safe=False)
+    if request.method == 'GET':
+        carrier = 7  # TODO Select carrier depending on who is logged.
+        query = EventForBus.objects.filter(
+            bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
+        query = query.exclude(bus__registrationPlate__icontains="dummyLPt")
+        date_init = request.GET.get('date_init')
+        date_end = request.GET.get('date_end')
+        types = request.GET.get('types')
+        query = query.filter(timeCreation__range=[date_init, date_end])
+        if types:
+            types = json.loads(types)
+            typeFilter = reduce(lambda x, y: x | y, [Q(event__category = type) for type in types])
+            query = query.filter(typeFilter)
+
+        data = {
+            'data': [report.getDictionary() for report in query]
+        }
+        return JsonResponse(data, safe=False)
 
 def maptest(request):
     template = loader.get_template('maptest.html')
