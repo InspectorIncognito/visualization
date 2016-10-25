@@ -225,6 +225,9 @@ def getFullTable(request):
     }
     return JsonResponse(data, safe=False)
 
+def maptest(request):
+    template = loader.get_template('maptest.html')
+    return HttpResponse(template.render(request=request))
 
 # from AndroidRequests.models import EventForBus, Service
 # from datetime import datetime, date, timedelta

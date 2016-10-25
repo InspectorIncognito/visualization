@@ -18,4 +18,5 @@ urlpatterns = [
     url(r'^updatePhysical/$', views.updatePhysical, name='updatePhysical'),
     url(r'^fullTable/$', views.fullTable, name='fullTable'),
     url(r'^getFullTable/$', views.getFullTable, name='getFullTable'),
+    url(r'^maptest/$', views.maptest, name='mapTest'),
 ]
