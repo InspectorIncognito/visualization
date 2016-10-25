@@ -45,17 +45,20 @@
 {% endblock maincontent %}
 
 {% block bottomimports %}
+    <!-- Moment -->
+    <script src="{% static 'components/gentelella/vendors/moment/min/moment.min.js' %}"></script>
     <!-- DataTables -->
     <script type="text/javascript"
             src="https://cdn.datatables.net/v/bs/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.12/b-1.2.2/b-colvis-1.2.2/b-flash-1.2.2/b-html5-1.2.2/b-print-1.2.2/r-2.1.0/datatables.min.js"></script>
-
+    <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script>
     <script>
         var table;
         var fileName = "Todos los reportes";
         $(document).ready(function () {
+            $.fn.dataTable.moment( 'DD-MM-YYYY HH:mm:ss' );
             table = $('#example').dataTable({
                 pageLength: 50,
-                order: [[2, "desc"]],
+                order: [[1, "desc"]],
                 dom: 'Bfrtip',
                 buttons: [
                     {extend: 'copy', text: 'Copiar'}, {
