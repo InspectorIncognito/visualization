@@ -98,7 +98,7 @@ class StadisticDataFromRegistration(Location):
 
 class StadisticDataFromRegistrationBus(StadisticDataFromRegistration):
     """ Save the report done for a user to confirm or decline a bus event """
-    reportOfEvent = models.ForeignKey('EventForBus', verbose_name='Bus Event')
+    reportOfEvent = models.ForeignKey('EventForBusv2', verbose_name='Bus Event')
 
 class StadisticDataFromRegistrationBusStop(StadisticDataFromRegistration):
     """ Save the report done for a user to confirm or decline a bus stop event """
@@ -182,7 +182,7 @@ class EventForBusv2(EventRegistration):
     '''This model stores the reported events for the Bus'''
     busassignment = models.ForeignKey('Busassignment', verbose_name='the bus')
     '''Indicates the bus to which the event refers'''
-    time_period = models.ForeignKey( 'EventForBusv2', verbose_name=b'Time Period', null = False)
+    time_period = models.ForeignKey( 'TimePeriod', verbose_name=b'Time Period', null = False)
 
     def getDictionary(self):
         '''A dictionary with the event information'''
@@ -274,7 +274,7 @@ class Bus(models.Model):
     """ It's the registration plate for the bus, without hyphen """
     service = models.CharField(max_length=5, null=False, blank=False)
     """ It indicates the service performed by the bus """
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     """ Unique ID to primarily identify Buses created without registrationPlate """
     events = models.ManyToManyField(Event,  verbose_name='the event' ,through=EventForBus)
 

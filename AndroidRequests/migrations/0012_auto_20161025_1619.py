@@ -4,11 +4,12 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 
 def fill_tables(apps, schema_editor):
-	eventsforbusv2 = apps.get_model('AndroidRequests', 'eventsforbusv2')
+    eventsforbusv2 = apps.get_model('AndroidRequests', 'EventForBusv2')
     timeperiods = apps.get_model('AndroidRequests', 'TimePeriod')
-	for ev in eventsforbusv2.objects.all():
-		# time_to_match = ev.timeCreation
-		# print(time_to_match)
+    
+    for ev in eventsforbusv2.objects.all():
+        # time_to_match = ev.timeCreation
+        # print(time_to_match)
         time = ev.timeCreation.time()
         timeperiod = None
         if ev.timeCreation.strftime("%A") == 'Saturday':
@@ -21,7 +22,9 @@ def fill_tables(apps, schema_editor):
             #Working day
             timeperiod = timeperiods.objects.get(day_type = 'Laboral',\
                 initial_time__lte = time , end_time__gt = time)
+
         ev.time_period = timeperiod
+        ev.save()
 
 class Migration(migrations.Migration):
 
@@ -39,8 +42,23 @@ class Migration(migrations.Migration):
         migrations.RunPython(fill_tables, reverse_code=migrations.RunPython.noop),
 
         migrations.AlterField(
-            model_name='eventsforbusv2',
+            model_name='eventforbusv2',
             name='time_period',
             field=models.ForeignKey(verbose_name=b'Time Period', to='AndroidRequests.TimePeriod', null = False),
+        ),
+        migrations.AddField(
+            model_name='eventforbus',
+            name='fixed',
+            field=models.BooleanField(default=False, verbose_name=b'Fixed'),
+        ),
+        migrations.AddField(
+            model_name='eventforbusstop',
+            name='fixed',
+            field=models.BooleanField(default=False, verbose_name=b'Fixed'),
+        ),
+        migrations.AddField(
+            model_name='eventforbusv2',
+            name='fixed',
+            field=models.BooleanField(default=False, verbose_name=b'Fixed'),
         ),
     ]

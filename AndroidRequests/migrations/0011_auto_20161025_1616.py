@@ -25,7 +25,7 @@ def fill_tables(apps, schema_editor):
 	timeperiods(day_type = 'Sabado', name = 'Punta mediodia sabado', initial_time = '13:30:00', end_time = '17:29:59').save()
 	timeperiods(day_type = 'Sabado', name = 'Tarde sabado', initial_time = '17:30:00', end_time = '20:29:59').save()
 	timeperiods(day_type = 'Sabado', name = 'Transicion sabado nocturno', initial_time = '20:30:00', end_time = '22:59:59').save()
-	timeperiods(day_type = 'Sabado', name = 'Pre nocturno sabado', initial_time = '23:00:00', end_time = '22:59:59').save()
+	timeperiods(day_type = 'Sabado', name = 'Pre nocturno sabado', initial_time = '23:00:00', end_time = '23:59:59').save()
 	timeperiods(day_type = 'Domingo', name = 'Pre nocturno domingo', initial_time = '00:00:00', end_time = '00:59:59').save()
 	timeperiods(day_type = 'Domingo', name = 'Nocturno domingo', initial_time = '01:00:00', end_time = '05:29:5905:30:00').save()
 	timeperiods(day_type = 'Domingo', name = 'Transicion domingo mañana', initial_time = '05:30:00', end_time = '09:29:59').save()
