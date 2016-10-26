@@ -96,3 +96,8 @@ ENV/
 
 #database
 *.sqlite3
+
+#keys and stuff
+static/*
+visualization/keys/*
+visualization/database.py

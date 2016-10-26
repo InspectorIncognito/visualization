@@ -9,6 +9,20 @@ import logging
 # Create your models here.
 # Remembre to add new models to admin.py
 
+
+
+
+class TimePeriod(models.Model):
+    """ Time period with standar names """
+    day_type = models.CharField(max_length=8)
+    """ Type of day: Working day, Saturday, Sunday """
+    name = models.CharField(max_length=30)
+    """ Standar name """
+    initial_time = models.TimeField(auto_now=False, auto_now_add=False)
+    """ Initial time for the period """
+    end_time = models.TimeField(auto_now=False, auto_now_add=False)
+    """ End time for the period """
+
 class Location(models.Model):
     """ Some of our models require to set a geolocation (coodinates)"""
     longitud = models.FloatField('Longitude', null=False, blank=False)
@@ -168,6 +182,33 @@ class EventForBusv2(EventRegistration):
     '''This model stores the reported events for the Bus'''
     busassignment = models.ForeignKey('Busassignment', verbose_name='the bus')
     '''Indicates the bus to which the event refers'''
+    time_period = models.ForeignKey( 'EventForBusv2', verbose_name=b'Time Period', null = False)
+
+    def getDictionary(self):
+        '''A dictionary with the event information'''
+        dictionary = {}
+
+        dictionary['eventConfirm'] = self.eventConfirm
+        dictionary['eventDecline'] = self.eventDecline
+        creation = timezone.localtime(self.timeCreation)
+        stamp = timezone.localtime(self.timeStamp)
+        dictionary['timeCreation'] = creation.strftime("%d-%m-%Y %H:%M:%S")
+        dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
+        dictionary['service'] = self.busassignment.service
+        dictionary['plate'] = self.busassignment.uuid.registrationPlate.upper()
+        dictionary['type'] = self.event.name
+        dictionary['busStop1'] = ""  # TODO Model needs to be changed to save it
+        dictionary['busStop2'] = ""
+        dictionary['place'] = ""
+        dictionary['fixed'] = "Si" if self.fixed else "No"
+        dictionary['id'] = self.id
+        dictionary['category'] = self.event.category
+        dictionary['zone777'] = ""
+        dictionary['commune'] = ""
+        dictionary['typeOfDay'] = ""
+        dictionary['periodHour'] = ""
+        dictionary['periodTransantiago'] = ""
+        return dictionary
 ##
 #
 # The end for the model for the registration
