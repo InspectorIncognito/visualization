@@ -9,8 +9,26 @@ import logging
 # Create your models here.
 # Remembre to add new models to admin.py
 
-
-
+class ReportInfo(models.Model):
+    """ Table for the report info data in Report """
+    REPORT_TYPE = (
+        ('bus', 'An event for the bus.'),
+        ('busStop', 'An event for the busStop.'))
+    reportType = models.CharField('Event Type', max_length=7, choices=REPORT_TYPE)
+    """ Represents the element to which the report refers """
+    busUuid = models.UUIDField(null=True)
+    """ Bus uuid """
+    service = models.CharField('Service', max_length=5, null=True)
+    """ Bus service """
+    registrationPlate = models.CharField(max_length=8)
+    """ Bus registrationplate """
+    busStopCode = models.CharField('Code', max_length=6, null=True)  # For example PA443    
+    """ Bus stop code"""
+    longitud = models.FloatField('Longitude', null=False, blank=False)
+    """ longitude from the geolocation """
+    latitud = models.FloatField('Latitude', null=False, blank=False)
+    """ longitude from the geolocation """
+    
 
 class TimePeriod(models.Model):
     """ Time period with standar names """
