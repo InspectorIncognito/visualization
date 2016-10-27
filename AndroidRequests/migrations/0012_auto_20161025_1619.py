@@ -10,18 +10,18 @@ def fill_tables(apps, schema_editor):
     for ev in eventsforbusv2.objects.all():
         # time_to_match = ev.timeCreation
         # print(time_to_match)
-        time = ev.timeCreation.time()
+        time = ev.timeCreation.time().replace(microsecond=0)
         timeperiod = None
         if ev.timeCreation.strftime("%A") == 'Saturday':
             timeperiod = timeperiods.objects.get(day_type = 'Sabado',\
-                initial_time__lte = time , end_time__gt = time)
+                initial_time__lte = time , end_time__gte = time)
         elif ev.timeCreation.strftime("%A") == 'Sunday':
             timeperiod = timeperiods.objects.get(day_type = 'Domingo',\
-                initial_time__lte = time , end_time__gt = time)
+                initial_time__lte = time , end_time__gte = time)
         else:
             #Working day
             timeperiod = timeperiods.objects.get(day_type = 'Laboral',\
-                initial_time__lte = time , end_time__gt = time)
+                initial_time__lte = time , end_time__gte = time)
 
         ev.time_period = timeperiod
         ev.save()

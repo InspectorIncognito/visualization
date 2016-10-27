@@ -23,6 +23,15 @@ class TimePeriod(models.Model):
     end_time = models.TimeField(auto_now=False, auto_now_add=False)
     """ End time for the period """
 
+class HalfHourPeriod(models.Model):
+    """ Time period with standar names """
+    name = models.CharField(max_length=30)
+    """ Name of the period """
+    initial_time = models.TimeField(auto_now=False, auto_now_add=False)
+    """ Initial time for the period """
+    end_time = models.TimeField(auto_now=False, auto_now_add=False)
+    """ End time for the period """
+
 class Location(models.Model):
     """ Some of our models require to set a geolocation (coodinates)"""
     longitud = models.FloatField('Longitude', null=False, blank=False)
@@ -183,6 +192,9 @@ class EventForBusv2(EventRegistration):
     busassignment = models.ForeignKey('Busassignment', verbose_name='the bus')
     '''Indicates the bus to which the event refers'''
     time_period = models.ForeignKey( 'TimePeriod', verbose_name=b'Time Period', null = False)
+    '''Indicates the Transantiago Time Period of the event'''
+    half_hour_period = models.ForeignKey( 'HalfHourPeriod', verbose_name=b'Half Hour Period', null = False)
+    '''Indicates the half hour time period of the event'''
 
     def getDictionary(self):
         '''A dictionary with the event information'''
