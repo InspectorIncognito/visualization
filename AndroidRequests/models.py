@@ -174,6 +174,10 @@ class EventForBusStop(EventRegistration):
     '''Indicates the bus stop to which the event refers'''
     aditionalInfo = models.CharField('Additional Information', max_length=140, default='nothing')
     ''' Saves additional information required by the event '''
+    time_period = models.ForeignKey( 'TimePeriod', verbose_name=b'Time Period', null = False)
+    '''Indicates the Transantiago Time Period of the event'''
+    half_hour_period = models.ForeignKey( 'HalfHourPeriod', verbose_name=b'Half Hour Period', null = False)
+    '''Indicates the half hour time period of the event'''
 
 
 class EventForBus(EventRegistration):
