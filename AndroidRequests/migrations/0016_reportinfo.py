@@ -16,12 +16,13 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('reportType', models.CharField(max_length=7, verbose_name=b'Event Type', choices=[(b'bus', b'An event for the bus.'), (b'busStop', b'An event for the busStop.')])),
-                ('busUuid', models.UUIDField(null=True)),
+                ('busUUID', models.UUIDField(null=True)),
                 ('service', models.CharField(max_length=5, null=True, verbose_name=b'Service')),
                 ('registrationPlate', models.CharField(max_length=8)),
                 ('busStopCode', models.CharField(max_length=6, null=True, verbose_name=b'Code')),
                 ('longitud', models.FloatField(verbose_name=b'Longitude')),
                 ('latitud', models.FloatField(verbose_name=b'Latitude')),
+                ('report', models.ForeignKey(verbose_name=b'The Report', to='AndroidRequests.Report')),
             ],
         ),
     ]

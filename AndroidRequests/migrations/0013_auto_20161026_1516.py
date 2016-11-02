@@ -20,27 +20,7 @@ def fill_tables(apps, schema_editor):
 			pass
 
 		bus.save()
-    # eventsforbusv2 = apps.get_model('AndroidRequests', 'EventForBusv2')
-    # timeperiods = apps.get_model('AndroidRequests', 'TimePeriod')
     
-    # for ev in eventsforbusv2.objects.all():
-    #     # time_to_match = ev.timeCreation
-    #     # print(time_to_match)
-    #     time = ev.timeCreation.time()
-    #     timeperiod = None
-    #     if ev.timeCreation.strftime("%A") == 'Saturday':
-    #         timeperiod = timeperiods.objects.get(day_type = 'Sabado',\
-    #             initial_time__lte = time , end_time__gt = time)
-    #     elif ev.timeCreation.strftime("%A") == 'Sunday':
-    #         timeperiod = timeperiods.objects.get(day_type = 'Domingo',\
-    #             initial_time__lte = time , end_time__gt = time)
-    #     else:
-    #         #Working day
-    #         timeperiod = timeperiods.objects.get(day_type = 'Laboral',\
-    #             initial_time__lte = time , end_time__gt = time)
-
-    #     ev.time_period = timeperiod
-    #     ev.save()
 
 class Migration(migrations.Migration):
 

@@ -16,7 +16,7 @@ class ReportInfo(models.Model):
         ('busStop', 'An event for the busStop.'))
     reportType = models.CharField('Event Type', max_length=7, choices=REPORT_TYPE)
     """ Represents the element to which the report refers """
-    busUuid = models.UUIDField(null=True)
+    busUUID = models.UUIDField(null=True)
     """ Bus uuid """
     service = models.CharField('Service', max_length=5, null=True)
     """ Bus service """
@@ -28,6 +28,8 @@ class ReportInfo(models.Model):
     """ longitude from the geolocation """
     latitud = models.FloatField('Latitude', null=False, blank=False)
     """ longitude from the geolocation """
+    report = models.ForeignKey('Report', verbose_name='The Report')
+    """ Link to the report """
     
 
 class TimePeriod(models.Model):
