@@ -1,5 +1,5 @@
 import uuid
-from django.db import models
+from django.contrib.gis.db import models
 from django.utils import timezone
 from random import uniform
 
@@ -712,3 +712,36 @@ class Route(Location):
     """ Bus identifier """
     sequence = models.IntegerField('Sequence')
     """ point position in a route """
+
+##
+#
+# Zonification
+#
+##
+
+class zonificationTransantiago(models.Model):
+    id = models.IntegerField(primary_key=True)
+    area = models.FloatField()
+    zona = models.FloatField()
+    com = models.CharField(max_length=80)
+    comuna = models.CharField(max_length=80)
+    cartodb_id = models.IntegerField()
+    created_at = models.DateField()
+    updated_at = models.DateField()
+    comunidad_field = models.FloatField()
+    geom = models.MultiPolygonField(srid=4326)
+    objects = models.GeoManager()
+
+# Auto-generated `LayerMapping` dictionary for zonificationTransantiago model
+zonificationtransantiago_mapping = {
+    'id' : 'id',
+    'area' : 'area',
+    'zona' : 'zona',
+    'com' : 'com',
+    'comuna' : 'comuna',
+    'cartodb_id' : 'cartodb_id',
+    'created_at' : 'created_at',
+    'updated_at' : 'updated_at',
+    'comunidad_field' : 'comunidad_',
+    'geom' : 'MULTIPOLYGON',
+}
