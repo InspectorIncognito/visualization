@@ -34,7 +34,7 @@
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
-                <table id="example" class="table table-striped table-bordered dt-responsive nowrap"
+                <table id="example" class="table table-striped table-bordered nowrap    "
                        cellspacing="0" width="100%"></table>
             </div>
         </div>
@@ -64,69 +64,5 @@
 <!-- DataTables -->
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs/dt-1.10.12/r-2.1.0/datatables.min.js"></script>
 <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script>
-<script>
-    function headers() {
-        var Dataurl = "http://" + location.host + "/carriers/getPhysicalHeaders/";
-        $.getJSON(Dataurl)
-                .done(function (data) {
-                    var html = ''
-                    $.each(data, function (key, number) {
-                        html += '<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">';
-                        html += '<span class="count_top" title="' + key + '">' + key + '</span>';
-                        html += '<div class="count" style="text-align:center">' + number + '</div>'
-                        html += '</div>'
-                    });
-                    $("#headers").html(html);
-                });
-    }
-    headers();
-    var id;
-    var text;
-    var table;
-    $(document).ready(function () {
-        $.fn.dataTable.moment( 'DD-MM-YYYY HH:mm:ss' );
-        table = $('#example').DataTable({
-            "pageLength": 100,
-            order: [[2, 'desc']],
-            responsive: true,
-            ajax: 'http://' + location.host + '/carriers/getPhysicalTable/',
-            columns: [
-                {title: "Reporte", data: 'type'},
-                {title: "Patente", data: 'plate'},
-                {title: "Fecha", data: 'timeCreation'},
-                {
-                    title: "Arreglar",
-                    data: null,
-                    "defaultContent": "<button type='button' class='btn-xs btn-primary' id='si'>Arreglar</button>"
-                },
-            ],
-            language: {
-                "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json"
-            }
-        });
-
-        $('#example tbody').on('click', 'button', function () {
-            var data = table.row($(this).parents('tr')).data();
-            id = data.id;
-            console.log(data)
-            $('#confirmationtext').html('Reporte: ' + data.type + '<br>Patente: ' + data.plate)
-            $("#myModal").modal()
-        });
-
-    });
-    function fix() {
-        var url = "http://" + location.host + "/carriers/updatePhysical/";
-        $.getJSON(url, {"id": id})
-                .done(function (data) {
-                    if (data == 'True') {
-                        table.ajax.reload();
-                        headers();
-                    }
-                });
-    }
-    setInterval(function () {
-        headers();
-        table.ajax.reload();
-    }, 30000);
-</script>
+<script src="{% static 'js/physicalTable.js' %}"> </script>
 {% endblock bottomimports %}

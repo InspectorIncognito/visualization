@@ -96,7 +96,7 @@ class EventRegistration(models.Model):
     """ amount of declinations for this event """
     userId = models.UUIDField()
     """ To identify the AndroidRequests owner """
-    fixed = models.BooleanField('Fixed', default=False)
+    fixed = models.NullBooleanField('Fixed', default=False)
     """ To know if the event is 'fixed' and stop showing it"""
 
     class Meta:

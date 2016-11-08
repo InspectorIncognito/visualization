@@ -40,6 +40,7 @@ function init() {
     if (types != null) params += '&types=' + JSON.stringify(types);
     $.fn.dataTable.moment('DD-MM-YYYY HH:mm:ss');
     table = $('#example').dataTable({
+        scrollX: true,
         pageLength: 50,
         order: [[1, "desc"]],
         dom: 'Bfrtip',
@@ -50,7 +51,6 @@ function init() {
             }, {extend: 'excel', filename: fileName},
 
         ],
-        responsive: true,
         ajax: url + params,
         columns: [
             {title: "Tipo de Reporte ", data: 'category'},
