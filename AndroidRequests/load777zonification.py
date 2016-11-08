@@ -22,6 +22,6 @@ world_shp = os.path.abspath(
 def run(verbose=True):
     lm = LayerMapping(
         zonificationTransantiago, world_shp, world_mapping,
-        transform=False, encoding='iso-8859-1',
+        transform=False, encoding='utf-8',
     )
     lm.save(strict=True, verbose=verbose)

@@ -729,7 +729,7 @@ class zonificationTransantiago(models.Model):
     cartodb_id = models.IntegerField()
     created_at = models.DateField()
     updated_at = models.DateField()
-    comunidad_field = models.FloatField()
+    comunidad_field = models.FloatField(null=True)
     geom = models.MultiPolygonField(srid=4326)
     objects = models.GeoManager()
 

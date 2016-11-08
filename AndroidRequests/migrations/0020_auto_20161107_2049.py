@@ -9,27 +9,32 @@ def fill_tables(apps, schema_editor):
     eventsforbusstop = apps.get_model('AndroidRequests', 'EventForBusStop')
     statisticsfrombus = apps.get_model('AndroidRequests', 'StadisticDataFromRegistrationBus')
     statisticsfrombusstop = apps.get_model('AndroidRequests', 'StadisticDataFromRegistrationBusStop')
-    zonification = apps.get_model('AndroidRequests', 'Zonification')
+    zonification = apps.get_model('AndroidRequests', 'zonificationTransantiago')
 
     for ev in eventsforbusv2.objects.all():
         statistic_data = statisticsfrombus.objects.filter(reportOfEvent = ev).order_by('-timeStamp')[0]
         ev_lat = statistic_data.latitud
         ev_long = statistic_data.longitud
         # pnt = 'POINT('+str(ev_long)+' '+str(ev_lat)+')'
-        pnt = Point(ev_long, ev_lat)
-        print pnt
-        county = zonification.objects.filter(geom__intersects = pnt)
-        print county
-        # ev.county = county
-        # ev.save()
+        pnt = Point(ev_lat, ev_long)
+        county = "Fuera de la zona"
+        try:
+            county = zonification.objects.filter(geom__intersects = pnt)[0].comuna
+        except:
+            pass
+        ev.county = county
+        ev.save()
     
     for ev in eventsforbusstop.objects.all():
         statistic_data = statisticsfrombusstop.objects.filter(reportOfEvent = ev).order_by('-timeStamp')[0]
         ev_lat = statistic_data.latitud
         ev_long = statistic_data.longitud
-        pnt = 'POINT('+str(ev_long)+' '+str(ev_lat)+')'
-        county = zonification.objects.filter(geom__contains = pnt)[0].comuna
-        print county
+        pnt = Point(ev_lat, ev_long)
+        county = "Fuera de la zona"
+        try:
+            county = zonification.objects.filter(geom__intersects = pnt)[0].comuna
+        except:
+            pass
         ev.county = county
         ev.save()
 

@@ -3,7 +3,10 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 import django.contrib.gis.db.models.fields
+import AndroidRequests.load777zonification
 
+def fill_tables(apps, schema_editor):
+    AndroidRequests.load777zonification.run()
 
 class Migration(migrations.Migration):
 
@@ -13,7 +16,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Zonification',
+            name='zonificationTransantiago',
             fields=[
                 ('id', models.IntegerField(serialize=False, primary_key=True)),
                 ('area', models.FloatField()),
@@ -23,8 +26,9 @@ class Migration(migrations.Migration):
                 ('cartodb_id', models.IntegerField()),
                 ('created_at', models.DateField()),
                 ('updated_at', models.DateField()),
-                ('comunidad_', models.FloatField(null=True)),
-                ('geom', django.contrib.gis.db.models.fields.MultiPolygonField(srid=-1)),
+                ('comunidad_field', models.FloatField(null=True)),
+                ('geom', django.contrib.gis.db.models.fields.MultiPolygonField(srid=4326)),
             ],
         ),
+        migrations.RunPython(fill_tables, reverse_code=migrations.RunPython.noop),
     ]
