@@ -66,6 +66,13 @@
                                                        id="date_end"/>
                                             </div>
                                         </div>
+                                        <div class='col-sm-4'>
+                                            <div class="form-group">
+                                                <button class="btn" onclick="updateDate(1)">Hoy</button>
+                                                <button class="btn" onclick="updateDate(2)">Ultimo mes</button>
+                                                <button class="btn" onclick="updateDate(3)">3 Meses</button>
+                                            </div>
+                                        </div>
                                     </div>
                                     <!--<div class="row">
                                         <div class='col-sm-2'>
@@ -109,23 +116,26 @@
                     <div class="container">
                         Agrupar por:
                         <div id="group" class="btn-toolbar" role="toolbar" data-toggle="buttons">
-                            <div class="btn-group">
-                                <!--<label class="btn btn-default active">
+                            <!--<div class="btn-group">
+                                &lt;!&ndash;<label class="btn btn-default active">
                                     <input type="radio" name="groups" value="weekday" checked> Dia semana
-                                </label>-->
+                                </label>&ndash;&gt;
                                 <label class="btn btn-default ">
                                     <input type="radio" name="groups" value="plate"> Patente
                                 </label>
                                 <label class="btn btn-default ">
                                     <input type="radio" name="groups" value="service"> Recorrido
                                 </label>
-                            </div>
+                            </div>-->
                             <div class="btn-group">
                                 <label class="btn btn-default active">
                                     <input type="radio" name="groups" value="daily" checked> Dia
                                 </label>
                                 <label class="btn btn-default ">
                                     <input type="radio" name="groups" value="monthly"> Mes
+                                </label>
+                                <label class="btn btn-default ">
+                                    <input type="radio" name="groups" value="yearly"> Año
                                 </label>
                             </div>
                         </div>

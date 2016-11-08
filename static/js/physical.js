@@ -299,6 +299,25 @@ function updatechart() {
         }
     }
 }
+
+function updateDate(n) {
+    switch (n) {
+        case 1:
+            $('#date_init').data("DateTimePicker").date(moment());
+            $('#date_end').data("DateTimePicker").date(moment());
+            break;
+        case 2:
+            $('#date_init').data("DateTimePicker").date(moment().subtract(1, 'months'));
+            $('#date_end').data("DateTimePicker").date(moment());
+            break;
+        case 3:
+            $('#date_init').data("DateTimePicker").date(moment().subtract(3, 'months'));
+            $('#date_end').data("DateTimePicker").date(moment());
+            break;
+    }
+}
+
+
 function myFunction() {
     var Dataurl = "http://" + location.host + "/carriers/getPhysicalData/";
     var data = {
@@ -342,5 +361,5 @@ function headers() {
 };
 headers();
 setInterval(function () {
-            headers();
-        }, 30000);
+    headers();
+}, 30000);
