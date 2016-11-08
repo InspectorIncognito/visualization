@@ -7,14 +7,14 @@ $(function () {
         defaultDate: moment(),
         format: 'LL'
     });
-    $('#hour1').datetimepicker({
-        defaultDate: moment().set({'hour': 0, 'minute': 0}),
-        format: 'LT'
-    });
-    $('#hour2').datetimepicker({
-        defaultDate: moment().set({'hour': 23, 'minute': 59}),
-        format: 'LT'
-    });
+    /*$('#hour1').datetimepicker({
+     defaultDate: moment().set({'hour': 0, 'minute': 0}),
+     format: 'LT'
+     });
+     $('#hour2').datetimepicker({
+     defaultDate: moment().set({'hour': 23, 'minute': 59}),
+     format: 'LT'
+     });*/
     $("#group :input").change(function () {
         updatechart();
     });
@@ -58,7 +58,7 @@ var chartdata = {
     'service': null,
     'daily': null,
     'monthly': null,
-    'yearly': null,
+    'yearly': null
 };
 var chart;
 function reloadchart() {
@@ -67,7 +67,8 @@ function reloadchart() {
         'plate': null,
         'service': null,
         'daily': null,
-        'monthly': null
+        'monthly': null,
+        'yearly': null
     };
 }
 
@@ -209,6 +210,35 @@ function updatechart() {
                 }
                 makechart(cols, null, null, 'x', '%m-%Y', [types], 'timeseries', '%m-%Y')
                 break;
+            case "yearly":
+                if (chartdata['yearly'] == null) {
+                    var years = [];
+                    var yearstype = [];
+                    for (i = 0; i < types.length; i++) {
+                        yearstype.push([]);
+                    }
+                    for (i = 0; i < resp.length; i++) {
+                        var type = resp[i]['type'];
+                        var year = moment(resp[i]['timeCreation'], "DD-MM-YYYY HH:mm:SS").format("YYYY")
+
+                        if (years.indexOf(year) == -1) {
+                            years.push(year)
+                            for (var j = 0; j < types.length; j++) {
+                                yearstype[j].push(0);
+                            }
+                        }
+                        var p = years.indexOf(year);
+                        yearstype[type][p] += resp[i]['eventConfirm'];
+                    }
+                }
+                var cols = years;
+                cols.unshift("x");
+                cols = [cols];
+                for (i = 0; i < types.length; i++) {
+                    cols.push([types[i]].concat(yearstype[i]));
+                }
+                makechart(cols, null, null, 'x', '%Y', [types], 'timeseries', '%Y')
+                break;
         }
     }
 }
@@ -243,16 +273,34 @@ function makechart(columns, categories, height, x, xformat, groups, type, tickfo
         }
     });
 }
+
+function updateDate(n) {
+    switch (n) {
+        case 1:
+            $('#date_init').data("DateTimePicker").date(moment());
+            $('#date_end').data("DateTimePicker").date(moment());
+            break;
+        case 2:
+            $('#date_init').data("DateTimePicker").date(moment().subtract(1, 'months'));
+            $('#date_end').data("DateTimePicker").date(moment());
+            break;
+        case 3:
+            $('#date_init').data("DateTimePicker").date(moment().subtract(3, 'months'));
+            $('#date_end').data("DateTimePicker").date(moment());
+            break;
+    }
+}
+
 function myFunction() {
     var Dataurl = "http://" + location.host + "/carriers/getDriversData/";
     var data = {
         carrier: '3',
         date_init: $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD"),
         date_end: $('#date_end').data("DateTimePicker").date().format("YYYY-MM-DD"),
-        hour1: $('#hour1').data("DateTimePicker").date().format("HH"),
-        hour2: $('#hour2').data("DateTimePicker").date().format("HH"),
-        minute1: $('#hour1').data("DateTimePicker").date().format("mm"),
-        minute2: $('#hour2').data("DateTimePicker").date().format("mm")
+        /*        hour1: $('#hour1').data("DateTimePicker").date().format("HH"),
+         hour2: $('#hour2').data("DateTimePicker").date().format("HH"),
+         minute1: $('#hour1').data("DateTimePicker").date().format("mm"),
+         minute2: $('#hour2').data("DateTimePicker").date().format("mm")*/
     };
     var service = $(".select2_multiple").val();
     var plate = $(".select2_plate").val();
@@ -271,7 +319,7 @@ function myFunction() {
         .done(function (data) {
             console.log(data)
         });
-     $.getJSON("http://nominatim.openstreetmap.org/search", {format: 'json', q: "-33.4570377,-70.6644547"})
+    $.getJSON("http://nominatim.openstreetmap.org/search", {format: 'json', q: "-33.4570377,-70.6644547"})
         .done(function (data) {
             console.log(data)
         });
