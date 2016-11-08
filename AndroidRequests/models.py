@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from django.utils import timezone
 from random import uniform
+from django.contrib.gis.db import models
 
 import logging
 
@@ -178,6 +179,7 @@ class EventForBusStop(EventRegistration):
     '''Indicates the Transantiago Time Period of the event'''
     half_hour_period = models.ForeignKey( 'HalfHourPeriod', verbose_name=b'Half Hour Period', null = False)
     '''Indicates the half hour time period of the event'''
+    county = models.CharField(max_length=80, null=True)
 
 
 class EventForBus(EventRegistration):
@@ -219,6 +221,7 @@ class EventForBusv2(EventRegistration):
     '''Indicates the Transantiago Time Period of the event'''
     half_hour_period = models.ForeignKey( 'HalfHourPeriod', verbose_name=b'Half Hour Period', null = False)
     '''Indicates the half hour time period of the event'''
+    county = models.CharField(max_length=80, null=True)
 
     def getDictionary(self):
         '''A dictionary with the event information'''
@@ -712,3 +715,20 @@ class Route(Location):
     """ Bus identifier """
     sequence = models.IntegerField('Sequence')
     """ point position in a route """
+##
+#
+# Zonification info
+#
+##
+class Zonification(models.Model):
+    id = models.IntegerField(primary_key=True)
+    area = models.FloatField()
+    zona = models.FloatField()
+    com = models.CharField(max_length=80)
+    comuna = models.CharField(max_length=80)
+    cartodb_id = models.IntegerField()
+    created_at = models.DateField()
+    updated_at = models.DateField()
+    comunidad_field = models.FloatField()
+    geom = models.MultiPolygonField(srid=-1)
+    objects = models.GeoManager()
