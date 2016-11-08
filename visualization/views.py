@@ -1,6 +1,9 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login
+from django.shortcuts import redirect
+from django.core.urlresolvers import reverse
+from carrier.views import index as cindex
 
 
 def index(request):
@@ -12,7 +15,6 @@ def login(request):
     user = authenticate(username=username, password=password)
     if user is not None:
         login(request, user)
-        # Redirect to a success page.
+        return redirect(cindex)
     else:
-        # Return an 'invalid login' error message.
-        print("hola")
+        return redirect(reverse(index))

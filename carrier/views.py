@@ -83,12 +83,8 @@ def getDriversReport(request):
         carrier = 7  # TODO Select carrier depending on who is logged.
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
-        hour1 = int(request.GET.get('hour1'))
-        hour2 = int(request.GET.get('hour2'))
         plates = request.GET.get('plate')
         serv = request.GET.get('service')
-        hour2 = (hour2 + 24) if hour2 < hour1 else hour2
-        hours = [hour % 24 for hour in range(hour1, hour2 + 1)]
         query = EventForBus.objects.filter(
             bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
         query = query.filter(event__category="conductor")
@@ -102,10 +98,6 @@ def getDriversReport(request):
             serv = json.loads(serv)
             serviceFilter = reduce(lambda x, y: x | y, [Q(bus__service=ser) for ser in serv])
             query = query.filter(serviceFilter)
-        hourFilter = reduce(lambda x, y: x | y, [Q(timeCreation__hour=h) for h in hours])
-        # minuteFilter = reduce(lambda x, y: x | y, [Q(timeCreation__minute=m) for m in minutes])
-        query = query.filter(hourFilter)
-        # query = query.filter(minuteInterval)
         data = {
             "reports": [change(report.getDictionary()) for report in query],
             "types": events
