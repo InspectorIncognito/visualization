@@ -5,6 +5,8 @@ from django.db import models, migrations
 import uuid
 import AndroidRequests.constants as Constants
 
+#Generate an unique UUID for every distinct license plate except the dummy ones
+
 def gen_uuid(apps, schema_editor):
     MyModel = apps.get_model('AndroidRequests', 'bus')
     uuidsArray = {}

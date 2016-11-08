@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 import uuid
 
+#Add the UUID field to the Bus table
 
 class Migration(migrations.Migration):
 

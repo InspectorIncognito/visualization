@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 
+#Create the Transantiago timePeriod table and its data.
+
 def fill_tables(apps, schema_editor):
 	timeperiods = apps.get_model('AndroidRequests', 'timeperiod')
 	timeperiods(day_type = 'Laboral', name = 'Pre nocturno', initial_time = '00:00:00', end_time = '00:59:59').save()

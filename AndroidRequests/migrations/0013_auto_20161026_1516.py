@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 import re
 
+#Add validation for the license plates.
+
 def fill_tables(apps, schema_editor):
 	buses = apps.get_model('AndroidRequests', 'Busv2')
 	ex = r"\A[a-zA-Z]{4}[0-9]{2}\Z|\A[a-zA-Z]{2}[0-9]{4}\Z"

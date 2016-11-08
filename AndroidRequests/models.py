@@ -31,6 +31,7 @@ class ReportInfo(models.Model):
     """ longitude from the geolocation """
     report = models.ForeignKey('Report', verbose_name='The Report')
     """ Link to the report """
+    county = models.CharField(max_length=80, null=True)
     
 
 class TimePeriod(models.Model):

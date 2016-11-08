@@ -4,9 +4,12 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 from django.contrib.gis.geos import Point
 
+#Add the county to the Events and ReportInfo tables.
+
 def fill_tables(apps, schema_editor):
     eventsforbusv2 = apps.get_model('AndroidRequests', 'EventForBusv2')
     eventsforbusstop = apps.get_model('AndroidRequests', 'EventForBusStop')
+    reportsinfo = apps.get_model('AndroidRequests', 'ReportInfo')
     statisticsfrombus = apps.get_model('AndroidRequests', 'StadisticDataFromRegistrationBus')
     statisticsfrombusstop = apps.get_model('AndroidRequests', 'StadisticDataFromRegistrationBusStop')
     zonification = apps.get_model('AndroidRequests', 'zonificationTransantiago')
@@ -15,7 +18,6 @@ def fill_tables(apps, schema_editor):
         statistic_data = statisticsfrombus.objects.filter(reportOfEvent = ev).order_by('-timeStamp')[0]
         ev_lat = statistic_data.latitud
         ev_long = statistic_data.longitud
-        # pnt = 'POINT('+str(ev_long)+' '+str(ev_lat)+')'
         pnt = Point(ev_lat, ev_long)
         county = "Fuera de la zona"
         try:
@@ -38,6 +40,16 @@ def fill_tables(apps, schema_editor):
         ev.county = county
         ev.save()
 
+    for ev in reportsinfo.objects.all():
+        pnt = Point(ev.latitud, ev.longitud)
+        county = "Fuera de la zona"
+        try:
+            county = zonification.objects.filter(geom__intersects = pnt)[0].comuna
+        except:
+            pass
+        ev.county = county
+        ev.save()
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -52,6 +64,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='eventforbusstop',
+            name='county',
+            field=models.CharField(max_length=80, null=True),
+        ),
+        migrations.AddField(
+            model_name='reportinfo',
             name='county',
             field=models.CharField(max_length=80, null=True),
         ),

@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 from django.core.exceptions import ObjectDoesNotExist
 
+#Erase the duplicated entrys in busassignments and its linked tables.
+
 def fill_table(apps, schema_editor):
     busesassignments = apps.get_model('AndroidRequests', 'busassignment')
     tokens = apps.get_model('AndroidRequests', 'token')

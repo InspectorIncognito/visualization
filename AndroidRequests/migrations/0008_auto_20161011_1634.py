@@ -5,11 +5,9 @@ from django.db import models, migrations
 import uuid
 import AndroidRequests.constants as Constants
 
+#Creates the Busv2, Busassignment and EventForBusv2 tables and migrate the data.
+
 def fill_tables(apps, schema_editor):
-    # tokens = apps.get_model('AndroidRequests', 'token')
-    # for token in MyModel.objects.all():
-    #     token.uuid = uuid.uuid4()
-    #     token.save()
     #migrate data from Bus to Busv2 and Busassignment
     buses = apps.get_model('AndroidRequests', 'bus')
     busesv2 = apps.get_model('AndroidRequests', 'busv2')

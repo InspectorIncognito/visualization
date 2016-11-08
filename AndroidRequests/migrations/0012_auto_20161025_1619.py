@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 
+#Add the link between TimePeriod and the Events tables.
+
 def fill_tables(apps, schema_editor):
     eventsforbusv2 = apps.get_model('AndroidRequests', 'EventForBusv2')
     eventsforbusstop = apps.get_model('AndroidRequests', 'EventForBusStop')

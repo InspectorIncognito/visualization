@@ -4,16 +4,29 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 import json
 
+#Loads the JSON info in the reports into the ReportInfo table
+
 def fill_table(apps, schema_editor):
 	reportsInfo = apps.get_model('AndroidRequests', 'ReportInfo')
 	reports = apps.get_model('AndroidRequests', 'Report')
+	buses = apps.get_model('AndroidRequests', 'Busv2')
 	for report1 in reports.objects.all():
 		try:
 			reportJson = json.loads(report1.reportInfo)
 			if 'bus' in reportJson:
+				busUUIDn = None
+				try:
+					busUUIDn = reportJson['bus']['machineId']
+				except:
+					if reportJson['bus']['licensePlate'].upper() != "DUMMYLPT":
+						aa = reportJson['bus']['licensePlate'][:2].upper()
+						bb = reportJson['bus']['licensePlate'][2:4].upper()
+						num = reportJson['bus']['licensePlate'][4:]
+						plate = aa + " " + bb + " " + num
+						busUUIDn = buses.objects.get(registrationPlate = plate).uuid
 				reportsInfo(
 					reportType = 'bus',
-					busUUID = reportJson['bus']['machineId'],
+					busUUID = busUUIDn,
 					service = reportJson['bus']['service'],
 					registrationPlate = reportJson['bus']['licensePlate'],
 					latitud = reportJson['bus']['latitude'],

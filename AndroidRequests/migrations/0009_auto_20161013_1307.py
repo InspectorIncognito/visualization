@@ -3,12 +3,9 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 
+#Migrates data from StadisticDataFromRegistrationBus
 
 def fill_table(apps, schema_editor):
-    # tokens = apps.get_model('AndroidRequests', 'token')
-    # for token in MyModel.objects.all():
-    #     token.uuid = uuid.uuid4()
-    #     token.save()
     stadistics = apps.get_model('AndroidRequests', 'stadisticdatafromregistrationbus')
     eventsForBus = apps.get_model('AndroidRequests', 'EventForBus')
     eventsForBusv2 = apps.get_model('AndroidRequests', 'EventForBusv2')
@@ -17,10 +14,6 @@ def fill_table(apps, schema_editor):
     assignments = apps.get_model('AndroidRequests', 'Busassignment')
     for stadistic in stadistics.objects.all():
         stadistic.reportOfEventv2 = eventsForBusv2.objects.get(ex_id = stadistic.reportOfEvent_id)
-        # bus = stadistic.reportOfEvent.bus
-        # assignment = assignments.objects.get(uuid = busesv2.objects.get(uuid=bus.uuid))
-        # eventForBusv2 = eventsForBusv2.objects.filter(busassignment = assignment)
-        # stadistic.reportOfEventv2 = eventForBusv2
         stadistic.save()
 
 
