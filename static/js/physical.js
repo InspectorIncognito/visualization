@@ -41,7 +41,8 @@ var chartdata = {
     'plate': null,
     'service': null,
     'daily': null,
-    'monthly': null
+    'monthly': null,
+    'yearly': null
 };
 var chart;
 function reloadchart() {
@@ -50,10 +51,10 @@ function reloadchart() {
         'plate': null,
         'service': null,
         'daily': null,
-        'monthly': null
+        'monthly': null,
+        'yearly': null
     };
 }
-
 function updatechart() {
     if (resp != null) {
         switch ($('input:checked', '#group').val()) {
@@ -66,30 +67,14 @@ function updatechart() {
                     for (i = 0; i < resp.length; i++) {
                         var type = resp[i]['type'];
                         var day = (moment(resp[i]['timeCreation'], "DD-MM-YYYY HH:mm:SS").day() + 6) % 7;
-                        chartdata['weekday'][type][day]++;
+                        chartdata['weekday'][type][day] += resp[i]['eventConfirm'];
                     }
                 }
                 var cols = [];
                 for (i = 0; i < types.length; i++) {
                     cols.push([types[i]].concat(chartdata['weekday'][i]));
                 }
-                chart = c3.generate({
-                    data: {
-                        columns: cols,
-                        type: 'bar'
-                    },
-                    axis: {
-                        x: {
-                            type: 'category',
-                            categories: ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo']
-                        },
-                        y: {
-                            tick: {
-                                outer: false
-                            }
-                        }
-                    }
-                });
+                makechart(cols, ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'], null, null, null, [], 'category', null)
                 break;
 
             case "plate":
@@ -113,34 +98,14 @@ function updatechart() {
                             }
                         }
                         var p = chartdata['plate']['plates'].indexOf(plate);
-                        chartdata['plate']['platetype'][type][p]++;
+                        chartdata['plate']['platetype'][type][p] += resp[i]['eventConfirm'];
                     }
                 }
                 var cols = [];
                 for (i = 0; i < types.length; i++) {
                     cols.push([types[i]].concat(chartdata['plate']['platetype'][i]));
                 }
-                chart = c3.generate({
-                    data: {
-                        columns: cols,
-                        type: 'bar',
-                    },
-                    axis: {
-                        x: {
-                            type: 'category',
-                            tick: {
-                                rotate: 90,
-                                multiline: false
-                            },
-                            categories: chartdata['plate']['plates']
-                        },
-                        y: {
-                            tick: {
-                                outer: false
-                            }
-                        }
-                    }
-                });
+                makechart(cols, chartdata['plate']['plates'], null, undefined, null, [], 'category', null);
                 break;
 
             case "service":
@@ -160,35 +125,16 @@ function updatechart() {
                             }
                         }
                         var p = services.indexOf(service);
-                        servicetype[type][p]++;
+                        servicetype[type][p] += resp[i]['eventConfirm'];
                     }
                 }
                 var cols = [];
                 for (i = 0; i < types.length; i++) {
                     cols.push([types[i]].concat(servicetype[i]));
                 }
-                chart = c3.generate({
-                    data: {
-                        columns: cols,
-                        type: 'bar'
-                    },
-                    axis: {
-                        x: {
-                            type: 'category',
-                            tick: {
-                                rotate: 90,
-                                multiline: false
-                            },
-                            categories: services
-                        },
-                        y: {
-                            tick: {
-                                outer: false
-                            }
-                        }
-                    }
-                });
+                makechart(cols, services, null, undefined, null, [], 'category', null);
                 break;
+
             case "daily":
                 if (chartdata['daily'] == null) {
                     var days = [];
@@ -207,7 +153,7 @@ function updatechart() {
                             }
                         }
                         var p = days.indexOf(day);
-                        daystype[type][p]++;
+                        daystype[type][p] += resp[i]['eventConfirm'];
                     }
                 }
                 var cols = days;
@@ -216,32 +162,7 @@ function updatechart() {
                 for (i = 0; i < types.length; i++) {
                     cols.push([types[i]].concat(daystype[i]));
                 }
-                chart = c3.generate({
-                    size: {
-                        height: 600,
-                    },
-                    data: {
-                        x: 'x',
-                        xFormat: '%d-%m-%Y',
-                        columns: cols,
-                        type: 'bar',
-                        groups: [types]
-                    },
-                    axis: {
-                        x: {
-                            type: 'timeseries',
-                            tick: {
-                                culling: false,
-                                rotate: 90,
-                                format: '%d-%m-%Y'
-                            }
-
-                        }
-                    },
-                    subchart: {
-                        show: $('#date_end').data("DateTimePicker").date().diff($('#date_init').data("DateTimePicker").date(), 'months') > 2
-                    }
-                });
+                makechart(cols, null, null, 'x', '%d-%m-%Y', [types], 'timeseries', '%d-%m-%Y')
                 break;
             case "monthly":
                 if (chartdata['monthly'] == null) {
@@ -261,7 +182,7 @@ function updatechart() {
                             }
                         }
                         var p = months.indexOf(month);
-                        monthstype[type][p]++;
+                        monthstype[type][p] += resp[i]['eventConfirm'];
                     }
                 }
                 var cols = months;
@@ -270,35 +191,72 @@ function updatechart() {
                 for (i = 0; i < types.length; i++) {
                     cols.push([types[i]].concat(monthstype[i]));
                 }
-                chart = c3.generate({
-                    data: {
-                        x: 'x',
-                        xFormat: '%m-%Y',
-                        columns: cols,
-                        type: 'bar',
-                        groups: [types]
-                    },
-                    bar: {
-                        width: {
-                            ratio: 0.4
-                        }
-                    },
-                    axis: {
-                        x: {
-                            type: 'timeseries',
-                            tick: {
-                                culling: false,
-                                rotate: 90,
-                                format: '%m-%Y'
-                            }
-
-                        }
+                makechart(cols, null, null, 'x', '%m-%Y', [types], 'timeseries', '%m-%Y')
+                break;
+            case "yearly":
+                if (chartdata['yearly'] == null) {
+                    var years = [];
+                    var yearstype = [];
+                    for (i = 0; i < types.length; i++) {
+                        yearstype.push([]);
                     }
-                });
+                    for (i = 0; i < resp.length; i++) {
+                        var type = resp[i]['type'];
+                        var year = moment(resp[i]['timeCreation'], "DD-MM-YYYY HH:mm:SS").format("YYYY")
+
+                        if (years.indexOf(year) == -1) {
+                            years.push(year)
+                            for (var j = 0; j < types.length; j++) {
+                                yearstype[j].push(0);
+                            }
+                        }
+                        var p = years.indexOf(year);
+                        yearstype[type][p] += resp[i]['eventConfirm'];
+                    }
+                }
+                var cols = years;
+                cols.unshift("x");
+                cols = [cols];
+                for (i = 0; i < types.length; i++) {
+                    cols.push([types[i]].concat(yearstype[i]));
+                }
+                makechart(cols, null, null, 'x', '%Y', [types], 'timeseries', '%Y')
                 break;
         }
     }
 }
+function makechart(columns, categories, height, x, xformat, groups, type, tickformat) {
+    chart = c3.generate({
+        size: {
+            height: height,
+        },
+        data: {
+            x: x,
+            xFormat: xformat,
+            columns: columns,
+            type: 'bar',
+            groups: groups
+        },
+        bar: {
+            width: {
+                ratio: 0.4
+            }
+        },
+        axis: {
+            x: {
+                type: type,
+                tick: {
+                    culling: false,
+                    rotate: 45,
+                    format: tickformat
+                },
+                categories: categories
+
+            }
+        }
+    });
+}
+
 
 function updateDate(n) {
     switch (n) {
