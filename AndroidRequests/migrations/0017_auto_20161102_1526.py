@@ -11,46 +11,52 @@ def fill_table(apps, schema_editor):
 	reports = apps.get_model('AndroidRequests', 'Report')
 	buses = apps.get_model('AndroidRequests', 'Busv2')
 	for report1 in reports.objects.all():
+		print(report1.pk)
 		try:
 			reportJson = json.loads(report1.reportInfo)
 			if 'bus' in reportJson:
+				aa = reportJson['bus']['licensePlate'][:2].upper()
+				bb = reportJson['bus']['licensePlate'][2:4].upper()
+				num = reportJson['bus']['licensePlate'][4:]
+				plate = aa + " " + bb + " " + num
 				busUUIDn = None
 				try:
 					busUUIDn = reportJson['bus']['machineId']
 				except:
 					if reportJson['bus']['licensePlate'].upper() != "DUMMYLPT":
-						aa = reportJson['bus']['licensePlate'][:2].upper()
-						bb = reportJson['bus']['licensePlate'][2:4].upper()
-						num = reportJson['bus']['licensePlate'][4:]
-						plate = aa + " " + bb + " " + num
 						busUUIDn = buses.objects.get(registrationPlate = plate).uuid
-				reportsInfo(
+				if reportJson['bus']['licensePlate'].upper() == "DUMMYLPT":
+					plate = reportJson['bus']['licensePlate'].upper()
+				reportinfo = reportsInfo(
 					reportType = 'bus',
 					busUUID = busUUIDn,
 					service = reportJson['bus']['service'],
-					registrationPlate = reportJson['bus']['licensePlate'],
+					registrationPlate = plate,
 					latitud = reportJson['bus']['latitude'],
 					longitud = reportJson['bus']['longitude'],
 					report = report1,
-					).save()
+					)
+				reportinfo.save()
 
 			elif 'bus_stop' in reportJson:
-				reportsInfo(
+				reportinfo = reportsInfo(
 					reportType = 'busStop',
 					busStopCode = reportJson['bus_stop']['id'],
 					latitud = reportJson['bus_stop']['latitude'],
 					longitud = reportJson['bus_stop']['longitude'],
 					report = report1,
-					).save()
+					)
+				reportinfo.save()
 
 			elif 'busStop' in reportJson:
-				reportsInfo(
+				reportinfo = reportsInfo(
 					reportType = 'busStop',
 					busStopCode = reportJson['busStop']['id'],
 					latitud = reportJson['busStop']['latitude'],
 					longitud = reportJson['busStop']['longitude'],
 					report = report1,
-					).save()
+					)
+				reportinfo.save()
 
 		except ValueError:
 			pass

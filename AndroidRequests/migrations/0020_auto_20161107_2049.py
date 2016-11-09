@@ -41,7 +41,7 @@ def fill_tables(apps, schema_editor):
         ev.save()
 
     for ev in reportsinfo.objects.all():
-        pnt = Point(ev.latitud, ev.longitud)
+        pnt = Point(ev.longitud, ev.latitud)
         county = "Fuera de la zona"
         try:
             county = zonification.objects.filter(geom__intersects = pnt)[0].comuna
