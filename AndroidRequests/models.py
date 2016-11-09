@@ -223,6 +223,11 @@ class EventForBusv2(EventRegistration):
     half_hour_period = models.ForeignKey( 'HalfHourPeriod', verbose_name=b'Half Hour Period', null = False)
     '''Indicates the half hour time period of the event'''
     county = models.CharField(max_length=80, null=True)
+    '''Indicates the county for the event'''
+    busStop1 = models.ForeignKey('BusStop', verbose_name='Bus Stop1', related_name='busStop1')
+    '''Indicates the 1 nearest bus stop'''
+    busStop2 = models.ForeignKey('BusStop', verbose_name='Bus Stop2', related_name='busStop2')
+    '''Indicates the 2 nearest bus stop'''
 
     def getDictionary(self):
         '''A dictionary with the event information'''
