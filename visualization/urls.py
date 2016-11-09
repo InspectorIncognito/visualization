@@ -8,4 +8,5 @@ urlpatterns = [
     url(r'^carriers/', include('carrier.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^login/', views.login, name='login'),
+    url(r'^logout/', views.logout, name='logout'),
 ]
