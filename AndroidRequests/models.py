@@ -280,6 +280,8 @@ class BusStop(Location):
     """ Name of the bus stop, indicating the streets """
     events = models.ManyToManyField(Event, verbose_name='Events', through=EventForBusStop)
 
+    point = models.PointField(srid=32140, verbose_name='The point')
+
     def getDictionary(self):
         """usefull information regarding the bus."""
         dictionary = {}

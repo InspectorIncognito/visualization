@@ -14,11 +14,17 @@ def fill_tables(apps, schema_editor):
     statisticsfrombusstop = apps.get_model('AndroidRequests', 'StadisticDataFromRegistrationBusStop')
     zonification = apps.get_model('AndroidRequests', 'zonificationTransantiago')
 
+    for st in statisticsfrombus.objects.all():
+        aux = st.latitud
+        st.latitud = st.longitud
+        st.longitud = aux
+        st.save()
+
     for ev in eventsforbusv2.objects.all():
         statistic_data = statisticsfrombus.objects.filter(reportOfEvent = ev).order_by('-timeStamp')[0]
         ev_lat = statistic_data.latitud
         ev_long = statistic_data.longitud
-        pnt = Point(ev_lat, ev_long)
+        pnt = Point(ev_long, ev_lat)
         county = "Fuera de la zona"
         try:
             county = zonification.objects.filter(geom__intersects = pnt)[0].comuna
@@ -31,7 +37,7 @@ def fill_tables(apps, schema_editor):
         statistic_data = statisticsfrombusstop.objects.filter(reportOfEvent = ev).order_by('-timeStamp')[0]
         ev_lat = statistic_data.latitud
         ev_long = statistic_data.longitud
-        pnt = Point(ev_lat, ev_long)
+        pnt = Point(ev_long, ev_lat)
         county = "Fuera de la zona"
         try:
             county = zonification.objects.filter(geom__intersects = pnt)[0].comuna
@@ -41,6 +47,7 @@ def fill_tables(apps, schema_editor):
         ev.save()
 
     for ev in reportsinfo.objects.all():
+
         pnt = Point(ev.longitud, ev.latitud)
         county = "Fuera de la zona"
         try:
