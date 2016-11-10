@@ -5,6 +5,7 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
+    url(r'^reports/$', views.reports, name='reports'),
     url(r'^drivers/$', views.drivers, name='drivers'),
     url(r'^physical/$', views.physical, name='physical'),
     url(r'^driversTable/$', views.driversTable, name='driversTable'),
@@ -13,7 +14,7 @@ urlpatterns = [
     url(r'^getPhysicalData/$', views.getPhysicalReport, name='gePhysicalReport'),
     url(r'^getDriversTable/$', views.getDriversTable, name='getDriversTable'),
     url(r'^getPhysicalTable/$', views.getPhysicalTable, name='getPhysicalTable'),
-    url(r'^getFreeReport/$', views.getFreeReport, name='getFreeReport'),
+    url(r'^getReports/$', views.getReports, name='getReports'),
     url(r'^getPhysicalHeaders/$', views.getPhysicalHeaders, name='getPhysicalHeaders'),
     url(r'^updatePhysical/$', views.updatePhysical, name='updatePhysical'),
     url(r'^fullTable/$', views.fullTable, name='fullTable'),

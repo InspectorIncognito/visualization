@@ -11,13 +11,18 @@ import json, pytz
 
 @login_required
 def index(request):
+    template = loader.get_template('test.html')
+    return HttpResponse(template.render(request=request))
+
+@login_required
+def reports(request):
     template = loader.get_template('reports.html')
     return HttpResponse(template.render(request=request))
 
 @login_required
 def drivers(request):
     template = loader.get_template('drivers.html')
-    carrier = request.user.carrieruser.carrier.color_id  # TODO Select carrier depending on who is logged.
+    carrier = request.user.carrieruser.carrier.color_id
     services = Service.objects.filter(color_id=carrier)
     buses = Bus.objects.filter(service__in=[service.service for service in services])
     buses = buses.exclude(registrationPlate__icontains='dummyLPt')
@@ -31,7 +36,7 @@ def drivers(request):
 @login_required
 def physical(request):
     template = loader.get_template('physical.html')
-    carrier = request.user.carrieruser.carrier.color_id  # TODO Select carrier depending on who is logged.
+    carrier = request.user.carrieruser.carrier.color_id
     services = Service.objects.filter(color_id=carrier)
     context = {
         'services': services
@@ -40,7 +45,7 @@ def physical(request):
 
 @login_required
 def getPhysicalHeaders(request):
-    carrier = request.user.carrieruser.carrier.color_id  # TODO Select carrier depending on who is logged.
+    carrier = request.user.carrieruser.carrier.color_id
     events = Event.objects.filter(category="estado físico", eventType="bus")
     events = [event.name for event in events]
     headerInfo = EventForBus.objects.filter(event__category='estado físico')
@@ -64,10 +69,14 @@ def getPhysicalHeaders(request):
     return JsonResponse(response, safe=False)
 
 @login_required
-def getFreeReport(request):  # TODO Change model to support filtering by carrier
-    reports = Report.objects.order_by('-timeStamp')
-    response = [report.getDictionary() for report in reports]
-    return JsonResponse(response, safe=False)
+def getReports(request):
+    if request.method == 'GET':
+        carrier = request.user.carrieruser.carrier.color_id
+        reports = Report.objects.all() #TODO Filter depending on carrier (after transform)
+        data = {
+            'data' : [report.getDictionary() for report in reports]
+        }
+        return JsonResponse(data, safe=False)
 
 @login_required
 def getDriversReport(request):
@@ -81,7 +90,7 @@ def getDriversReport(request):
             dict["type"] = eventToPos[dict["type"]]
             return dict
 
-        carrier = request.user.carrieruser.carrier.color_id  # TODO Select carrier depending on who is logged.
+        carrier = request.user.carrieruser.carrier.color_id
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
         plates = request.GET.get('plate')
@@ -112,7 +121,7 @@ def driversTable(request):
 
 @login_required
 def getDriversTable(request):
-    carrier = request.user.carrieruser.carrier.color_id  # TODO Select carrier depending on who is logged.
+    carrier = request.user.carrieruser.carrier.color_id
     query = EventForBus.objects.filter(
         bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
     query = query.filter(event__category="conductor")
@@ -134,7 +143,7 @@ def physicalTable(request):
 
 @login_required
 def getPhysicalTable(request):
-    carrier = request.user.carrieruser.carrier.color_id  # TODO Select carrier depending on who is logged.
+    carrier = request.user.carrieruser.carrier.color_id
     query = EventForBus.objects.filter(
         bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
     query = query.filter(event__category="estado físico", fixed = False).exclude(event__id="evn00225")
@@ -157,7 +166,7 @@ def getPhysicalReport(request):
             dict["type"] = eventToPos[dict["type"]]
             return dict
 
-        carrier = request.user.carrieruser.carrier.color_id  # TODO Select carrier depending on who is logged.
+        carrier = request.user.carrieruser.carrier.color_id
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
         hour1 = int(request.GET.get('hour1'))
@@ -212,7 +221,7 @@ def fullTable(request):
 @login_required
 def getFullTable(request):
     if request.method == 'GET':
-        carrier = request.user.carrieruser.carrier.color_id  # TODO Select carrier depending on who is logged.
+        carrier = request.user.carrieruser.carrier.color_id
         query = EventForBus.objects.filter(
             bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
         query = query.exclude(bus__registrationPlate__icontains="dummyLPt")
