@@ -26,7 +26,7 @@ function init() {
     var params = '?date_init=' + date_init + '&date_end=' + date_end;
     $.fn.dataTable.moment('DD-MM-YYYY HH:mm:ss');
     var i = 0;
-    table = $('#example').dataTable({
+    table = $('#example').DataTable({
         scrollX: true,
         pageLength: 50,
         order: [[0, "desc"]],
@@ -44,8 +44,8 @@ function init() {
             {title: "Mensaje", data: 'message'},
             {
                 title: 'Imagen',
-                data: 'imageName',
-                defaultContent: "<button type='button' class='btn-xs btn-primary' id='si'> imageName </button>" //TODO should say Ver imagen if string isn't 'no image'
+                data: null,
+                defaultContent: "<div></div><button type='button' class='btn-xs btn-primary' id='si'> imageName </button>" //TODO should say Ver imagen if string isn't 'no image'
             },
         ],
         language: {
@@ -59,12 +59,22 @@ function init() {
             }
         }
     });
+    table.rows().every(function (rowIdx, tableLoop, rowLoop) {
+        var data = this.data();
+        console.log(5343);
+    });
 
     $('#example tbody').on('click', 'button', function () {
-            var data = table.row($(this).parents('tr')).data();
-            $('#confirmationtext').html('hola');
-            $("#myModal").modal();
+        table.rows().every(function (rowIdx, tableLoop, rowLoop) {
+            var data = this.data();
+            console.log(data);
         });
+
+        var data = table.row($(this).parents('tr')).data();
+        console.log(data.imageName)
+        $('#confirmationtext').html('hola');
+        $("#myModal").modal();
+    });
 }
 
 
