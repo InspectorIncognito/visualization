@@ -44,8 +44,13 @@ function init() {
             {title: "Mensaje", data: 'message'},
             {
                 title: 'Imagen',
-                data: null,
-                defaultContent: "<div></div><button type='button' class='btn-xs btn-primary' id='si'> imageName </button>" //TODO should say Ver imagen if string isn't 'no image'
+                render: function (data, type, row) {
+                    if (row.imageName != "no image") {
+                        return '<button type="button" class="btn-xs btn-primary" onclick="openModal(\'' + row.imageName + '\')"> Ver imagen </button>';
+                    }
+                    else
+                        return "<button type='button' class='btn-xs btn-danger disabled'> No hay imagen </button>";
+                }
             },
         ],
         language: {
@@ -59,24 +64,13 @@ function init() {
             }
         }
     });
-    table.rows().every(function (rowIdx, tableLoop, rowLoop) {
-        var data = this.data();
-        console.log(5343);
-    });
 
-    $('#example tbody').on('click', 'button', function () {
-        table.rows().every(function (rowIdx, tableLoop, rowLoop) {
-            var data = this.data();
-            console.log(data);
-        });
-
-        var data = table.row($(this).parents('tr')).data();
-        console.log(data.imageName)
-        $('#confirmationtext').html('hola');
-        $("#myModal").modal();
-    });
 }
 
+function openModal(imageName) {
+    $('#confirmationtext').html('Imagen: ' + imageName);
+    $("#myModal").modal();
+}
 
 function myFunction() {
 
