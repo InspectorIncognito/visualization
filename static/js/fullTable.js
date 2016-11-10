@@ -58,7 +58,7 @@ function init() {
             {title: "Reporte ", data: 'type'},
             {title: "Verdaderos", data: 'eventConfirm'},
             {title: "Falsos", data: 'eventDecline'},
-            {title: "Tipo de día", data: 'plate'},
+            {title: "Tipo de día", data: 'typeOfDay'},
             {title: "Período media hora", data: 'periodHour'},
             {title: "Servicio", data: 'service'},
             {title: "Patente", data: 'plate'},

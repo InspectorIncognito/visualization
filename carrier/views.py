@@ -222,8 +222,9 @@ def fullTable(request):
 def getFullTable(request):
     if request.method == 'GET':
         carrier = request.user.carrieruser.carrier.color_id
-        query = EventForBus.objects.filter(
-            bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
+        #query = EventForBus.objects.filter(
+        #    bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
+        query = EventForBus.objects.all()
         query = query.exclude(bus__registrationPlate__icontains="dummyLPt")
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
