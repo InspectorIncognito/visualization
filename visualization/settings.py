@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_crontab',
+    'AndroidRequestsBackups',
 ]
 
 MIDDLEWARE = [
@@ -117,3 +119,42 @@ STATICFILES_DIRS = (
 )
 
 LOGIN_URL = "/"
+
+
+
+
+## ----------------------------------------------------------------------------
+## VIZ_BACKUP_APP
+## see also: AndroidRequestsBackups/REAME.md
+
+# database on host and remote must have the same name
+VIZ_BKP_APP_REMOTE_DATABASE = "transappvis"
+
+# from where to lookup for images on host
+VIZ_BKP_APP_IMGS_FLDR       = "media/reported_images"
+
+# amount of days to keep backup files, then delete them 
+# this is only for complete backups
+VIZ_BKP_APP_BKPS_LIFETIME   = "15"
+
+# where to put backups on remote. (full path!)
+# this folder will be created on the VIZ_BKP_APP_REMOTE_USER home
+VIZ_BKP_APP_REMOTE_BKP_FLDR = "/home/transapp/bkps"
+## ----------------------------------------------------------------------------
+
+# cron settings
+CRONJOBS = [
+   
+    # check for complete updates every one hour
+    #('0 */1 * * *', 'AndroidRequestsBackups.jobs.complete_loaddata', '> /tmp/vizbkpapp_complete_loaddata_log.txt'),
+    ('*/2 * * * *', 'AndroidRequestsBackups.jobs.complete_loaddata', '> /tmp/vizbkpapp_complete_loaddata_log.txt'),
+    
+    # check for partial updates every 2 minutes
+    ('*/1 * * * *', 'AndroidRequestsBackups.jobs.partial_loaddata',  '> /tmp/vizbkpapp_partial_loaddata_log.txt'),
+    #('*/1 * * * *', 'AndroidRequestsBackups.jobs.partial_loaddata',  '> /tmp/vizbkpapp_partial_loaddata_log.txt'),
+]
+CRONTAB_LOCK_JOBS = True
+
+
+
+
