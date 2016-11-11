@@ -96,3 +96,6 @@ ENV/
 
 #database
 *.sqlite3
+
+# ignore another repos
+AndroidRequestsBackups
