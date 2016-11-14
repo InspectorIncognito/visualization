@@ -127,7 +127,7 @@ LOGIN_URL = "/"
 ## VIZ_BACKUP_APP
 ## see also: AndroidRequestsBackups/REAME.md
 
-# database on host and remote must have the same name
+# database name
 VIZ_BKP_APP_REMOTE_DATABASE = "transappvis"
 
 # from where to lookup for images on host
@@ -154,7 +154,7 @@ CRONJOBS = [
     #('*/1 * * * *', 'AndroidRequestsBackups.jobs.partial_loaddata',  '> /tmp/vizbkpapp_partial_loaddata_log.txt'),
 ]
 CRONTAB_LOCK_JOBS = True
-
+CRONTAB_COMMAND_SUFFIX = '2>&1'
 
 
 
