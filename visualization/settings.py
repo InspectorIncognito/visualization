@@ -26,7 +26,7 @@ with open(os.path.join(os.path.dirname(__file__), 'keys/secret_key.txt')) as fil
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [u'104.236.183.105']
 
 # Application definition
 
