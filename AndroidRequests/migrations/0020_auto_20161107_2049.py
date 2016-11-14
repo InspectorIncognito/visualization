@@ -20,41 +20,44 @@ def fill_tables(apps, schema_editor):
         st.longitud = aux
         st.save()
 
+    print("ZONIFICACION DE EVENTS FOR BUS")
     for ev in eventsforbusv2.objects.all():
         statistic_data = statisticsfrombus.objects.filter(reportOfEvent = ev).order_by('-timeStamp')[0]
         ev_lat = statistic_data.latitud
         ev_long = statistic_data.longitud
         pnt = Point(ev_long, ev_lat)
-        zonification = None
+        zon = None
         try:
-            zonification = zonification.objects.filter(geom__intersects = pnt)[0]
+            zon = zonification.objects.filter(geom__intersects = pnt)[0]
         except:
             pass
-        ev.zonification = zonification
+        ev.zonification = zon
         ev.save()
     
+    print("ZONIFICACION DE EVENTS FOR BUS STOP")
     for ev in eventsforbusstop.objects.all():
         statistic_data = statisticsfrombusstop.objects.filter(reportOfEvent = ev).order_by('-timeStamp')[0]
         ev_lat = statistic_data.latitud
         ev_long = statistic_data.longitud
         pnt = Point(ev_long, ev_lat)
-        zonification = None
+        zon = None
         try:
-            zonification = zonification.objects.filter(geom__intersects = pnt)[0]
+            zon = zonification.objects.filter(geom__intersects = pnt)[0]
         except:
             pass
-        ev.zonification = zonification
+        ev.zonification = zon
         ev.save()
 
+    print("ZONIFICACION DE REPORT INFO")
     for ev in reportsinfo.objects.all():
 
         pnt = Point(ev.longitud, ev.latitud)
-        zonification = None
+        zon = None
         try:
-            zonification = zonification.objects.filter(geom__intersects = pnt)[0]
+            zon = zonification.objects.filter(geom__intersects = pnt)[0]
         except:
             pass
-        ev.zonification = zonification
+        ev.zonification = zon
         ev.save()
 
 class Migration(migrations.Migration):
