@@ -4,10 +4,14 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "visualization.settings")
 
 # your imports, e.g. Django models
 import django
+import re
+import json
+import sys
 django.setup()
-from AndroidRequests.models  import EventForBusv2, EventForBusStop, TimePeriod, \
+from AndroidRequests.models import EventForBusv2, EventForBusStop, TimePeriod, \
 	Busv2, HalfHourPeriod, Report, ReportInfo, StadisticDataFromRegistrationBus, \
-	StadisticDataFromRegistrationBusStop
+	StadisticDataFromRegistrationBusStop, BusStop
+from django.contrib.gis.geos import Point
 
 def add_time_periods():
     
@@ -81,7 +85,7 @@ def add_half_hour_periods():
 
 def add_report_info():
 	for report1 in Report.objects.all():
-		print(report1.pk)
+		# print(report1.pk)
 		try:
 			reportJson = json.loads(report1.reportInfo)
 			if 'bus' in reportJson:
@@ -176,10 +180,6 @@ def add_county():
         ev.save()
 
 def add_nearest_busstops():
-    eventsforbusv2 = apps.get_model('AndroidRequests', 'EventForBusv2')
-    busstops = apps.get_model('AndroidRequests', 'BusStop')
-    statisticsfrombus = apps.get_model('AndroidRequests', 'StadisticDataFromRegistrationBus')
-    zonification = apps.get_model('AndroidRequests', 'zonificationTransantiago')
     sys.stdout.write("\nBusStop iteration\nTotal rows: "+str(BusStop.objects.all().count())+"\n")
     sys.stdout.write("\r Rows modified: 0")
     sys.stdout.flush()
@@ -218,4 +218,9 @@ def add_nearest_busstops():
     sys.stdout.write("\n Total rows modified: "+str(counter) + "\n")
 
 if __name__ == '__main__':
-	add_time_periods()
+    add_time_periods()
+    validate_plates()
+    add_half_hour_periods()
+    add_report_info()
+    add_county()
+    add_nearest_busstops()
