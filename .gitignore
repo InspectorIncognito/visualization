@@ -99,3 +99,8 @@ ENV/
 
 # ignore another repos
 AndroidRequestsBackups
+
+media/
+node_modules/
+static/components/
+visualization/keys/
