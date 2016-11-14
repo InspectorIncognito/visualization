@@ -2,7 +2,7 @@
 
 from django.http import HttpResponse
 from django.template import loader
-from AndroidRequests.models import Report, EventForBus, Service, Event, Bus
+from AndroidRequests.models import *
 from django.http import JsonResponse
 from django.db.models import Q
 from datetime import datetime, date
@@ -24,8 +24,10 @@ def drivers(request):
     template = loader.get_template('drivers.html')
     carrier = request.user.carrieruser.carrier.color_id
     services = Service.objects.filter(color_id=carrier)
-    buses = Bus.objects.filter(service__in=[service.service for service in services])
-    buses = buses.exclude(registrationPlate__icontains='dummyLPt')
+    ba = Busassignment.objects.filter(service__in=[service.service for service in services])
+    ba = ba.values_list('uuid', flat = True)
+    buses = Busv2.objects.filter(id__in=ba)
+    buses = buses.exclude(registrationPlate__icontains='No Info.').order_by("registrationPlate")
     plates = [bus.registrationPlate for bus in buses]
     context = {
         'services': services,
@@ -95,11 +97,11 @@ def getDriversReport(request):
         date_end = request.GET.get('date_end')
         plates = request.GET.get('plate')
         serv = request.GET.get('service')
-        query = EventForBus.objects.filter(
-            bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
+        query = EventForBusv2.objects.filter(
+            busassignment__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
         query = query.filter(event__category="conductor")
         query = query.filter(timeCreation__range=[date_init, date_end])
-        query = query.exclude(bus__registrationPlate__icontains="dummyLPt")
+        query = query.exclude(bus__registrationPlate__icontains="No Info.")
         if plates:
             plates = json.loads(plates)
             plateFilter = reduce(lambda x, y: x | y, [Q(bus__registrationPlate=plate) for plate in plates])
@@ -122,10 +124,10 @@ def driversTable(request):
 @login_required
 def getDriversTable(request):
     carrier = request.user.carrieruser.carrier.color_id
-    query = EventForBus.objects.filter(
-        bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
+    query = EventForBusv2.objects.filter(
+        busassignment__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
     query = query.filter(event__category="conductor")
-    query = query.exclude(bus__registrationPlate__icontains="dummylpt")
+    query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
     query = query.exclude(event__id='evn00233')
     today = datetime.now(pytz.timezone('Chile/Continental'))
     # query = query.filter(timeCreation__year=str(today.year),

@@ -31,7 +31,9 @@ class ReportInfo(models.Model):
     """ longitude from the geolocation """
     report = models.ForeignKey('Report', verbose_name='The Report')
     """ Link to the report """
-    county = models.CharField(max_length=80, null=True)
+    zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null = True)
+    '''Indicates the zonification for the event'''
+    
     
 
 class TimePeriod(models.Model):
@@ -180,7 +182,9 @@ class EventForBusStop(EventRegistration):
     '''Indicates the Transantiago Time Period of the event'''
     half_hour_period = models.ForeignKey( 'HalfHourPeriod', verbose_name=b'Half Hour Period', null = False)
     '''Indicates the half hour time period of the event'''
-    county = models.CharField(max_length=80, null=True)
+    zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null = True)
+    '''Indicates the zonification for the event'''
+    
 
 
 class EventForBus(EventRegistration):
@@ -222,8 +226,8 @@ class EventForBusv2(EventRegistration):
     '''Indicates the Transantiago Time Period of the event'''
     half_hour_period = models.ForeignKey( 'HalfHourPeriod', verbose_name=b'Half Hour Period', null = False)
     '''Indicates the half hour time period of the event'''
-    county = models.CharField(max_length=80, null=True)
-    '''Indicates the county for the event'''
+    zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null = True)
+    '''Indicates the zonification for the event'''
     busStop1 = models.ForeignKey('BusStop', verbose_name='Bus Stop1', related_name='busStop1')
     '''Indicates the 1 nearest bus stop'''
     busStop2 = models.ForeignKey('BusStop', verbose_name='Bus Stop2', related_name='busStop2')
@@ -240,19 +244,18 @@ class EventForBusv2(EventRegistration):
         dictionary['timeCreation'] = creation.strftime("%d-%m-%Y %H:%M:%S")
         dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
         dictionary['service'] = self.busassignment.service
-        dictionary['plate'] = self.busassignment.uuid.registrationPlate.upper()
+        dictionary['plate'] = self.busassignment.uuid.registrationPlate
         dictionary['type'] = self.event.name
-        dictionary['busStop1'] = ""  # TODO Model needs to be changed to save it
-        dictionary['busStop2'] = ""
-        dictionary['place'] = ""
+        dictionary['busStop1'] = self.busStop1.name
+        dictionary['busStop2'] = self.busStop2.name
         dictionary['fixed'] = "Si" if self.fixed else "No"
         dictionary['id'] = self.id
         dictionary['category'] = self.event.category
-        dictionary['zone777'] = ""
-        dictionary['commune'] = ""
-        dictionary['typeOfDay'] = ""
-        dictionary['periodHour'] = ""
-        dictionary['periodTransantiago'] = ""
+        dictionary['zone777'] = "hola"
+        dictionary['commune'] = self.county
+        dictionary['typeOfDay'] = self.time_period.day_type
+        dictionary['periodHour'] = self.half_hour_period.name
+        dictionary['periodTransantiago'] = self.time_period.name
         return dictionary
 ##
 #
