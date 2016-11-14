@@ -104,3 +104,5 @@ media/
 node_modules/
 static/components/
 visualization/keys/
+static/*
+visualization/database.py

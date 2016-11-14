@@ -31,6 +31,7 @@ ALLOWED_HOSTS = [u'104.236.183.105']
 # Application definition
 
 INSTALLED_APPS = [
+    'visualization',
     'carrier.apps.CarrierConfig',
     'AndroidRequests.apps.AndroidRequestsConfig',
     'django.contrib.admin',
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_crontab',
     'AndroidRequestsBackups',
+    'django.contrib.gis',
 ]
 
 MIDDLEWARE = [
@@ -77,6 +79,7 @@ WSGI_APPLICATION = 'visualization.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 DATABASES = database.DATABASES
+DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
