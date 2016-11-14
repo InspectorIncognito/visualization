@@ -68,7 +68,7 @@ function init() {
 }
 
 function openModal(imageName) {
-    $('#confirmationtext').html('Imagen: ' + imageName);
+    $('#confirmationtext').html('<img src="" alt="My image"/>');
     $("#myModal").modal();
 }
 
