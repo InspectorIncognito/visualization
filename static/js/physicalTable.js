@@ -56,6 +56,9 @@ function headers() {
                         table.ajax.reload();
                         headers();
                     }
+                    else{
+                        console.log("Un error ocurrió");
+                    }
                 });
     }
     setInterval(function () {

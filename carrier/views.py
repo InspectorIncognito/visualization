@@ -50,9 +50,9 @@ def getPhysicalHeaders(request):
     carrier = request.user.carrieruser.carrier.color_id
     events = Event.objects.filter(category="estado físico", eventType="bus")
     events = [event.name for event in events]
-    headerInfo = EventForBus.objects.filter(event__category='estado físico')
+    headerInfo = EventForBusv2.objects.filter(event__category='estado físico')
     headerInfo = headerInfo.filter(
-        bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
+        busassignment__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
     today = date.today()
     year = today.year
     if today.month <= 3:
@@ -61,12 +61,12 @@ def getPhysicalHeaders(request):
     else:
         last_month = today.month - 3
     headerInfo = headerInfo.filter(timeCreation__gte=date(year, last_month, today.day)).exclude(
-        bus__registrationPlate="dummyLPt")
-    headerInfo = headerInfo.filter(fixed=False)
+        busassignment__uuid__registrationPlate="No Info.")
     response = {}
     for ev in events:
         q = headerInfo.filter(event__name=ev)
-        q = q.distinct('bus__registrationPlate')
+        q = q.order_by("busassignment__uuid__registrationPlate", "-timeStamp").distinct('busassignment__uuid__registrationPlate')
+        q = q.filter(fixed = False)
         response[ev] = q.count()
     return JsonResponse(response, safe=False)
 
@@ -146,11 +146,20 @@ def physicalTable(request):
 @login_required
 def getPhysicalTable(request):
     carrier = request.user.carrieruser.carrier.color_id
-    query = EventForBus.objects.filter(
-        bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
-    query = query.filter(event__category="estado físico", fixed = False).exclude(event__id="evn00225")
-    query = query.exclude(bus__registrationPlate__icontains="dummyLPt")
-    query = query.distinct("event__name", "bus__registrationPlate")
+    query = EventForBusv2.objects.filter(
+        busassignment__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
+    query = query.filter(event__category="estado físico").exclude(event__id="evn00225")
+    today = date.today()
+    year = today.year
+    if today.month <= 3:
+        last_month = today.month + 12 - 3
+        year = year - 1
+    else:
+        last_month = today.month - 3
+    query = query.filter(timeCreation__gte=date(year, last_month, today.day)).exclude(
+        busassignment__uuid__registrationPlate="No Info.")
+    query = query.order_by("event__name", "busassignment__uuid__registrationPlate", "-timeStamp").distinct("event__name", "busassignment__uuid__registrationPlate")
+    query = query.filter(fixed = False)
     data = {
         'data': [report.getDictionary() for report in query]
     }
@@ -204,10 +213,13 @@ def getPhysicalReport(request):
 def updatePhysical(request):
     if request.method == 'GET':
         id = request.GET.get('id')
-        event = EventForBus.objects.get(id=id)
+        event = EventForBusv2.objects.get(id=id)
         event.fixed = True
-        event.save()
-        ans = "True"
+        try:
+            event.save()
+            ans = "True"
+        except:
+            ans = "False"
         return JsonResponse(ans, safe=False)
 
 @login_required
