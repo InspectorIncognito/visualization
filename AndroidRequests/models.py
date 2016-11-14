@@ -31,7 +31,9 @@ class ReportInfo(models.Model):
     """ longitude from the geolocation """
     report = models.ForeignKey('Report', verbose_name='The Report')
     """ Link to the report """
-    county = models.CharField(max_length=80, null=True)
+    zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null = True)
+    '''Indicates the zonification for the event'''
+    
     
 
 class TimePeriod(models.Model):
@@ -180,7 +182,9 @@ class EventForBusStop(EventRegistration):
     '''Indicates the Transantiago Time Period of the event'''
     half_hour_period = models.ForeignKey( 'HalfHourPeriod', verbose_name=b'Half Hour Period', null = False)
     '''Indicates the half hour time period of the event'''
-    county = models.CharField(max_length=80, null=True)
+    zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null = True)
+    '''Indicates the zonification for the event'''
+    
 
 
 class EventForBus(EventRegistration):
@@ -222,8 +226,8 @@ class EventForBusv2(EventRegistration):
     '''Indicates the Transantiago Time Period of the event'''
     half_hour_period = models.ForeignKey( 'HalfHourPeriod', verbose_name=b'Half Hour Period', null = False)
     '''Indicates the half hour time period of the event'''
-    county = models.CharField(max_length=80, null=True)
-    '''Indicates the county for the event'''
+    zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null = True)
+    '''Indicates the zonification for the event'''
     busStop1 = models.ForeignKey('BusStop', verbose_name='Bus Stop1', related_name='busStop1')
     '''Indicates the 1 nearest bus stop'''
     busStop2 = models.ForeignKey('BusStop', verbose_name='Bus Stop2', related_name='busStop2')
