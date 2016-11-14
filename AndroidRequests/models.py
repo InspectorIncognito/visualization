@@ -240,19 +240,18 @@ class EventForBusv2(EventRegistration):
         dictionary['timeCreation'] = creation.strftime("%d-%m-%Y %H:%M:%S")
         dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
         dictionary['service'] = self.busassignment.service
-        dictionary['plate'] = self.busassignment.uuid.registrationPlate.upper()
+        dictionary['plate'] = self.busassignment.uuid.registrationPlate
         dictionary['type'] = self.event.name
-        dictionary['busStop1'] = ""  # TODO Model needs to be changed to save it
-        dictionary['busStop2'] = ""
-        dictionary['place'] = ""
+        dictionary['busStop1'] = self.busStop1.name
+        dictionary['busStop2'] = self.busStop2.name
         dictionary['fixed'] = "Si" if self.fixed else "No"
         dictionary['id'] = self.id
         dictionary['category'] = self.event.category
-        dictionary['zone777'] = ""
-        dictionary['commune'] = ""
-        dictionary['typeOfDay'] = ""
-        dictionary['periodHour'] = ""
-        dictionary['periodTransantiago'] = ""
+        dictionary['zone777'] = "hola"
+        dictionary['commune'] = self.county
+        dictionary['typeOfDay'] = self.time_period.day_type
+        dictionary['periodHour'] = self.half_hour_period.name
+        dictionary['periodTransantiago'] = self.time_period.name
         return dictionary
 ##
 #
