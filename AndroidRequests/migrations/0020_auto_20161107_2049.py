@@ -25,12 +25,12 @@ def fill_tables(apps, schema_editor):
         ev_lat = statistic_data.latitud
         ev_long = statistic_data.longitud
         pnt = Point(ev_long, ev_lat)
-        county = "Fuera de la zona"
+        zonification = None
         try:
-            county = zonification.objects.filter(geom__intersects = pnt)[0].comuna
+            zonification = zonification.objects.filter(geom__intersects = pnt)[0]
         except:
             pass
-        ev.county = county
+        ev.zonification = zonification
         ev.save()
     
     for ev in eventsforbusstop.objects.all():
@@ -38,23 +38,23 @@ def fill_tables(apps, schema_editor):
         ev_lat = statistic_data.latitud
         ev_long = statistic_data.longitud
         pnt = Point(ev_long, ev_lat)
-        county = "Fuera de la zona"
+        zonification = None
         try:
-            county = zonification.objects.filter(geom__intersects = pnt)[0].comuna
+            zonification = zonification.objects.filter(geom__intersects = pnt)[0]
         except:
             pass
-        ev.county = county
+        ev.zonification = zonification
         ev.save()
 
     for ev in reportsinfo.objects.all():
 
         pnt = Point(ev.longitud, ev.latitud)
-        county = "Fuera de la zona"
+        zonification = None
         try:
-            county = zonification.objects.filter(geom__intersects = pnt)[0].comuna
+            zonification = zonification.objects.filter(geom__intersects = pnt)[0]
         except:
             pass
-        ev.county = county
+        ev.zonification = zonification
         ev.save()
 
 class Migration(migrations.Migration):
@@ -66,18 +66,19 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='eventforbusv2',
-            name='county',
-            field=models.CharField(max_length=80, null=True),
+            name='zonification',
+            field=models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null = True),
+    
         ),
         migrations.AddField(
             model_name='eventforbusstop',
-            name='county',
-            field=models.CharField(max_length=80, null=True),
+            name='zonification',
+            field=models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null = True),
         ),
         migrations.AddField(
             model_name='reportinfo',
-            name='county',
-            field=models.CharField(max_length=80, null=True),
+            name='zonification',
+            field=models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null = True),
         ),
         migrations.RunPython(fill_tables, reverse_code=migrations.RunPython.noop),
     ]
