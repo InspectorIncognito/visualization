@@ -251,8 +251,8 @@ class EventForBusv2(EventRegistration):
         dictionary['fixed'] = "Si" if self.fixed else "No"
         dictionary['id'] = self.id
         dictionary['category'] = self.event.category
-        dictionary['zone777'] = "hola"
-        dictionary['commune'] = self.county
+        dictionary['zone777'] = self.zonification.zona if self.zonification else "No info."
+        dictionary['commune'] = self.zonification.comuna if self.zonification else "No info."
         dictionary['typeOfDay'] = self.time_period.day_type
         dictionary['periodHour'] = self.half_hour_period.name
         dictionary['periodTransantiago'] = self.time_period.name
