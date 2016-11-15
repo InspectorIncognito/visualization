@@ -74,9 +74,11 @@ def getPhysicalHeaders(request):
 def getReports(request):
     if request.method == 'GET':
         carrier = request.user.carrieruser.carrier.color_id
-        reports = Report.objects.all() #TODO Filter depending on carrier (after transform)
+        services = Service.objects.filter(color_id=carrier)
+        query = ReportInfo.objects.filter(reportType='bus')
+        query = query.filter(service__in=[service.service for service in services])
         data = {
-            'data' : [report.getDictionary() for report in reports]
+            'data' : [q.report.getDictionary() for q in query]
         }
         return JsonResponse(data, safe=False)
 
