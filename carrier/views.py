@@ -61,7 +61,7 @@ def getPhysicalHeaders(request):
     else:
         last_month = today.month - 3
     headerInfo = headerInfo.filter(timeCreation__gte=date(year, last_month, today.day)).exclude(
-        busassignment__uuid__registrationPlate="No Info.")
+        busassignment__uuid__registrationPlate__icontains="No Info.")
     response = {}
     for ev in events:
         q = headerInfo.filter(event__name=ev)
@@ -73,11 +73,18 @@ def getPhysicalHeaders(request):
 @login_required
 def getReports(request):
     if request.method == 'GET':
-        carrier = request.user.carrieruser.carrier.color_id
-        reports = Report.objects.all() #TODO Filter depending on carrier (after transform)
+        reports = Report.objects.all()
         data = {
             'data' : [report.getDictionary() for report in reports]
         }
+        # # TODO use block below after DEMO
+        # carrier = request.user.carrieruser.carrier.color_id
+        # services = Service.objects.filter(color_id=carrier)
+        # query = ReportInfo.objects.filter(reportType='bus')
+        # query = query.filter(service__in=[service.service for service in services])
+        # data = {
+        #     'data': [q.report.getDictionary() for q in query]
+        # }
         return JsonResponse(data, safe=False)
 
 @login_required
@@ -101,14 +108,14 @@ def getDriversReport(request):
             busassignment__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
         query = query.filter(event__category="conductor")
         query = query.filter(timeCreation__range=[date_init, date_end])
-        query = query.exclude(bus__registrationPlate__icontains="No Info.")
+        query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
         if plates:
             plates = json.loads(plates)
-            plateFilter = reduce(lambda x, y: x | y, [Q(bus__registrationPlate=plate) for plate in plates])
+            plateFilter = reduce(lambda x, y: x | y, [Q(busassignment__uuid__registrationPlate=plate) for plate in plates])
             query = query.filter(plateFilter)
         if serv:
             serv = json.loads(serv)
-            serviceFilter = reduce(lambda x, y: x | y, [Q(bus__service=ser) for ser in serv])
+            serviceFilter = reduce(lambda x, y: x | y, [Q(busassignment__service=ser) for ser in serv])
             query = query.filter(serviceFilter)
         data = {
             "reports": [change(report.getDictionary()) for report in query],
@@ -129,7 +136,8 @@ def getDriversTable(request):
     query = query.filter(event__category="conductor")
     query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
     query = query.exclude(event__id='evn00233')
-    today = datetime.now(pytz.timezone('Chile/Continental'))
+    # TODO use block below on production
+    # today = datetime.now(pytz.timezone('Chile/Continental'))
     # query = query.filter(timeCreation__year=str(today.year),
     #                       timeCreation__month=str(today.month),
     #                       timeCreation__day=str(today.day))
@@ -157,7 +165,7 @@ def getPhysicalTable(request):
     else:
         last_month = today.month - 3
     query = query.filter(timeCreation__gte=date(year, last_month, today.day)).exclude(
-        busassignment__uuid__registrationPlate="No Info.")
+        busassignment__uuid__registrationPlate__icontains="No Info.")
     query = query.order_by("event__name", "busassignment__uuid__registrationPlate", "-timeStamp").distinct("event__name", "busassignment__uuid__registrationPlate")
     query = query.filter(fixed = False)
     data = {
@@ -186,18 +194,18 @@ def getPhysicalReport(request):
         serv = request.GET.get('service')
         hour2 = (hour2 + 24) if hour2 < hour1 else hour2
         hours = [hour % 24 for hour in range(hour1, hour2 + 1)]
-        query = EventForBus.objects.filter(
-            bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
+        query = EventForBusv2.objects.filter(
+            busassignment__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
         query = query.filter(event__category="estado físico", fixed = False)
         query = query.filter(timeCreation__range=[date_init, date_end])
-        query = query.exclude(bus__registrationPlate__icontains="dummyLPt")
+        query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info")
         if plates:
             plates = json.loads(plates)
-            plateFilter = reduce(lambda x, y: x | y, [Q(bus__registrationPlate=plate) for plate in plates])
+            plateFilter = reduce(lambda x, y: x | y, [Q(busassignment__uuid__registrationPlate=plate) for plate in plates])
             query = query.filter(plateFilter)
         if serv:
             serv = json.loads(serv)
-            serviceFilter = reduce(lambda x, y: x | y, [Q(bus__service=ser) for ser in serv])
+            serviceFilter = reduce(lambda x, y: x | y, [Q(busassignment__service=ser) for ser in serv])
             query = query.filter(serviceFilter)
         hourFilter = reduce(lambda x, y: x | y, [Q(timeCreation__hour=h) for h in hours])
         # minuteFilter = reduce(lambda x, y: x | y, [Q(timeCreation__minute=m) for m in minutes])
@@ -238,8 +246,8 @@ def getFullTable(request):
         carrier = request.user.carrieruser.carrier.color_id
         #query = EventForBus.objects.filter(
         #    bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
-        query = EventForBus.objects.all()
-        query = query.exclude(bus__registrationPlate__icontains="dummyLPt")
+        query = EventForBusv2.objects.all()
+        query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
         types = request.GET.get('types')
