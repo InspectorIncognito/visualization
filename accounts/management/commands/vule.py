@@ -8,7 +8,7 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
-        carrier = Carrier(name = "VULE S.A", color_id=4, image=static("images/bus06.png"))
+        carrier = Carrier(name = "VULE S.A", color_id=6, image=static("images/bus06.png"))
         carrier.save()
         user = User.objects.create_user('vule', None, 'vule')
         user.save()
