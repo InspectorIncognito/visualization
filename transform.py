@@ -20,7 +20,7 @@ from pytz import timezone
 def add_time_periods(timestamp):
 	counter = 0
 
-	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=5)):
+	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=2)):
 		# time_to_match = ev.timeCreation
 		# print(time_to_match)
 		time = ev.timeCreation.time().replace(microsecond=0)
@@ -44,7 +44,7 @@ def add_time_periods(timestamp):
 	sys.stdout.flush()
 	counter = 0
 
-	for ev in EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=5)):
+	for ev in EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=2)):
 		# time_to_match = ev.timeCreation
 		# print(time_to_match)
 		time = ev.timeCreation.time().replace(microsecond=0)
@@ -92,7 +92,7 @@ def add_half_hour_periods(timestamp):
 	
 	counter = 0
 
-	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=5)):
+	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=2)):
 		time = ev.timeCreation.time().replace(microsecond=0)
 		hhperiod = HalfHourPeriod.objects.get(initial_time__lte = time , end_time__gte = time)
 		ev.half_hour_period = hhperiod
@@ -103,7 +103,7 @@ def add_half_hour_periods(timestamp):
 	sys.stdout.flush()
 	counter = 0
 
-	for ev in EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=5)):
+	for ev in EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=2)):
 		time = ev.timeCreation.time().replace(microsecond=0)
 		hhperiod = HalfHourPeriod.objects.get(initial_time__lte = time , end_time__gte = time)
 		ev.half_hour_period = hhperiod
@@ -117,7 +117,7 @@ def add_report_info(timestamp):
 
 	counter = 0
 
-	for report1 in Report.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=5)):
+	for report1 in Report.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=2)):
 		try:
 			reportJson = json.loads(report1.reportInfo)
 			if 'bus' in reportJson:
@@ -174,7 +174,7 @@ def add_county(timestamp):
 
 	counter = 0
 
-	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp- timedelta(minutes=5)):
+	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp- timedelta(minutes=2)):
 		zon = None
 		try:
 			statistic_data = StadisticDataFromRegistrationBus.objects.filter(reportOfEvent = ev).order_by('-timeStamp')[0]
@@ -192,7 +192,7 @@ def add_county(timestamp):
 	sys.stdout.flush()
 	counter = 0
 	
-	for ev in EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=5)):
+	for ev in EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=2)):
 		zon = None
 		try:
 			statistic_data = StadisticDataFromRegistrationBusStop.objects.filter(reportOfEvent = ev).order_by('-timeStamp')[0]
@@ -246,7 +246,7 @@ def add_nearest_busstops(timestamp):
 	sys.stdout.write("\r Rows modified: 0")
 	sys.stdout.flush()
 	counter = 0
-	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=5)):
+	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=2)):
 		nearest = []
 		statistic_data = StadisticDataFromRegistrationBus.objects.filter(reportOfEvent = ev).order_by('-timeStamp')[0]
 		ev_lat = statistic_data.latitud
