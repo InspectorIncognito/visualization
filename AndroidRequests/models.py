@@ -163,7 +163,7 @@ class EventRegistration(models.Model):
 
         dictionary['eventConfirm'] = self.eventConfirm
         dictionary['eventDecline'] = self.eventDecline
-        creation = timezone.localtime(self.timeStamp, pytz.timezone('Chile/Continental'))
+        creation = timezone.localtime(self.timeCreation, pytz.timezone('Chile/Continental'))
         stamp = timezone.localtime(self.timeStamp, pytz.timezone('Chile/Continental'))
         dictionary['timeCreation'] = creation.strftime("%d-%m-%Y %H:%M:%S")
         dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
@@ -240,8 +240,8 @@ class EventForBusv2(EventRegistration):
 
         dictionary['eventConfirm'] = self.eventConfirm
         dictionary['eventDecline'] = self.eventDecline
-        creation = timezone.localtime(self.timeCreation)
-        stamp = timezone.localtime(self.timeStamp)
+        creation = timezone.localtime(self.timeCreation, pytz.timezone('Chile/Continental'))
+        stamp = timezone.localtime(self.timeStamp, pytz.timezone('Chile/Continental'))
         dictionary['timeCreation'] = creation.strftime("%d-%m-%Y %H:%M:%S")
         dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
         dictionary['service'] = self.busassignment.service if self.busassignment else "No info."
@@ -701,7 +701,7 @@ class Report(models.Model):
         dictionary['message'] = self.message
         dictionary['imageName'] = ("/media/reported_images/"+self.imageName) if (self.imageName and self.imageName != "no image") else "no image"
         dictionary['reportInfo'] = self.reportInfo
-        stamp = timezone.localtime(self.timeStamp)
+        stamp = timezone.localtime(self.timeStamp, pytz.timezone('Chile/Continental'))
         dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
         return dictionary
 
