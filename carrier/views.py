@@ -133,11 +133,10 @@ def getDriversTable(request):
     query = query.filter(event__category="conductor")
     query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
     query = query.exclude(event__id='evn00233')
-    # TODO use block below on production
-    # today = datetime.now(pytz.timezone('Chile/Continental'))
-    # query = query.filter(timeCreation__year=str(today.year),
-    #                       timeCreation__month=str(today.month),
-    #                       timeCreation__day=str(today.day))
+    today = datetime.now(pytz.timezone('Chile/Continental'))
+    query = query.filter(timeCreation__year=str(today.year),
+                          timeCreation__month=str(today.month),
+                           timeCreation__day=str(today.day))
     data = {
         'data': [report.getDictionary() for report in query]
     }
