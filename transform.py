@@ -229,7 +229,7 @@ def add_nearest_busstops(timestamp):
 	sys.stdout.write("\r Rows modified: 0")
 	sys.stdout.flush()
 	counter = 0
-	last_bus_stop_events = EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=5)).values_list('busStop_id', flat=True)
+	last_bus_stop_events = EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=2)).values_list('busStop_id', flat=True)
 
 	for busstop in BusStop.objects.filter(code__in = last_bus_stop_events):
 		busstop.point = Point(busstop.longitud, busstop.latitud)
