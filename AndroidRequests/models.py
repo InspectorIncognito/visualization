@@ -178,9 +178,9 @@ class EventForBusStop(EventRegistration):
     '''Indicates the bus stop to which the event refers'''
     aditionalInfo = models.CharField('Additional Information', max_length=140, default='nothing')
     ''' Saves additional information required by the event '''
-    time_period = models.ForeignKey( 'TimePeriod', verbose_name=b'Time Period', null = False)
+    time_period = models.ForeignKey( 'TimePeriod', verbose_name=b'Time Period', null = True)
     '''Indicates the Transantiago Time Period of the event'''
-    half_hour_period = models.ForeignKey( 'HalfHourPeriod', verbose_name=b'Half Hour Period', null = False)
+    half_hour_period = models.ForeignKey( 'HalfHourPeriod', verbose_name=b'Half Hour Period', null = True)
     '''Indicates the half hour time period of the event'''
     zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null = True)
     '''Indicates the zonification for the event'''
@@ -222,15 +222,15 @@ class EventForBusv2(EventRegistration):
     '''This model stores the reported events for the Bus'''
     busassignment = models.ForeignKey('Busassignment', verbose_name='the bus')
     '''Indicates the bus to which the event refers'''
-    time_period = models.ForeignKey( 'TimePeriod', verbose_name=b'Time Period', null = False)
+    time_period = models.ForeignKey( 'TimePeriod', verbose_name=b'Time Period', null = True)
     '''Indicates the Transantiago Time Period of the event'''
-    half_hour_period = models.ForeignKey( 'HalfHourPeriod', verbose_name=b'Half Hour Period', null = False)
+    half_hour_period = models.ForeignKey( 'HalfHourPeriod', verbose_name=b'Half Hour Period', null = True)
     '''Indicates the half hour time period of the event'''
     zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null = True)
     '''Indicates the zonification for the event'''
-    busStop1 = models.ForeignKey('BusStop', verbose_name='Bus Stop1', related_name='busStop1')
+    busStop1 = models.ForeignKey('BusStop', verbose_name='Bus Stop1', related_name='busStop1', null = True)
     '''Indicates the 1 nearest bus stop'''
-    busStop2 = models.ForeignKey('BusStop', verbose_name='Bus Stop2', related_name='busStop2')
+    busStop2 = models.ForeignKey('BusStop', verbose_name='Bus Stop2', related_name='busStop2', null = True)
     '''Indicates the 2 nearest bus stop'''
 
     def getDictionary(self):
@@ -283,7 +283,7 @@ class BusStop(Location):
     """ Name of the bus stop, indicating the streets """
     events = models.ManyToManyField(Event, verbose_name='Events', through=EventForBusStop)
 
-    point = models.PointField(srid=32140, verbose_name='The point')
+    point = models.PointField(srid=32140, verbose_name='The point', null = True)
 
     def getDictionary(self):
         """usefull information regarding the bus."""
@@ -687,7 +687,7 @@ class Report(models.Model):
     """ Specific date time when the server received a pose in the trajectory """
     message = models.TextField()
     """ Text reported by the user """
-    imageName = models.CharField(max_length=100, default="no image")
+    imageName = models.CharField(max_length=100, default="no image", null = True)
     """ image name that was saved """
     reportInfo = models.TextField()
     """ Aditinal information regarding the report. For example the user location."""
