@@ -67,56 +67,13 @@
                                                 <hr/>
                                                 <input type="button" id="seeBuses1" value="Ver servicio"
                                                        class="btn btn-default"/>
-                                                <hr/>
-                                                <div class="form-group">
-                                                    <label class="control-label">Origen:</label>
-                                                    <p id="serviceOrigin1" type="text" class="form-control-static"></p>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="control-label">Destino:</label>
-                                                    <p id="serviceDestination1" type="text"
-                                                       class="form-control-static"></p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <h3 class="panel-title">Servicio</h3>
-                                        </div>
-                                        <div class="panel-body">
-                                            <div class="form-inline">
-                                                <input id="serviceCode2" type="text" class="form-control"
-                                                       placeholder="Ingresar servicio aquí...">
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="direction2" id="optionsRadios1" value="R"
-                                                           checked>
-                                                    REGRESO
-                                                </label>
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="direction2" id="optionsRadios2" value="I">
-                                                    IDA
-                                                </label>
-                                                <hr/>
-                                                <input type="button" id="seeBuses2" value="Ver servicio"
-                                                       class="btn btn-default"/>
-                                                <hr/>
-                                                <div class="form-group">
-                                                    <label class="control-label">Origen:</label>
-                                                    <p id="serviceOrigin2" type="text" class="form-control-static"></p>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="control-label">Destino:</label>
-                                                    <p id="serviceDestination2" type="text"
-                                                       class="form-control-static"></p>
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-9" style="height: 100%;min-height: 100%">
                                     <div id="mapid" class="map">
-                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -149,26 +106,30 @@
         /**
          * SET MAP
          */
-        var beauchefLocation = L.latLng(-36.9554,  -73.0202);
+
+        var data = {
+            "506": {
+                "I": [[-33.4579141, -70.6646977],[-33.4679141, -70.6546977]],
+                "R": [[-33.4679141, -70.6546977]]
+            }
+        }
+        var beauchefLocation = L.latLng(-33.4579141, -70.6646977);
         var map = L.map("mapid", {editable: true}).setView(beauchefLocation, 15);
 
 
         var routeLayer1 = L.featureGroup([]);
         var busStopsLayer1 = L.layerGroup([]);
-        var routeLayer2 = L.featureGroup([]);
-        var busStopsLayer2 = L.layerGroup([]);
-        var commonBusStopsLayer = L.layerGroup([]);
+        var routeReports = L.layerGroup([]);
 
         var overlays = {
-            "servicio 1": routeLayer1,
-            "paradas 1": busStopsLayer1,
-            "servicio 2": routeLayer2,
-            "paradas 2": busStopsLayer2,
-            "paradas comunes": commonBusStopsLayer
+            "servicio": routeLayer1,
+            "paradas": busStopsLayer1,
+            "reportes": routeReports
         };
         L.control.layers({}, overlays).addTo(map);
 
         function drawRoute(service, direction, busStopsLayer, routeLayer) {
+            routeReports.clearLayers();
             // draw bus stops related to service
             busStopsLayer = GTFS.drawStopsForService(busStopsLayer, service, direction);
 
@@ -211,27 +172,17 @@
 
             map.fitBounds(routeLayer.getBounds());
 
-            drawCommonBusStops(commonBusStopsLayer);
+            markers = data[service][direction];
+            console.log(data)
+            for (i = 0; i < markers.length; i++) {
+                marker = L.marker([markers[i][0], markers[i][1]]);
+                routeReports.addLayer(marker);
+            }
+
 
             console.log("Map updated with service: " + service + direction);
         };
 
-        function drawCommonBusStops(busStopsLayer) {
-            var serviceCode1 = $("#serviceCode1").val();
-            var direction1 = $("input[name=direction1]:checked").val();
-            var serviceCode2 = $("#serviceCode2").val();
-            var direction2 = $("input[name=direction2]:checked").val();
-
-            var stopsData1 = GTFS.data.service[serviceCode1]["stops" + direction1].split('-');
-            var stopsData2 = GTFS.data.service[serviceCode2]["stops" + direction2].split('-');
-
-            var commonValues = stopsData1.filter(function (value) {
-                return stopsData2.indexOf(value) > -1;
-            });
-
-            GTFS.drawStops(busStopsLayer, commonValues);
-            busStopsLayer.addTo(map);
-        }
 
         /**
          * LOAD DATA
@@ -240,18 +191,14 @@
             var baseLayer = GTFS.setLayerControl(map);
             // SET BUTTON ACTION
             var drawServiceButton1 = $("#seeBuses1");
-            var drawServiceButton2 = $("#seeBuses2");
 
             var clickFunction = function (e) {
                 var index = $(e.target).attr('id').substr(-1);
                 var serviceCode = $("#serviceCode" + index).val();
                 var direction = $("input[name=direction" + index + "]:checked").val();
 
-                if (index == 1) {
-                    drawRoute(serviceCode, direction, busStopsLayer1, routeLayer1);
-                } else {
-                    drawRoute(serviceCode, direction, busStopsLayer2, routeLayer2);
-                }
+                drawRoute(serviceCode, direction, busStopsLayer1, routeLayer1);
+
 
                 var serviceInfo = GTFS.data.service[serviceCode];
                 var origin = serviceInfo.origin;
@@ -266,7 +213,6 @@
             };
 
             drawServiceButton1.click(clickFunction);
-            drawServiceButton2.click(clickFunction);
 
             // press enter on serviceCode input
             var keyPressFunction = function (e) {
@@ -279,7 +225,6 @@
                 }
             }
             $("#serviceCode1").keypress(keyPressFunction);
-            $("#serviceCode2").keypress(keyPressFunction);
 
             // change radio button
             $("input[type=radio][name=direction1]").change(function () {
@@ -287,12 +232,7 @@
                     drawServiceButton1.trigger("click");
                 }
             });
-            $("input[type=radio][name=direction2]").change(function () {
-                if ($("#serviceCode2").val()) {
-                    drawServiceButton2.trigger("click");
-                }
-            });
-        }, "/static/", "dataconce");
+        }, "/static/", "datasantiago");
     });
 </script>
 {% endblock bottomimports %}
