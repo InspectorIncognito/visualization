@@ -243,19 +243,19 @@ class EventForBusv2(EventRegistration):
         stamp = timezone.localtime(self.timeStamp)
         dictionary['timeCreation'] = creation.strftime("%d-%m-%Y %H:%M:%S")
         dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
-        dictionary['service'] = self.busassignment.service
-        dictionary['plate'] = self.busassignment.uuid.registrationPlate
+        dictionary['service'] = self.busassignment.service if self.busassignment else "No info."
+        dictionary['plate'] = self.busassignment.uuid.registrationPlate if self.busassignment else "No info."
         dictionary['type'] = self.event.name
-        dictionary['busStop1'] = self.busStop1.name
-        dictionary['busStop2'] = self.busStop2.name
+        dictionary['busStop1'] = self.busStop1.name if self.busStop1 else "No info."
+        dictionary['busStop2'] = self.busStop2.name if self.busStop2 else "No info."
         dictionary['fixed'] = "Si" if self.fixed else "No"
         dictionary['id'] = self.id
         dictionary['category'] = self.event.category
         dictionary['zone777'] = self.zonification.zona if self.zonification else "No info."
         dictionary['commune'] = self.zonification.comuna if self.zonification else "No info."
-        dictionary['typeOfDay'] = self.time_period.day_type
-        dictionary['periodHour'] = self.half_hour_period.name
-        dictionary['periodTransantiago'] = self.time_period.name
+        dictionary['typeOfDay'] = self.time_period.day_type if self.time_period else "No info."
+        dictionary['periodHour'] = self.half_hour_period.name if self.half_hour_period else "No info."
+        dictionary['periodTransantiago'] = self.time_period.name if self.time_period else "No info."
         return dictionary
 ##
 #
@@ -698,7 +698,7 @@ class Report(models.Model):
         """ Return a dictionary with the event information """
         dictionary = {}
         dictionary['message'] = self.message
-        dictionary['imageName'] = self.imageName
+        dictionary['imageName'] = ("/media/reported_images/"+self.imageName) if (self.imageName and self.imageName != "no image") else "no image"
         dictionary['reportInfo'] = self.reportInfo
         stamp = timezone.localtime(self.timeStamp)
         dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
