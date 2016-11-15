@@ -174,17 +174,6 @@ def add_county(timestamp):
 
 	counter = 0
 
-	for st in StadisticDataFromRegistrationBus.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=5)):
-		aux = st.latitud
-		st.latitud = st.longitud
-		st.longitud = aux
-		st.save()
-		counter = counter + 1
-
-	sys.stdout.write("\n StadisticDataFromRegistrationBus rows modified: "+str(counter) + "\n")
-	sys.stdout.flush()
-	counter = 0
-
 	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp- timedelta(minutes=5)):
 		zon = None
 		try:
