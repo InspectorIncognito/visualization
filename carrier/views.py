@@ -5,7 +5,7 @@ from django.template import loader
 from AndroidRequests.models import *
 from django.http import JsonResponse
 from django.db.models import Q
-from datetime import datetime, date
+from datetime import datetime, date, timedelta, time
 from django.contrib.auth.decorators import login_required
 import json, pytz
 
@@ -133,10 +133,11 @@ def getDriversTable(request):
     query = query.filter(event__category="conductor")
     query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
     query = query.exclude(event__id='evn00233')
-    today = datetime.now(pytz.timezone('Chile/Continental'))
-    query = query.filter(timeCreation__year=str(today.year),
-                          timeCreation__month=str(today.month),
-                           timeCreation__day=str(today.day))
+    today = datetime.now().date()
+    tomorrow = today + timedelta(1)
+    today_start = datetime.combine(today, time())
+    today_end = datetime.combine(tomorrow, time())
+    query = query.filter(timeCreation__gte=today_start, timeCreation__lte=today_end)
     data = {
         'data': [report.getDictionary() for report in query]
     }
