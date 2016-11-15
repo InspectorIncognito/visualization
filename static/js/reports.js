@@ -68,7 +68,7 @@ function init() {
 }
 
 function openModal(imageName) {
-    $('#confirmationtext').html('<img src="/media/reported_images/'+imageName+'" alt="My image"/>');
+    $('#confirmationtext').html('<img src="/media/reported_images/'+imageName+'" alt="My image" style="display:block; width: auto; max-width: 100%; height: auto;"/>');
     console.log(imageName);
     $("#myModal").modal();
 }
