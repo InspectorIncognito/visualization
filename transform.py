@@ -11,7 +11,7 @@ import pytz
 django.setup()
 from AndroidRequests.models import EventForBusv2, EventForBusStop, TimePeriod, \
 	Busv2, HalfHourPeriod, Report, ReportInfo, StadisticDataFromRegistrationBus, \
-	StadisticDataFromRegistrationBusStop, BusStop
+	StadisticDataFromRegistrationBusStop, BusStop, zonificationTransantiago
 from django.contrib.gis.geos import Point
 from datetime import datetime, time, date, timedelta
 from sys import argv
@@ -172,17 +172,6 @@ def add_report_info(timestamp):
 
 def add_county(timestamp):
 
-	counter = 0
-
-	for st in StadisticDataFromRegistrationBus.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=5)):
-		aux = st.latitud
-		st.latitud = st.longitud
-		st.longitud = aux
-		st.save()
-		counter = counter + 1
-
-	sys.stdout.write("\n StadisticDataFromRegistrationBus rows modified: "+str(counter) + "\n")
-	sys.stdout.flush()
 	counter = 0
 
 	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp- timedelta(minutes=5)):
