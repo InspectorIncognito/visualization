@@ -75,7 +75,9 @@ def getReports(request):
     if request.method == 'GET':
         carrier = request.user.carrieruser.carrier.color_id
         services = Service.objects.filter(color_id=carrier)
-        query = ReportInfo.objects.filter(reportType='bus')
+        date_init = request.GET.get('date_init')
+        date_end = request.GET.get('date_end')
+        query = ReportInfo.objects.filter(reportType='bus', report__timeStamp__range=[date_init,date_end])
         query = query.filter(service__in=[service.service for service in services])
         data = {
             'data': [q.report.getDictionary() for q in query]
@@ -239,9 +241,8 @@ def fullTable(request):
 def getFullTable(request):
     if request.method == 'GET':
         carrier = request.user.carrieruser.carrier.color_id
-        #query = EventForBus.objects.filter(
-        #    bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
-        query = EventForBusv2.objects.all()
+        query = EventForBusv2.objects.filter(
+            busassignment__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
         query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
@@ -275,3 +276,4 @@ def maptest(request):
 #     time = time - delta
 #     event.timeCreation = time
 #     event.save()
+
