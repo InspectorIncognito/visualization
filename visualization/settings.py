@@ -145,6 +145,10 @@ VIZ_BKP_APP_BKPS_LIFETIME   = "15"
 # where to put backups on remote. (full path!)
 # this folder will be created on the VIZ_BKP_APP_REMOTE_USER home
 VIZ_BKP_APP_REMOTE_BKP_FLDR = "/home/transapp/bkps"
+
+# send updates for the last 5 minutes
+VIZ_BKP_APP_TIME            = "5"
+
 ## ----------------------------------------------------------------------------
 
 # cron settings

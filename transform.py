@@ -17,10 +17,11 @@ from datetime import datetime, time, date, timedelta
 from sys import argv
 from pytz import timezone
 
-def add_time_periods(timestamp):
+
+def add_time_periods(timestamp, minutes_to_filter):
 	counter = 0
 
-	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=2)):
+	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter)):
 		# time_to_match = ev.timeCreation
 		# print(time_to_match)
 		time = ev.timeCreation.time().replace(microsecond=0)
@@ -44,7 +45,7 @@ def add_time_periods(timestamp):
 	sys.stdout.flush()
 	counter = 0
 
-	for ev in EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=2)):
+	for ev in EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter)):
 		# time_to_match = ev.timeCreation
 		# print(time_to_match)
 		time = ev.timeCreation.time().replace(microsecond=0)
@@ -66,6 +67,7 @@ def add_time_periods(timestamp):
 
 	sys.stdout.write("\n EventForBusStop rows modified: "+str(counter) + "\n")
 	sys.stdout.flush()
+
 
 def validate_plates(timestamp):
 	ex = r"\A[a-zA-Z]{4}[0-9]{2}\Z|\A[a-zA-Z]{2}[0-9]{4}\Z"
@@ -88,11 +90,12 @@ def validate_plates(timestamp):
 	sys.stdout.write("\n Bus rows modified: "+str(counter) + "\n")
 	sys.stdout.flush()
 
-def add_half_hour_periods(timestamp):
+
+def add_half_hour_periods(timestamp, minutes_to_filter):
 	
 	counter = 0
 
-	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=2)):
+	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter)):
 		time = ev.timeCreation.time().replace(microsecond=0)
 		hhperiod = HalfHourPeriod.objects.get(initial_time__lte = time , end_time__gte = time)
 		ev.half_hour_period = hhperiod
@@ -103,7 +106,7 @@ def add_half_hour_periods(timestamp):
 	sys.stdout.flush()
 	counter = 0
 
-	for ev in EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=2)):
+	for ev in EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter)):
 		time = ev.timeCreation.time().replace(microsecond=0)
 		hhperiod = HalfHourPeriod.objects.get(initial_time__lte = time , end_time__gte = time)
 		ev.half_hour_period = hhperiod
@@ -113,11 +116,12 @@ def add_half_hour_periods(timestamp):
 	sys.stdout.write("\n EventForBusStop rows modified: "+str(counter) + "\n")
 	sys.stdout.flush()
 
-def add_report_info(timestamp):
+
+def add_report_info(timestamp, minutes_to_filter):
 
 	counter = 0
 
-	for report1 in Report.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=2)):
+	for report1 in Report.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter)):
 		try:
 			reportJson = json.loads(report1.reportInfo)
 			if 'bus' in reportJson:
@@ -170,11 +174,12 @@ def add_report_info(timestamp):
 	sys.stdout.write("\n ReportInfo rows modified: "+str(counter) + "\n")
 	sys.stdout.flush()
 
-def add_county(timestamp):
+
+def add_county(timestamp, minutes_to_filter):
 
 	counter = 0
 
-	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp- timedelta(minutes=2)):
+	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp- timedelta(minutes=minutes_to_filter)):
 		zon = None
 		try:
 			statistic_data = StadisticDataFromRegistrationBus.objects.filter(reportOfEvent = ev).order_by('-timeStamp')[0]
@@ -192,7 +197,7 @@ def add_county(timestamp):
 	sys.stdout.flush()
 	counter = 0
 	
-	for ev in EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=2)):
+	for ev in EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter)):
 		zon = None
 		try:
 			statistic_data = StadisticDataFromRegistrationBusStop.objects.filter(reportOfEvent = ev).order_by('-timeStamp')[0]
@@ -224,12 +229,13 @@ def add_county(timestamp):
 	sys.stdout.write("\n ReportInfo rows modified: "+str(counter) + "\n")
 	sys.stdout.flush()
 
-def add_nearest_busstops(timestamp):
+
+def add_nearest_busstops(timestamp, minutes_to_filter):
 	sys.stdout.write("\nBusStop iteration\nTotal rows: "+str(BusStop.objects.all().count())+"\n")
 	sys.stdout.write("\r Rows modified: 0")
 	sys.stdout.flush()
 	counter = 0
-	last_bus_stop_events = EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=2)).values_list('busStop_id', flat=True)
+	last_bus_stop_events = EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter)).values_list('busStop_id', flat=True)
 
 	for busstop in BusStop.objects.filter(code__in = last_bus_stop_events):
 		busstop.point = Point(busstop.longitud, busstop.latitud)
@@ -246,7 +252,7 @@ def add_nearest_busstops(timestamp):
 	sys.stdout.write("\r Rows modified: 0")
 	sys.stdout.flush()
 	counter = 0
-	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=2)):
+	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter)):
 		nearest = []
 		statistic_data = StadisticDataFromRegistrationBus.objects.filter(reportOfEvent = ev).order_by('-timeStamp')[0]
 		ev_lat = statistic_data.latitud
@@ -264,6 +270,7 @@ def add_nearest_busstops(timestamp):
 			sys.stdout.flush()
 	sys.stdout.write("\n Total rows modified: "+str(counter) + "\n")
 
+
 if __name__ == '__main__':
 
 	ts1 = argv[1].split('.')[0]
@@ -277,6 +284,8 @@ if __name__ == '__main__':
 	minute = ts_time.split('_')[1]
 	second = ts_time.split('_')[2]
 
+	minutes_to_filter = int(argv[2])
+
 	ddate = date(int(year),int(month),int(day))
 	# print(ddate)
 	dtime = time(int(hour), int(minute),int(second))
@@ -288,10 +297,10 @@ if __name__ == '__main__':
 
 	dttz = tz.localize(dt)
 	print(dttz)
-
-	add_time_periods(dttz)
+	
+	add_time_periods(dttz, minutes_to_filter)
 	validate_plates(dttz)
-	add_half_hour_periods(dttz)
-	add_report_info(dttz)
-	add_county(dttz)
-	add_nearest_busstops(dttz)
+	add_half_hour_periods(dttz, minutes_to_filter)
+	add_report_info(dttz, minutes_to_filter)
+	add_county(dttz, minutes_to_filter)
+	add_nearest_busstops(dttz, minutes_to_filter)
