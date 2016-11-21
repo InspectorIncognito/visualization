@@ -122,28 +122,29 @@ STATICFILES_DIRS = (
 )
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-
+MEDIA_IMAGE = os.path.join(MEDIA_ROOT, "reported_images/")
 
 
 ## ----------------------------------------------------------------------------
 ## VIZ_BACKUP_APP
 ## see also: AndroidRequestsBackups/REAME.md
 
-# database name
-ANDROID_REQUESTS_BACKUPS_REMOTE_DATABASE = "transappvis"
-
-# from where to lookup for images on host
-ANDROID_REQUESTS_BACKUPS_IMGS_FLDR       = "media/reported_images"
-
-# amount of days to keep backup files, then delete them 
-# this is only for complete backups
-ANDROID_REQUESTS_BACKUPS_BKPS_LIFETIME   = "15"
-
-# where to lookup for backups on remote. (full path!)
+# Folder (full path) where to put backups on remote (TranSappViz) server.
+# Any file older than ANDROID_REQUESTS_BACKUPS_BKPS_LIFETIME days
+# will be deleted!
+# This value MUST match the one on the other server!, otherwise
+# really bad stuff might happen
 ANDROID_REQUESTS_BACKUPS_REMOTE_BKP_FLDR = "/home/transapp/bkps"
 
-# send updates for the last 5 minutes
+# Amount of minutes to send to the remote (TranSappViz) server.
+# This value MUST match the one on the other server!, otherwise
+# some data can be lost
 ANDROID_REQUESTS_BACKUPS_TIME            = "5"
+
+# Amount of days to keep "complete backup" files. Older files are deleted.
+# This value is only valid for complete backups. Partial backups are only
+# kept for 2 days
+ANDROID_REQUESTS_BACKUPS_BKPS_LIFETIME   = "10"
 
 ## ----------------------------------------------------------------------------
 
@@ -151,10 +152,10 @@ ANDROID_REQUESTS_BACKUPS_TIME            = "5"
 CRONJOBS = [
    
     # check for complete updates every one hour
-    ('0 */1 * * *', 'AndroidRequestsBackups.jobs.complete_loaddata', '> /tmp/vizbkpapp_complete_loaddata_log.txt'),
+    ('0 */1 * * *', 'AndroidRequestsBackups.jobs.complete_loaddata', '> /tmp/android_request_bkps_complete_loaddata_log.txt'),
     
     # check for partial updates every 1 minute
-    ('*/1 * * * *', 'AndroidRequestsBackups.jobs.partial_loaddata',  '> /tmp/vizbkpapp_partial_loaddata_log.txt'),
+    ('*/1 * * * *', 'AndroidRequestsBackups.jobs.partial_loaddata',  '> /tmp/android_request_bkps_partial_loaddata_log.txt'),
 ]
 CRONTAB_LOCK_JOBS = True
 CRONTAB_COMMAND_SUFFIX = '2>&1'
