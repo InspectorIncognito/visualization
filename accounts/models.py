@@ -18,9 +18,11 @@ class CarrierUser(models.Model):
     def __unicode__(self):
         return self.user.username
 
+    @property
     def string(self):
         return self.carrier.name
 
+    @property
     def image(self):
         return self.carrier.image
 
@@ -31,9 +33,11 @@ class TransappUser(models.Model):
     def __unicode__(self):
         return self.user.username
 
+    @property
     def string(self):
         return self.user.username
 
+    @property
     def image(self):
         return static("images/bus01.png")
 
@@ -44,7 +48,11 @@ class TransantiagoUser(models.Model):
     def __unicode__(self):
         return self.user.username
 
+    @property
     def string(self):
-        return static("images/bus01.png")
+        return self.user.username
 
+    @property
+    def image(self):
+        return static("images/bus01.png")
 
