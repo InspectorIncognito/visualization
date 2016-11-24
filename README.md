@@ -9,6 +9,7 @@ For install this server first get the source of the project
 ```(bash)
 # Run on the target machine
 $ git clone https://github.com/InspectorIncognito/visualization.git
+```
 
 Next, you need install the server prerequisites, for that execute the bash file prerequisites.bash
 
@@ -17,8 +18,8 @@ Next, you need install the server prerequisites, for that execute the bash file 
 $ bash prerequisites.bash
 ```
 
-For the database of the server, first you need to create a empty database in postgres. Also you need a dump of the 
-database from transapp app (AndroidRequest) for a initial work. Using psql clone the dump in your empty database
+For the database of the server, first you need to create a empty database in postgres. Also you need a dump 
+from transapp database app (AndroidRequest) for a initial work and migrations. Using psql clone the dump in your empty database
 
 ```(bash)
 # Run on the target machine in the visualization folder
@@ -51,7 +52,7 @@ DATABASES = {
 Also you need to generate a secret key for the django app, for that get a key (http://www.miniwebtool.com/django-secret-key-generator/) and write in
 visualization/visualization/keys/secret_key.txt
 
-You need to add the public-key from the server that will send the data.
+You need to add the public-key from the server that will send you the data.
 
 Finally you can run the server
 
