@@ -97,9 +97,6 @@ ENV/
 #database
 *.sqlite3
 
-# ignore another repos
-AndroidRequestsBackups
-
 media/
 node_modules/
 static/components/
