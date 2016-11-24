@@ -56,7 +56,8 @@ You need to add the public-key from the server that will send you the data.
 
 Finally you can run the server
 
-```python manage.py runserver
+```(bash)
+python manage.py runserver
 ```
 
 
