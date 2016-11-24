@@ -140,8 +140,8 @@ ANDROID_REQUESTS_BACKUPS_TIME            = "5"
 
 # Amount of days to keep "complete backup" files. Older files are deleted.
 # This value is only valid for complete backups. Partial backups are only
-# kept for 2 days
-ANDROID_REQUESTS_BACKUPS_BKPS_LIFETIME   = "10"
+# kept for 1 day
+ANDROID_REQUESTS_BACKUPS_BKPS_LIFETIME   = "4"
 
 ## ----------------------------------------------------------------------------
 
