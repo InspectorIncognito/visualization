@@ -15,8 +15,12 @@ import_data=true
 
 if $install_packages; then
   sudo apt-get update
+  #install python and pip
+  sudo apt-get install python-pip python-dev libpq-dev
   #install django
-  sudo apt-get install python-django
+  pip install django psycopg2
+  #install apache
+  sudo apt-get install apache2
   #install postgres
   sudo apt-get install postgresql postgresql-contrib
   #install npm
@@ -28,8 +32,7 @@ if $install_packages; then
   #install postgis
   sudo apt-get install postgis
   #install gdal
-  sudo apt-get install libgdal-dev
-  sudo pip install gdal
+  sudo apt-get install binutils libproj-dev gdal-bin
 fi
 
 
