@@ -30,6 +30,7 @@ After that you need make the migrations
 
 ```(bash)
 $ python manage.py migrate
+$ python manage.py collectstatic
 ```
 
 Also you need add your database configuration, for that create a file called database.py in visualization/visualization/ whit the next info
