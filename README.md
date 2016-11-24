@@ -10,6 +10,7 @@ For install this server first get the source of the project
 # Run on the target machine
 $ git clone https://github.com/InspectorIncognito/visualization.git
 ```
+Place the project in the principal user folder
 
 Next, you need install the server prerequisites, for that execute the bash file prerequisites.bash
 
@@ -55,10 +56,28 @@ visualization/visualization/keys/secret_key.txt
 
 You need to add the public-key from the server that will send you the data.
 
-Finally you can run the server
+For apache configuration, first go to the folder /etc/apache2/sites-available and open the file 000-default.conf
+Copy the next configuration
 
-```(bash)
-python manage.py runserver
+```(xml)
+<VirtualHost *:80>
+    . . .
+
+    Alias /static /home/<your user>/visualization/static
+    <Directory /home/<your user>/visualization/static>
+        Require all granted
+    </Directory>
+
+    <Directory /home/<your user>/visualization/visualization>
+        <Files wsgi.py>
+            Require all granted
+        </Files>
+    </Directory>
+
+    WSGIDaemonProcess visualization python-path=/home/<your user>/visualization:/home/<your user>/visualization/visualizationenv/lib/python2.7/site-packages
+    WSGIProcessGroup visualization
+    WSGIScriptAlias / /home/<your user>/visualization/visualization/wsgi.py
+
+</VirtualHost>
 ```
-
 
