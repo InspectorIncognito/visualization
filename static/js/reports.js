@@ -22,7 +22,7 @@ var url = 'http://' + location.host + '/carriers/getReports/';
 
 function init() {
     var date_init = $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD");
-    var date_end = $('#date_end').data("DateTimePicker").date().format("YYYY-MM-DD");
+    var date_end = $('#date_end').data("DateTimePicker").date().add(1, 'days').format("YYYY-MM-DD");
     var params = '?date_init=' + date_init + '&date_end=' + date_end;
     $.fn.dataTable.moment('DD-MM-YYYY HH:mm:ss');
     var i = 0;
@@ -76,6 +76,7 @@ function openModal(imageName) {
 function myFunction() {
 
     var date_init = $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD");
-    var date_end = $('#date_end').data("DateTimePicker").date().format("YYYY-MM-DD");
-    table.api().ajax.url(url + params).load();
+    var date_end = $('#date_end').data("DateTimePicker").date().add(1, 'days').format("YYYY-MM-DD");
+    var params = '?date_init=' + date_init + '&date_end=' + date_end;
+    table.ajax.url(url + params).load();
 }

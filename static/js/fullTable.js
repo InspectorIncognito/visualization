@@ -84,7 +84,7 @@ function init() {
 function myFunction() {
 
     var date_init = $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD");
-    var date_end = $('#date_end').data("DateTimePicker").date().format("YYYY-MM-DD");
+    var date_end = $('#date_end').data("DateTimePicker").date().add(1, 'days').format("YYYY-MM-DD");
     var types = $(".select2_multiple").val();
     var params = '?date_init=' + date_init + '&date_end=' + date_end;
     if (types != null) params += '&types=' + JSON.stringify(types);

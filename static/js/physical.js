@@ -281,7 +281,7 @@ function myFunction() {
     var data = {
         carrier: '3',
         date_init: $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD"),
-        date_end: $('#date_end').data("DateTimePicker").date().format("YYYY-MM-DD"),
+        date_end: $('#date_end').data("DateTimePicker").date().add(1, 'days').format("YYYY-MM-DD"),
         hour1: 00,
         hour2: 23,
         minute1: 00,

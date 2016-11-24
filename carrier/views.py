@@ -5,9 +5,18 @@ from django.template import loader
 from AndroidRequests.models import *
 from django.http import JsonResponse
 from django.db.models import Q
-from datetime import datetime, date
+from datetime import datetime, date, timedelta, time
 from django.contrib.auth.decorators import login_required
 import json, pytz
+
+def filter(request):
+    user = request.user
+    try:
+        user.transappuser
+        return Q()
+    except:
+        color_id = user.carrieruser.carrier.color_id
+        return Q(color_id = color_id)
 
 @login_required
 def index(request):
@@ -22,8 +31,7 @@ def reports(request):
 @login_required
 def drivers(request):
     template = loader.get_template('drivers.html')
-    carrier = request.user.carrieruser.carrier.color_id
-    services = Service.objects.filter(color_id=carrier)
+    services = Service.objects.filter(filter(request))
     ba = Busassignment.objects.filter(service__in=[service.service for service in services])
     ba = ba.values_list('uuid', flat = True)
     buses = Busv2.objects.filter(id__in=ba)
@@ -38,8 +46,7 @@ def drivers(request):
 @login_required
 def physical(request):
     template = loader.get_template('physical.html')
-    carrier = request.user.carrieruser.carrier.color_id
-    services = Service.objects.filter(color_id=carrier)
+    services = Service.objects.filter(filter(request))
     context = {
         'services': services
     }
@@ -47,12 +54,11 @@ def physical(request):
 
 @login_required
 def getPhysicalHeaders(request):
-    carrier = request.user.carrieruser.carrier.color_id
     events = Event.objects.filter(category="estado físico", eventType="bus")
     events = [event.name for event in events]
     headerInfo = EventForBusv2.objects.filter(event__category='estado físico')
     headerInfo = headerInfo.filter(
-        busassignment__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
+        busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
     today = date.today()
     year = today.year
     if today.month <= 3:
@@ -73,18 +79,14 @@ def getPhysicalHeaders(request):
 @login_required
 def getReports(request):
     if request.method == 'GET':
-        reports = Report.objects.all()
+        services = Service.objects.filter(filter(request))
+        date_init = request.GET.get('date_init')
+        date_end = request.GET.get('date_end')
+        query = ReportInfo.objects.filter(reportType='bus', report__timeStamp__range=[date_init,date_end])
+        query = query.filter(service__in=[service.service for service in services])
         data = {
-            'data' : [report.getDictionary() for report in reports]
+            'data': [q.report.getDictionary() for q in query]
         }
-        # # TODO use block below after DEMO
-        # carrier = request.user.carrieruser.carrier.color_id
-        # services = Service.objects.filter(color_id=carrier)
-        # query = ReportInfo.objects.filter(reportType='bus')
-        # query = query.filter(service__in=[service.service for service in services])
-        # data = {
-        #     'data': [q.report.getDictionary() for q in query]
-        # }
         return JsonResponse(data, safe=False)
 
 @login_required
@@ -99,13 +101,12 @@ def getDriversReport(request):
             dict["type"] = eventToPos[dict["type"]]
             return dict
 
-        carrier = request.user.carrieruser.carrier.color_id
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
         plates = request.GET.get('plate')
         serv = request.GET.get('service')
         query = EventForBusv2.objects.filter(
-            busassignment__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
+            busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
         query = query.filter(event__category="conductor")
         query = query.filter(timeCreation__range=[date_init, date_end])
         query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
@@ -130,17 +131,16 @@ def driversTable(request):
 
 @login_required
 def getDriversTable(request):
-    carrier = request.user.carrieruser.carrier.color_id
     query = EventForBusv2.objects.filter(
-        busassignment__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
+        busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
     query = query.filter(event__category="conductor")
     query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
     query = query.exclude(event__id='evn00233')
-    # TODO use block below on production
-    # today = datetime.now(pytz.timezone('Chile/Continental'))
-    # query = query.filter(timeCreation__year=str(today.year),
-    #                       timeCreation__month=str(today.month),
-    #                       timeCreation__day=str(today.day))
+    today = datetime.now().date()
+    tomorrow = today + timedelta(1)
+    today_start = datetime.combine(today, time())
+    today_end = datetime.combine(tomorrow, time())
+    query = query.filter(timeCreation__gte=today_start, timeCreation__lte=today_end)
     data = {
         'data': [report.getDictionary() for report in query]
     }
@@ -153,9 +153,8 @@ def physicalTable(request):
 
 @login_required
 def getPhysicalTable(request):
-    carrier = request.user.carrieruser.carrier.color_id
     query = EventForBusv2.objects.filter(
-        busassignment__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
+        busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
     query = query.filter(event__category="estado físico").exclude(event__id="evn00225")
     today = date.today()
     year = today.year
@@ -185,7 +184,6 @@ def getPhysicalReport(request):
             dict["type"] = eventToPos[dict["type"]]
             return dict
 
-        carrier = request.user.carrieruser.carrier.color_id
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
         hour1 = int(request.GET.get('hour1'))
@@ -195,7 +193,7 @@ def getPhysicalReport(request):
         hour2 = (hour2 + 24) if hour2 < hour1 else hour2
         hours = [hour % 24 for hour in range(hour1, hour2 + 1)]
         query = EventForBusv2.objects.filter(
-            busassignment__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
+            busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
         query = query.filter(event__category="estado físico", fixed = False)
         query = query.filter(timeCreation__range=[date_init, date_end])
         query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info")
@@ -208,9 +206,7 @@ def getPhysicalReport(request):
             serviceFilter = reduce(lambda x, y: x | y, [Q(busassignment__service=ser) for ser in serv])
             query = query.filter(serviceFilter)
         hourFilter = reduce(lambda x, y: x | y, [Q(timeCreation__hour=h) for h in hours])
-        # minuteFilter = reduce(lambda x, y: x | y, [Q(timeCreation__minute=m) for m in minutes])
         query = query.filter(hourFilter)
-        # query = query.filter(minuteInterval)
         data = {
             "reports": [change(report.getDictionary()) for report in query],
             "types": events
@@ -243,10 +239,8 @@ def fullTable(request):
 @login_required
 def getFullTable(request):
     if request.method == 'GET':
-        carrier = request.user.carrieruser.carrier.color_id
-        #query = EventForBus.objects.filter(
-        #    bus__service__in=[service.service for service in Service.objects.filter(color_id=carrier)])
-        query = EventForBusv2.objects.all()
+        query = EventForBusv2.objects.filter(
+            busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
         query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
@@ -266,17 +260,3 @@ def getFullTable(request):
 def maptest(request):
     template = loader.get_template('maptest.html')
     return HttpResponse(template.render(request=request))
-
-# from AndroidRequests.models import EventForBus, Service
-# from datetime import datetime, date, timedelta
-# from random import randint
-# import pytz
-#
-# query = EventForBus.objects.filter(bus__service__in=[service.service for service in Service.objects.filter(color_id=7)])
-# events = query.filter(event__category='conductor')[:12]
-# for event in events:
-#     time = datetime.now(pytz.timezone('Chile/Continental'))
-#     delta = timedelta(seconds=randint(0, 3600 * 5))
-#     time = time - delta
-#     event.timeCreation = time
-#     event.save()
