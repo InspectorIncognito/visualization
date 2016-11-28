@@ -74,15 +74,6 @@ class TransantiagoUser(models.Model):
     def image(self):
         return static("images/bus01.png")
 
-
-def getUser(user):
-    if hasattr(user, 'transappuser'):
-        return user.transappuser
-    if hasattr(user, 'transantiagouser'):
-        return user.transantiagouser
-    if hasattr(user, 'carrieruser'):
-        return user.carrieruser
-
 class ProxyUser(User):
     class Meta:
         proxy = True

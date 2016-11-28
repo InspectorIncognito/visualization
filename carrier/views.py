@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 import json, pytz
 
 def filter(request):
-    user = request.user
+    user = request.user.getUser()
     if user.color() == "all":
         return Q()
     else:
