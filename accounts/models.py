@@ -18,6 +18,12 @@ class CarrierUser(models.Model):
     def __unicode__(self):
         return self.user.username
 
+    def color(self):
+        return self.carrier.color_id
+
+    def type(self):
+        return "carrier"
+
     @property
     def string(self):
         return self.carrier.name
@@ -32,6 +38,12 @@ class TransappUser(models.Model):
 
     def __unicode__(self):
         return self.user.username
+
+    def type(self):
+        return "transapp"
+
+    def color(self):
+        return "all"
 
     @property
     def string(self):
@@ -48,6 +60,12 @@ class TransantiagoUser(models.Model):
     def __unicode__(self):
         return self.user.username
 
+    def type(self):
+        return "transantiago"
+
+    def color(self):
+        return "all"
+
     @property
     def string(self):
         return self.user.username
@@ -56,3 +74,25 @@ class TransantiagoUser(models.Model):
     def image(self):
         return static("images/bus01.png")
 
+
+def getUser(user):
+    if hasattr(user, 'transappuser'):
+        return user.transappuser
+    if hasattr(user, 'transantiagouser'):
+        return user.transantiagouser
+    if hasattr(user, 'carrieruser'):
+        return user.carrieruser
+
+class ProxyUser(User):
+    class Meta:
+        proxy = True
+
+    def getUser(self):
+        if hasattr(self, 'transappuser'):
+            return self.transappuser
+        elif hasattr(self, 'transantiagouser'):
+            return self.transantiagouser
+        elif hasattr(self, 'carrieruser'):
+            return self.carrieruser
+        else:
+            return self

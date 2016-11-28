@@ -3,6 +3,7 @@
 from django.http import HttpResponse
 from django.template import loader
 from AndroidRequests.models import *
+from accounts.models import *
 from django.http import JsonResponse
 from django.db.models import Q
 from datetime import datetime, date, timedelta, time
@@ -11,12 +12,10 @@ import json, pytz
 
 def filter(request):
     user = request.user
-    try:
-        user.transappuser
+    if user.color() == "all":
         return Q()
-    except:
-        color_id = user.carrieruser.carrier.color_id
-        return Q(color_id = color_id)
+    else:
+        return Q(color_id = user.color())
 
 @login_required
 def index(request):

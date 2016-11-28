@@ -56,6 +56,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+AUTHENTICATION_BACKENDS = (
+    'accounts.backends.ModelBackend',
+)
+
 ROOT_URLCONF = 'visualization.urls'
 
 TEMPLATES = [
@@ -116,7 +120,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static/') TODO USE STATIC ROOT IN PRODUCTION
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_IMAGE = os.path.join(MEDIA_ROOT, "reported_images/")
