@@ -54,6 +54,9 @@ var resp = null;
 var types = 0;
 var chartdata = {
     'weekday': null,
+    'daytype': null,
+    'periodHour': null,
+    'periodTransantiago': null,
     'plate': null,
     'service': null,
     'daily': null,
@@ -64,6 +67,9 @@ var chart;
 function reloadchart() {
     chartdata = {
         'weekday': null,
+        'daytype': null,
+        'periodHour': null,
+        'periodTransantiago': null,
         'plate': null,
         'service': null,
         'daily': null,
@@ -93,6 +99,102 @@ function updatechart() {
                 }
                 makechart(cols, ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'], null, null, null, [], 'category', null)
                 break;
+
+            case "daytype":
+                if (chartdata['daytype'] == null) {
+                    chartdata['daytype'] = {
+                        'daytypes': [],
+                        'daytypetype': []
+                    }
+                    chartdata['daytype']['daytypes'] = [];
+                    chartdata['daytype']['daytypetype'] = [];
+                    for (i = 0; i < types.length; i++) {
+                        chartdata['daytype']['daytypetype'].push([]);
+                    }
+                    for (i = 0; i < resp.length; i++) {
+                        var type = resp[i]['type'];
+                        var daytype = resp[i]['typeOfDay'];
+                        if (chartdata['daytype']['daytypes'].indexOf(daytype) == -1) {
+                            chartdata['daytype']['daytypes'].push(daytype)
+                            for (var j = 0; j < types.length; j++) {
+                                chartdata['daytype']['daytypetype'][j].push(0);
+                            }
+                        }
+                        var p = chartdata['daytype']['daytypes'].indexOf(daytype);
+                        chartdata['daytype']['daytypetype'][type][p] += resp[i]['eventConfirm'];
+                    }
+                }
+                var cols = [];
+                for (i = 0; i < types.length; i++) {
+                    cols.push([types[i]].concat(chartdata['daytype']['daytypetype'][i]));
+                }
+                makechart(cols, chartdata['daytype']['daytypes'], null, undefined, null, [], 'category', null);
+                break;
+
+            case "periodHour":
+                if (chartdata['halfhour'] == null) {
+                    chartdata['halfhour'] = {
+                        'halfhours': [],
+                        'halfhourtype': []
+                    }
+                    chartdata['halfhour']['halfhours'] = [];
+                    chartdata['halfhour']['halfhourtype'] = [];
+                    for (i = 0; i < types.length; i++) {
+                        chartdata['halfhour']['halfhourtype'].push([]);
+                    }
+                    for (i = 0; i < resp.length; i++) {
+                        var type = resp[i]['type'];
+                        var halfhour = resp[i]['periodHour'];
+                        if (chartdata['halfhour']['halfhours'].indexOf(halfhour) == -1) {
+                            chartdata['halfhour']['halfhours'].push(halfhour)
+                            for (var j = 0; j < types.length; j++) {
+                                chartdata['halfhour']['halfhourtype'][j].push(0);
+                            }
+                        }
+                        var p = chartdata['halfhour']['halfhours'].indexOf(halfhour);
+                        chartdata['halfhour']['halfhourtype'][type][p] += resp[i]['eventConfirm'];
+                    }
+                }
+                var cols = [];
+                for (i = 0; i < types.length; i++) {
+                    cols.push([types[i]].concat(chartdata['halfhour']['halfhourtype'][i]));
+                }
+                makechart(cols, chartdata['halfhour']['halfhours'], null, undefined, null, [], 'category', null);
+                break;
+
+
+case "periodTransantiago":
+                if (chartdata['period'] == null) {
+                    chartdata['period'] = {
+                        'periods': [],
+                        'periodtype': []
+                    }
+                    chartdata['period']['periods'] = [];
+                    chartdata['period']['periodtype'] = [];
+                    for (i = 0; i < types.length; i++) {
+                        chartdata['period']['periodtype'].push([]);
+                    }
+                    for (i = 0; i < resp.length; i++) {
+                        var type = resp[i]['type'];
+                        var period = resp[i]['periodTransantiago'];
+                        if (chartdata['period']['periods'].indexOf(period) == -1) {
+                            chartdata['period']['periods'].push(period)
+                            for (var j = 0; j < types.length; j++) {
+                                chartdata['period']['periodtype'][j].push(0);
+                            }
+                        }
+                        var p = chartdata['period']['periods'].indexOf(period);
+                        chartdata['period']['periodtype'][type][p] += resp[i]['eventConfirm'];
+                    }
+                }
+                var cols = [];
+                for (i = 0; i < types.length; i++) {
+                    cols.push([types[i]].concat(chartdata['period']['periodtype'][i]));
+                }
+                makechart(cols, chartdata['period']['periods'], null, undefined, null, [], 'category', null);
+                break;
+
+
 
             case "plate":
                 if (chartdata['plate'] == null) {
