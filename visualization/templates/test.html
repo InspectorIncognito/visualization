@@ -1,21 +1,53 @@
 {% extends 'visualization/dashboard.html' %}
 {% load staticfiles %}
 {% block title %}
-<title>Visualizador Transapp</title>
+    <title>Visualizador Transapp</title>
 {% endblock title %}
 
 {% block topimports %}
+    <!-- jQuery Script -->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <!-- C3 -->
+    <link href="{% static 'components/c3/c3.min.css' %}" rel="stylesheet">
 {% endblock topimports %}
 
 {% block toptiles %}
 {% endblock toptiles %}
 
 {% block maincontent %}
+    <div class="col-md-6 col-sm-6 col-xs-12">
+        <div class="x_panel tile overflow_hidden">
+            <div class="x_title">
+                <h2>Resumen</h2>
+
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div id="resumen"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-sm-6 col-xs-12">
+        <div class="x_panel tile overflow_hidden">
+            <div class="x_title">
+                <h2 id="detailtext">Detalle</h2>
+
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div id="detalle"></div>
+            </div>
+        </div>
+    </div>
+
 {% endblock maincontent %}
 
 {% block bottomimports %}
+    <!-- C3 -->
+    <script src="{% static 'components/c3/c3.min.js' %}"></script>
+    <script src="{% static 'components/d3/d3.min.js' %}"></script>
 
-
+    <script src="{% static 'js/test.js' %}"></script>
 {% endblock bottomimports %}
 
 
