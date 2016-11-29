@@ -287,11 +287,14 @@ def maptest(request):
 
 @login_required
 def getMap(request):
-    query = StadisticDataFromRegistrationBus.objects.filter(reportOfEvent__busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
-    query = query.exclude(reportOfEvent__event__category="estado físico")
+    services = Service.objects.filter(filter(request))
+    query = StadisticDataFromRegistrationBus.exclude(reportOfEvent__event__category="estado físico")
     query = query.order_by("reportOfEvent", "-timeStamp").distinct('reportOfEvent')
+    dict = {}
+    for service in services:
+        dict[service.service] = [stadistic.getDictionary() for stadistic in query.filter(reportOfEvent__busassignment__service = service.service)]
     data = {
-        'data': [report.reportOfEvent.getDictionary() for report in query]
+        'data': dict
     }
     return JsonResponse(data, safe=False)
 
