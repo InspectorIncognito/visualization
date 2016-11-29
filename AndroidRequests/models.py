@@ -139,6 +139,7 @@ class StadisticDataFromRegistrationBus(StadisticDataFromRegistration):
         dictionary["lat"] = self.latitud
         dictionary["lon"] = self.longitud
         dictionary["id"] = self.reportOfEvent.id
+        return dictionary
 
 
 class StadisticDataFromRegistrationBusStop(StadisticDataFromRegistration):
