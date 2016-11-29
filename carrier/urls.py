@@ -21,4 +21,6 @@ urlpatterns = [
     url(r'^fullTable/$', views.fullTable, name='fullTable'),
     url(r'^getFullTable/$', views.getFullTable, name='getFullTable'),
     url(r'^maptest/$', views.maptest, name='mapTest'),
+    url(r'^getMap/$', views.getMap, name='getMap'),
+
 ]

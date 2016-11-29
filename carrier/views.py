@@ -210,12 +210,12 @@ def getPhysicalReport(request):
 
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
-        hour1 = int(request.GET.get('hour1'))
-        hour2 = int(request.GET.get('hour2'))
+        #hour1 = int(request.GET.get('hour1'))
+        #hour2 = int(request.GET.get('hour2'))
         plates = request.GET.get('plate')
         serv = request.GET.get('service')
-        hour2 = (hour2 + 24) if hour2 < hour1 else hour2
-        hours = [hour % 24 for hour in range(hour1, hour2 + 1)]
+        #hour2 = (hour2 + 24) if hour2 < hour1 else hour2
+        #hours = [hour % 24 for hour in range(hour1, hour2 + 1)]
         query = EventForBusv2.objects.filter(
             busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
         query = query.filter(event__category="estado físico", fixed = False)
@@ -229,8 +229,8 @@ def getPhysicalReport(request):
             serv = json.loads(serv)
             serviceFilter = reduce(lambda x, y: x | y, [Q(busassignment__service=ser) for ser in serv])
             query = query.filter(serviceFilter)
-        hourFilter = reduce(lambda x, y: x | y, [Q(timeCreation__hour=h) for h in hours])
-        query = query.filter(hourFilter)
+        #hourFilter = reduce(lambda x, y: x | y, [Q(timeCreation__hour=h) for h in hours])
+        #query = query.filter(hourFilter)
         data = {
             "reports": [change(report.getDictionary()) for report in query],
             "types": events
@@ -284,3 +284,14 @@ def getFullTable(request):
 def maptest(request):
     template = loader.get_template('maptest.html')
     return HttpResponse(template.render(request=request))
+
+@login_required
+def getMap(request):
+    query = StadisticDataFromRegistrationBus.objects.filter(reportOfEvent__busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
+    query = query.exclude(reportOfEvent__event__category="estado físico")
+    query = query.order_by("reportOfEvent", "-timeStamp").distinct('reportOfEvent')
+    data = {
+        'data': [report.getDictionary() for report in query]
+    }
+    return JsonResponse(data, safe=False)
+
