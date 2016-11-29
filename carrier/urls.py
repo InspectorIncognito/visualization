@@ -6,6 +6,7 @@ from . import views
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^reports/$', views.reports, name='reports'),
+    url(r'^getCount/$', views.getCount, name='getCount'),
     url(r'^drivers/$', views.drivers, name='drivers'),
     url(r'^physical/$', views.physical, name='physical'),
     url(r'^driversTable/$', views.driversTable, name='driversTable'),

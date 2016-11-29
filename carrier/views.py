@@ -23,6 +23,23 @@ def index(request):
     return HttpResponse(template.render(request=request))
 
 @login_required
+def getCount(request):
+    events = Event.objects.filter(eventType="bus").distinct("category")
+    types = [event.category for event in events]
+    query = EventForBusv2.objects.filter(
+        busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
+    query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
+    groups = {}
+    for type in types:
+        groups[type] = query.filter(event__catergoy = type).count()
+
+    data = {
+        'types': types,
+        'data': groups,
+    }
+    return JsonResponse(data, safe=False)
+
+@login_required
 def reports(request):
     template = loader.get_template('reports.html')
     return HttpResponse(template.render(request=request))

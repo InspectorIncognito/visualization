@@ -1,14 +1,15 @@
 from django.http import HttpResponse
-from django.shortcuts import render
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.shortcuts import redirect
-from django.core.urlresolvers import reverse
 from carrier.views import index as cindex
+from django.template import loader
 
 def index(request):
+    context = {}
     if request.user.is_authenticated():
         return redirect(login)
-    return render(request, 'login.html')
+    template = loader.get_template('login.html')
+    return HttpResponse(template.render(context, request))
 
 def login(request):
     if request.user.is_authenticated():
