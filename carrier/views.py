@@ -291,7 +291,7 @@ def getMap(request):
     query = query.exclude(reportOfEvent__event__category="estado físico")
     query = query.order_by("reportOfEvent", "-timeStamp").distinct('reportOfEvent')
     data = {
-        'data': [report.getDictionary() for report in query]
+        'data': [report.reportOfEvent.getDictionary() for report in query]
     }
     return JsonResponse(data, safe=False)
 
