@@ -35,11 +35,11 @@ def getCount(request):
     groups = {}
     for type in types:
 
-        q = query.filter(event__category=type).distinct('name')
+        events = Event.objects.filter(eventType="bus", category = type)
+        names = [event.name for event in events]
         groups[type] = {}
-        names = [event.name for event in q]
         for name in names:
-            groups[type][name] = query.filter(event__category=type, name = name).count()
+            groups[type][name] = query.filter(event__category=type, event__name = name).count()
 
     data = {
         'datatype': datatype,
