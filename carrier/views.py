@@ -26,16 +26,24 @@ def index(request):
 def getCount(request):
     events = Event.objects.filter(eventType="bus").distinct("category")
     types = [event.category for event in events]
+    datatype = {}
     query = EventForBusv2.objects.filter(
         busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
     query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
+    for type in types:
+        datatype[type] =  query.filter(event__category = type).count()
     groups = {}
     for type in types:
-        groups[type] = query.filter(event__catergoy = type).count()
+
+        q = query.filter(event__category=type).distinct('name')
+        groups[type] = {}
+        names = [event.name for event in q]
+        for name in names:
+            groups[type][name] = query.filter(event__category=type, name = name).count()
 
     data = {
-        'types': types,
-        'data': groups,
+        'datatype': datatype,
+        'groups': groups,
     }
     return JsonResponse(data, safe=False)
 
