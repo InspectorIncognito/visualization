@@ -288,7 +288,7 @@ def maptest(request):
 @login_required
 def getMap(request):
     services = Service.objects.filter(filter(request))
-    query = StadisticDataFromRegistrationBus.exclude(reportOfEvent__event__category="estado físico")
+    query = StadisticDataFromRegistrationBus.objects.exclude(reportOfEvent__event__category="estado físico")
     query = query.order_by("reportOfEvent", "-timeStamp").distinct('reportOfEvent')
     dict = {}
     for service in services:
