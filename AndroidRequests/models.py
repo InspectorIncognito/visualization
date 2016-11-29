@@ -32,10 +32,9 @@ class ReportInfo(models.Model):
     """ longitude from the geolocation """
     report = models.ForeignKey('Report', verbose_name='The Report')
     """ Link to the report """
-    zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null = True)
+    zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null=True)
     '''Indicates the zonification for the event'''
-    
-    
+
 
 class TimePeriod(models.Model):
     """ Time period with standar names """
@@ -48,6 +47,7 @@ class TimePeriod(models.Model):
     end_time = models.TimeField(auto_now=False, auto_now_add=False)
     """ End time for the period """
 
+
 class HalfHourPeriod(models.Model):
     """ Time period with standar names """
     name = models.CharField(max_length=30)
@@ -56,6 +56,7 @@ class HalfHourPeriod(models.Model):
     """ Initial time for the period """
     end_time = models.TimeField(auto_now=False, auto_now_add=False)
     """ End time for the period """
+
 
 class Location(models.Model):
     """ Some of our models require to set a geolocation (coodinates)"""
@@ -130,9 +131,18 @@ class StadisticDataFromRegistration(Location):
     class Meta:
         abstract = True
 
+
 class StadisticDataFromRegistrationBus(StadisticDataFromRegistration):
     """ Save the report done for a user to confirm or decline a bus event """
     reportOfEvent = models.ForeignKey('EventForBusv2', verbose_name='Bus Event')
+    gpsLongitud = models.FloatField('GPS Longitude', null=True, blank=False)
+    """ longitude of the bus GPS """
+    gpsLatitud = models.FloatField('GPS Latitude', null=True, blank=False)
+    """ latitude of the bus GPS """
+    gpsTimeStamp = models.DateTimeField('GPS Time Stamp', null=True, blank=False)
+    """ date time of the bus GPS position data """
+    distance = models.FloatField('Distance', null=True, blank=False)
+    """ distance from the report to the bus GPS """
 
     def getDictionary(self):
         dictionary = {}
@@ -145,6 +155,7 @@ class StadisticDataFromRegistrationBus(StadisticDataFromRegistration):
 class StadisticDataFromRegistrationBusStop(StadisticDataFromRegistration):
     """ Save the report done for a user to confirm or decline a bus stop event """
     reportOfEvent = models.ForeignKey('EventForBusStop', verbose_name='Bus Stop Event')
+
 
 class EventRegistration(models.Model):
     '''This model stores the reports of events coming from the passagers of the system of public transport buses.'''
@@ -187,13 +198,12 @@ class EventForBusStop(EventRegistration):
     '''Indicates the bus stop to which the event refers'''
     aditionalInfo = models.CharField('Additional Information', max_length=140, default='nothing')
     ''' Saves additional information required by the event '''
-    time_period = models.ForeignKey( 'TimePeriod', verbose_name=b'Time Period', null = True)
+    time_period = models.ForeignKey('TimePeriod', verbose_name=b'Time Period', null=True)
     '''Indicates the Transantiago Time Period of the event'''
-    half_hour_period = models.ForeignKey( 'HalfHourPeriod', verbose_name=b'Half Hour Period', null = True)
+    half_hour_period = models.ForeignKey('HalfHourPeriod', verbose_name=b'Half Hour Period', null=True)
     '''Indicates the half hour time period of the event'''
-    zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null = True)
+    zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null=True)
     '''Indicates the zonification for the event'''
-    
 
 
 class EventForBus(EventRegistration):
@@ -227,19 +237,20 @@ class EventForBus(EventRegistration):
         dictionary['periodTransantiago'] = ""
         return dictionary
 
+
 class EventForBusv2(EventRegistration):
     '''This model stores the reported events for the Bus'''
     busassignment = models.ForeignKey('Busassignment', verbose_name='the bus')
     '''Indicates the bus to which the event refers'''
-    time_period = models.ForeignKey( 'TimePeriod', verbose_name=b'Time Period', null = True)
+    time_period = models.ForeignKey('TimePeriod', verbose_name=b'Time Period', null=True)
     '''Indicates the Transantiago Time Period of the event'''
-    half_hour_period = models.ForeignKey( 'HalfHourPeriod', verbose_name=b'Half Hour Period', null = True)
+    half_hour_period = models.ForeignKey('HalfHourPeriod', verbose_name=b'Half Hour Period', null=True)
     '''Indicates the half hour time period of the event'''
-    zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null = True)
+    zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null=True)
     '''Indicates the zonification for the event'''
-    busStop1 = models.ForeignKey('BusStop', verbose_name='Bus Stop1', related_name='busStop1', null = True)
+    busStop1 = models.ForeignKey('BusStop', verbose_name='Bus Stop1', related_name='busStop1', null=True)
     '''Indicates the 1 nearest bus stop'''
-    busStop2 = models.ForeignKey('BusStop', verbose_name='Bus Stop2', related_name='busStop2', null = True)
+    busStop2 = models.ForeignKey('BusStop', verbose_name='Bus Stop2', related_name='busStop2', null=True)
     '''Indicates the 2 nearest bus stop'''
 
     def getDictionary(self):
@@ -266,6 +277,8 @@ class EventForBusv2(EventRegistration):
         dictionary['periodHour'] = self.half_hour_period.name if self.half_hour_period else "No info."
         dictionary['periodTransantiago'] = self.time_period.name if self.time_period else "No info."
         return dictionary
+
+
 ##
 #
 # The end for the model for the registration
@@ -284,6 +297,7 @@ class ServicesByBusStop(models.Model):
     service = models.ForeignKey('Service', verbose_name='the service')
     """ Service that stops in the bus stop """
 
+
 class BusStop(Location):
     """Represents the busStop itself."""
     code = models.CharField('Code', max_length=6, primary_key=True)  # For example PA443
@@ -292,7 +306,7 @@ class BusStop(Location):
     """ Name of the bus stop, indicating the streets """
     events = models.ManyToManyField(Event, verbose_name='Events', through=EventForBusStop)
 
-    point = models.PointField(srid=32140, verbose_name='The point', null = True)
+    point = models.PointField(srid=32140, verbose_name='The point', null=True)
 
     def getDictionary(self):
         """usefull information regarding the bus."""
@@ -318,11 +332,14 @@ class Service(models.Model):
     """ Represent an index for a color array in the app """
     busStops = models.ManyToManyField(BusStop, verbose_name='Bus Stops', through=ServicesByBusStop)
 
+
 class ServiceNotFoundException(Exception):
     """ error produced when service information does not exist in service table """
 
+
 class ServiceDistanceNotFoundException(Exception):
     """ error produced when it is not possible to get distance between a service and bus stop """
+
 
 class Bus(models.Model):
     """DEPRECATED
@@ -335,7 +352,7 @@ class Bus(models.Model):
     """ It indicates the service performed by the bus """
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     """ Unique ID to primarily identify Buses created without registrationPlate """
-    events = models.ManyToManyField(Event,  verbose_name='the event' ,through=EventForBus)
+    events = models.ManyToManyField(Event, verbose_name='the event', through=EventForBus)
 
     class Meta:
         unique_together = ('registrationPlate', 'service')
@@ -472,51 +489,53 @@ class Bus(models.Model):
 
         return dictionary
 
+
 class Busv2(models.Model):
     """Represent a bus like the unique combination of registration plate and service as one.
     So there can be two buses with the same service and two buses with the same registration plate.
     The last thing means that one fisical bus can work in two different services."""
     registrationPlate = models.CharField(max_length=8)
     """ It's the registration plate for the bus, without hyphen """
-    #service = models.CharField(max_length=5, null=False, blank=False)
-    #""" It indicates the service performed by the bus """
+    # service = models.CharField(max_length=5, null=False, blank=False)
+    # """ It indicates the service performed by the bus """
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     """ Unique ID to primarily identify Buses created without registrationPlate """
-    #events = models.ManyToManyField(Event,  verbose_name='the event' ,through=EventForBus)
+    # events = models.ManyToManyField(Event,  verbose_name='the event' ,through=EventForBus)
+
 
 class Busassignment(models.Model):
     """Represent a bus like the unique combination of registration plate and service as one.
     So there can be two buses with the same service and two buses with the same registration plate.
     The last thing means that one fisical bus can work in two different services."""
-    #registrationPlate = models.CharField(max_length=8)
+    # registrationPlate = models.CharField(max_length=8)
     """ It's the registration plate for the bus, without hyphen """
     service = models.CharField(max_length=5, null=False, blank=False)
     """ It indicates the service performed by the bus """
     uuid = models.ForeignKey(Busv2, verbose_name='Thebusv2')
     """ Unique ID to primarily identify Buses created without registrationPlate """
-    events = models.ManyToManyField(Event,  verbose_name='the event' ,through=EventForBusv2)
+    events = models.ManyToManyField(Event, verbose_name='the event', through=EventForBusv2)
 
-    #class Meta:
+    # class Meta:
     #    unique_together = ('registrationPlate', 'service')
 
     def getDirection(self, pBusStop, pDistance):
         """ Given a bus stop and the distance from the bus to the bus stop, return the address to which point the bus """
         try:
-            serviceCode = ServicesByBusStop.objects.get(busStop = pBusStop, service = self.service).code
+            serviceCode = ServicesByBusStop.objects.get(busStop=pBusStop, service=self.service).code
         except ServicesByBusStop.DoesNotExist:
             raise ServiceNotFoundException("Service {} is not present in bus stop {}".format(self.service, pBusStop))
 
         try:
-            serviceDistance = ServiceStopDistance.objects.get(busStop = pBusStop, service = serviceCode).distance
+            serviceDistance = ServiceStopDistance.objects.get(busStop=pBusStop, service=serviceCode).distance
         except ServiceStopDistance.DoesNotExist:
-            raise ServiceDistanceNotFoundException(\
-                    "The distance is not possible getting for bus stop '{}' and service '{}'".format(pBusStop, serviceCode))
+            raise ServiceDistanceNotFoundException( \
+                "The distance is not possible getting for bus stop '{}' and service '{}'".format(pBusStop, serviceCode))
 
         distance = serviceDistance - int(pDistance)
         # bus service distance from route origin
-        greaters = ServiceLocation.objects.filter(service = serviceCode, distance__gt=distance).order_by('distance')[:1]
+        greaters = ServiceLocation.objects.filter(service=serviceCode, distance__gt=distance).order_by('distance')[:1]
         # get 2 locations greater than current location (nearer to the bus stop)
-        lowers = ServiceLocation.objects.filter(service = serviceCode, distance__lte=distance).order_by('-distance')[:1]
+        lowers = ServiceLocation.objects.filter(service=serviceCode, distance__lte=distance).order_by('-distance')[:1]
         # get 2 locations lower than current location
 
         # we need two point to detect the bus direction (left, right, up, down)
@@ -540,27 +559,27 @@ class Busassignment(models.Model):
             greater = greaters[1]
         elif len(greaters) == 0 and len(lowers) == 0:
             # there are not points to detect direction
-            #TODO: add log to register this situations
+            # TODO: add log to register this situations
             logger = logging.getLogger(__name__)
             logger.info("There is not position to detect bus direction")
             return "left"
 
         epsilon = 0.00008
         x1 = lower.longitud
-        #y1 = lower.latitud
+        # y1 = lower.latitud
         x2 = greater.longitud
-        #y2 = greater.latitud
+        # y2 = greater.latitud
 
-        if(abs(x2-x1)>=epsilon):
-            if(x2-x1>0):
+        if (abs(x2 - x1) >= epsilon):
+            if (x2 - x1 > 0):
                 return "right"
             else:
                 return "left"
         else:
             # we compare bus location with bus stop location
-            busStopObj = BusStop.objects.get(code = pBusStop)
+            busStopObj = BusStop.objects.get(code=pBusStop)
             xBusStop = busStopObj.longitud
-            if(x2-xBusStop>0):
+            if (x2 - xBusStop > 0):
                 return "left"
             else:
                 return "right"
@@ -568,19 +587,19 @@ class Busassignment(models.Model):
     def getLocation(self):
         """This method estimate the location of a bus given one user that is inside or gives a geolocation estimated."""
         tokens = Token.objects.filter(busassignment=self)
-        lastDate = timezone.now()-timezone.timedelta(minutes=5)
+        lastDate = timezone.now() - timezone.timedelta(minutes=5)
         passengers = 0
         lat = -500
         lon = -500
         random = True
         for token in tokens:
-            if(not hasattr(token, 'activetoken')):
+            if (not hasattr(token, 'activetoken')):
                 continue
             passengers += 1
-            trajectoryQuery = PoseInTrajectoryOfToken.objects.filter(token = token)
+            trajectoryQuery = PoseInTrajectoryOfToken.objects.filter(token=token)
             if trajectoryQuery.exists():
                 lastPose = trajectoryQuery.latest('timeStamp');
-                if (lastPose.timeStamp>=lastDate):
+                if (lastPose.timeStamp >= lastDate):
                     lastDate = lastPose.timeStamp
                     lat = lastPose.latitud
                     lon = lastPose.longitud
@@ -595,27 +614,29 @@ class Busassignment(models.Model):
     def getEstimatedLocation(self, busstop, distance):
         '''Given a distace from the bus to the busstop, this method returns the global position of the machine.'''
         try:
-            serviceCode = ServicesByBusStop.objects.get(busStop = busstop, service = self.service).code
+            serviceCode = ServicesByBusStop.objects.get(busStop=busstop, service=self.service).code
         except ServicesByBusStop.DoesNotExist:
             raise ServiceNotFoundException("Service {} is not present in bus stop {}".format(self.service, busstop))
 
-        ssd = ServiceStopDistance.objects.get(busStop = busstop, service = serviceCode).distance - int(distance)
+        ssd = ServiceStopDistance.objects.get(busStop=busstop, service=serviceCode).distance - int(distance)
 
         try:
-            closest_gt = ServiceLocation.objects.filter(service = serviceCode, distance__gte=ssd).order_by('distance')[0].distance
+            closest_gt = ServiceLocation.objects.filter(service=serviceCode, distance__gte=ssd).order_by('distance')[
+                0].distance
         except:
             closest_gt = 50000
         try:
-            closest_lt = ServiceLocation.objects.filter(service = serviceCode, distance__lte=ssd).order_by('-distance')[0].distance
+            closest_lt = ServiceLocation.objects.filter(service=serviceCode, distance__lte=ssd).order_by('-distance')[
+                0].distance
         except:
             closest_lt = 0
 
-        if(abs(closest_gt-ssd) < abs(closest_lt-ssd)):
+        if (abs(closest_gt - ssd) < abs(closest_lt - ssd)):
             closest = closest_gt
         else:
             closest = closest_lt
 
-        location = ServiceLocation.objects.filter(service = serviceCode, distance = closest)[0]
+        location = ServiceLocation.objects.filter(service=serviceCode, distance=closest)[0]
 
         return {'latitude': location.latitud,
                 'longitude': location.longitud,
@@ -630,6 +651,7 @@ class Busassignment(models.Model):
         dictionary['registrationPlateBus'] = self.uuid.registrationPlate
 
         return dictionary
+
 
 class ServiceLocation(Location):
     '''This models stores the position along the route of every bus at 20 meters apart.
@@ -660,16 +682,18 @@ class Token(models.Model):
     '''Identifier for an incognito trip'''
     busassignment = models.ForeignKey(Busassignment, verbose_name='Bus')
     '''Bus that is making the trip'''
-    direction = models.CharField(max_length = 1, null = True)
+    direction = models.CharField(max_length=1, null=True)
     ''' route direction that the bus is doing. It can be 'R' or 'I' '''
     color = models.CharField("Icon's color", max_length=7, default='#00a0f0')
     '''Color to paint the travel icon'''
     userId = models.UUIDField()
     """ To identify the data owner """
-    #uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    #''' UUID to identify a dummy bus'''
+
+    # uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    # ''' UUID to identify a dummy bus'''
     def getBusesIn(self, pListOfServices):
         """ return a list of buses that match with buses given as parameter """
+
 
 class PoseInTrajectoryOfToken(Location):
     '''This stores all the poses of a trajectory. The trajectory can start on foot and end on foot.'''
@@ -696,7 +720,7 @@ class Report(models.Model):
     """ Specific date time when the server received a pose in the trajectory """
     message = models.TextField()
     """ Text reported by the user """
-    imageName = models.CharField(max_length=100, default="no image", null = True)
+    imageName = models.CharField(max_length=100, default="no image", null=True)
     """ image name that was saved """
     reportInfo = models.TextField()
     """ Aditinal information regarding the report. For example the user location."""
@@ -707,7 +731,8 @@ class Report(models.Model):
         """ Return a dictionary with the event information """
         dictionary = {}
         dictionary['message'] = self.message
-        dictionary['imageName'] = ("/media/reported_images/"+self.imageName) if (self.imageName and self.imageName != "no image") else "no image"
+        dictionary['imageName'] = ("/media/reported_images/" + self.imageName) if (
+        self.imageName and self.imageName != "no image") else "no image"
         dictionary['reportInfo'] = self.reportInfo
         stamp = timezone.localtime(self.timeStamp, pytz.timezone('Chile/Continental'))
         dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
@@ -735,6 +760,8 @@ class Route(Location):
     """ Bus identifier """
     sequence = models.IntegerField('Sequence')
     """ point position in a route """
+
+
 ##
 #
 # Zonification
@@ -753,16 +780,17 @@ class zonificationTransantiago(models.Model):
     geom = models.MultiPolygonField(srid=4326)
     objects = models.GeoManager()
 
+
 # Auto-generated `LayerMapping` dictionary for zonificationTransantiago model
 zonificationtransantiago_mapping = {
-    'id' : 'id',
-    'area' : 'area',
-    'zona' : 'zona',
-    'com' : 'com',
-    'comuna' : 'comuna',
-    'cartodb_id' : 'cartodb_id',
-    'created_at' : 'created_at',
-    'updated_at' : 'updated_at',
-    'comunidad_field' : 'comunidad_',
-    'geom' : 'MULTIPOLYGON',
+    'id': 'id',
+    'area': 'area',
+    'zona': 'zona',
+    'com': 'com',
+    'comuna': 'comuna',
+    'cartodb_id': 'cartodb_id',
+    'created_at': 'created_at',
+    'updated_at': 'updated_at',
+    'comunidad_field': 'comunidad_',
+    'geom': 'MULTIPOLYGON',
 }
