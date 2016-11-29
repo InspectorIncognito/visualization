@@ -102,4 +102,5 @@ node_modules/
 static/components/
 visualization/keys/
 static/*
+!static/js
 visualization/database.py
