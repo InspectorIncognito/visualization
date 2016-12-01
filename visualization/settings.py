@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_crontab',
-    'AndroidRequestsBackups',
     'django.contrib.gis',
 ]
 
@@ -120,7 +119,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static/') TODO USE STATIC ROOT IN PRODUCTION
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static/') #TODO USE STATIC ROOT IN PRODUCTION
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
@@ -154,10 +153,10 @@ ANDROID_REQUESTS_BACKUPS_BKPS_LIFETIME   = "4"
 
 # cron settings
 CRONJOBS = [
-   
+
     # check for complete updates every one hour
     ('0 */1 * * *', 'AndroidRequestsBackups.jobs.complete_loaddata', '> /tmp/android_request_bkps_complete_loaddata_log.txt'),
-    
+
     # check for partial updates every 1 minute
     ('*/1 * * * *', 'AndroidRequestsBackups.jobs.partial_loaddata',  '> /tmp/android_request_bkps_partial_loaddata_log.txt'),
 ]
