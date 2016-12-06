@@ -100,7 +100,7 @@ class LoginForm(forms.Form):
         username = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
         user = authenticate(username=username, password=password)
-        if not user.getUser() or not user.is_active:
+        if not user or not user.getUser() or not user.is_active:
             raise forms.ValidationError("El usuario y/o la contraseña no son correctos")
         return self.cleaned_data
 
