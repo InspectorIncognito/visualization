@@ -298,3 +298,13 @@ def getMap(request):
     }
     return JsonResponse(data, safe=False)
 
+@login_required
+def usageRecords(request):
+    #todo
+    pass
+
+@login_required
+def usersActivities(request):
+    #todo
+    pass
+
