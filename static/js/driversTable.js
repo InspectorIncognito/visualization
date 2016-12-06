@@ -7,7 +7,6 @@ var table;
             table = $('#example').dataTable({
                 scrollX: true,
                 pageLength: 15,
-                responsive: true,
                 order: [[1, "desc"]],
                 dom: 'Bfrtip',
                 buttons: [
