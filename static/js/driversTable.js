@@ -6,7 +6,7 @@ var table;
             $.fn.dataTable.moment( 'DD-MM-YYYY HH:mm:ss' );
             table = $('#example').dataTable({
                 scrollX: true,
-                pageLength: 100,
+                pageLength: 15,
                 order: [[1, "desc"]],
                 dom: 'Bfrtip',
                 buttons: [
