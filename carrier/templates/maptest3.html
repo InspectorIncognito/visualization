@@ -7,6 +7,8 @@
 {% block topimports %}
     <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.css"/>
+    <!-- Select2 -->
+    <link href="{% static 'components/gentelella/vendors/select2/dist/css/select2.min.css' %}" rel="stylesheet">
     <!-- Marker Cluster Style -->
     <link href="{% static 'components/leaflet.markercluster/dist/MarkerCluster.css' %}" rel="stylesheet">
     <!-- Leaflet Scripts -->
@@ -44,7 +46,7 @@
                     <div class="dashboard-widget-content">
                         <div id="filters" class="container">
                             <div class="form">
-                                <div class="row form-inline">
+                                {% comment %}<div class="row form-inline">
                                     <div class='col-sm-4'>
                                         <div class="form-group">
                                             <label for="date_init">Fecha Inicio:</label>
@@ -66,7 +68,7 @@
                                             <button class="btn" onclick="updateDate(3)">3 Meses</button>
                                         </div>
                                     </div>
-                                </div>
+                                </div>{% endcomment %}
                                 <div class="row">
                                     <!--<div class='col-sm-2'>
                                         <div class="form-group">
@@ -82,27 +84,11 @@
                                                    id="hour2"/>
                                         </div>
                                     </div>-->
-                                    <div class='col-sm-4'>
+                                    <div class='col-sm-12'>
                                         <div class="form-group">
                                             <label for="service">Recorrido(s)</label>
                                             <select class="select2_multiple form-control"
                                                     id='service' multiple="multiple">
-                                                <option>Todos los recorridos</option>
-                                                {% for service in services %}
-                                                    <option>{{ service.service }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class='col-sm-4'>
-                                        <div class="form-group">
-                                            <label for="plate">Patente</label>
-                                            <select class="select2_plate form-control"
-                                                    id='plate' multiple="multiple">
-                                                <option>Todas las patentes</option>
-                                                {% for plate in plates %}
-                                                    <option>{{ plate }}</option>
-                                                {% endfor %}
                                             </select>
                                         </div>
                                     </div>
@@ -121,5 +107,8 @@
 {% endblock maincontent %}
 
 {% block bottomimports %}
+    <!-- Select2 -->
+    <script src="{% static 'components/gentelella/vendors/select2/dist/js/select2.full.min.js' %}"></script>
+
     <script src="{% static 'js/maptest3.js' %}"></script>
 {% endblock bottomimports %}
