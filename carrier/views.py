@@ -282,7 +282,7 @@ def getFullTable(request):
 
 @login_required
 def maptest(request):
-    template = loader.get_template('maptest.html')
+    template = loader.get_template('maptest3.html')
     return HttpResponse(template.render(request=request))
 
 @login_required
