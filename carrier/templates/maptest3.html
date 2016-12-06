@@ -1,0 +1,125 @@
+{% extends 'visualization/dashboard.html' %}
+{% load staticfiles %}
+{% block title %}
+    <title>Test Mapa</title>
+{% endblock title %}
+
+{% block topimports %}
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.css"/>
+    <!-- Marker Cluster Style -->
+    <link href="{% static 'components/leaflet.markercluster/dist/MarkerCluster.css' %}" rel="stylesheet">
+    <!-- Leaflet Scripts -->
+    <script src="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.js"></script>
+
+    <script src="{% static 'js/Leaflet.GTFS.js' %}"></script>
+
+    <!-- markercluster Script -->
+    <script src="{% static 'components/leaflet.markercluster/dist/leaflet.markercluster.js' %}"></script>
+    <script src="http://200.9.100.91:8080/gpsonline/static/js/Leaflet.polylineDecorator.js"></script>
+
+    <style>
+        .map {
+            height: 600px;
+        }
+    </style>
+{% endblock topimports %}
+
+{% block toptiles %}
+{% endblock toptiles %}
+
+{% block maincontent %}
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Mapa</h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                        </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <div class="dashboard-widget-content">
+                        <div id="filters" class="container">
+                            <div class="form">
+                                <div class="row form-inline">
+                                    <div class='col-sm-4'>
+                                        <div class="form-group">
+                                            <label for="date_init">Fecha Inicio:</label>
+                                            <input type='text' class="form-control"
+                                                   id="date_init"/>
+                                        </div>
+                                    </div>
+                                    <div class='col-sm-4'>
+                                        <div class="form-group">
+                                            <label for="date_end">Fecha Fin:</label>
+                                            <input type='text' class="form-control"
+                                                   id="date_end"/>
+                                        </div>
+                                    </div>
+                                    <div class='col-sm-4'>
+                                        <div class="form-group">
+                                            <button class="btn" onclick="updateDate(1)">Hoy</button>
+                                            <button class="btn" onclick="updateDate(2)">Ultimo mes</button>
+                                            <button class="btn" onclick="updateDate(3)">3 Meses</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <!--<div class='col-sm-2'>
+                                        <div class="form-group">
+                                            <label for="hour1">Desde</label>
+                                            <input type='text' onchange="myFunction()"
+                                                   class="form-control" id="hour1"/>
+                                        </div>
+                                    </div>
+                                    <div class='col-sm-2'>
+                                        <div class="form-group">
+                                            <label for="hour2">Hasta</label>
+                                            <input type='text' class="form-control"
+                                                   id="hour2"/>
+                                        </div>
+                                    </div>-->
+                                    <div class='col-sm-4'>
+                                        <div class="form-group">
+                                            <label for="service">Recorrido(s)</label>
+                                            <select class="select2_multiple form-control"
+                                                    id='service' multiple="multiple">
+                                                <option>Todos los recorridos</option>
+                                                {% for service in services %}
+                                                    <option>{{ service.service }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class='col-sm-4'>
+                                        <div class="form-group">
+                                            <label for="plate">Patente</label>
+                                            <select class="select2_plate form-control"
+                                                    id='plate' multiple="multiple">
+                                                <option>Todas las patentes</option>
+                                                {% for plate in plates %}
+                                                    <option>{{ plate }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container">
+                            <div id="mapid" class="map">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock maincontent %}
+
+{% block bottomimports %}
+    <script src="{% static 'js/maptest3.js' %}"></script>
+{% endblock bottomimports %}

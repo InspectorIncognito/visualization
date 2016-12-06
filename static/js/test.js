@@ -19,7 +19,7 @@ function makechart() {
             // iris data from R
             json: reports.datatype,
             type: 'pie',
-            onclick: function (d, i) {
+            onmouseover: function (d, i) {
                 makedetail(d.id);
             }
         },
