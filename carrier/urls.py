@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^getMap/$', views.getMap, name='getMap'),
     url(r'^usageRecords/$', views.usageRecords, name='usageRecords'),
     url(r'^usersActivities/$', views.usersActivities, name='usersActivities'),
+    url(r'^getUsersActivities/$', views.getUsersActivities, name='getUsersActivities'),
     
 
 ]

@@ -5,7 +5,7 @@ from django.template import loader
 from AndroidRequests.models import *
 from accounts.models import *
 from django.http import JsonResponse
-from django.db.models import Q
+from django.db.models import Q, Count
 from datetime import datetime, date, timedelta, time
 from django.contrib.auth.decorators import login_required
 import json, pytz
@@ -308,3 +308,25 @@ def usersActivities(request):
     #todo
     pass
 
+#4th function
+def getUsersActivities(request):
+    if request.method == 'GET':
+        date_init = request.GET.get('date_init')
+        date_end = request.GET.get('date_end')
+        response = {}
+        #Per user id get:
+        #devicePositionInTime count
+        devices = DevicePositionInTime.objects.filter(timeStamp__range=[date_init, date_end])
+        devices = devices.values('userId').annotate(num_positions=Count('timeStamp'))
+        #bus and busstops events -> eventFor*
+
+        #confirms and declines fro bus and busstops events -> statistic*
+
+        #tokens
+
+        #reports
+
+        #busstops checkeds -> nearbyBusesLog
+        for device in devices:
+            response[str(device['userId'])] = {'devicePositionInTimeCount' : device['num_positions']}
+        return JsonResponse(response, safe=False)
