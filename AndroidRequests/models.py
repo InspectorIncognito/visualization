@@ -39,7 +39,10 @@ class ReportInfo(models.Model):
         dict = {}
         dict["registrationPlate"] = self.registrationPlate
         dict["service"] = self.service
-        dict["report"] = self.report.getDictionary()
+        report = self.report.getDictionary()
+        dict["imageName"] = report["imageName"]
+        dict["timeStamp"] = report["timeStamp"]
+        dict["message"] = report["message"]
         return dict
 
 class TimePeriod(models.Model):

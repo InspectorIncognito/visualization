@@ -40,15 +40,15 @@ function init() {
         ],
         ajax: url + params,
         columns: [
-            {title: "Fecha", data: 'report.timeStamp'},
-            {title: "Mensaje", data: 'report.message'},
+            {title: "Fecha", data: 'timeStamp'},
+            {title: "Mensaje", data: 'message'},
             {title: "Patente", data: 'registrationPlate'},
             {title: "Servicio", data: 'service'},
             {
                 title: 'Imagen',
                 render: function (data, type, row) {
-                    if (row.report.imageName != "no image") {
-                        return '<button type="button" class="btn-xs btn-primary" onclick="openModal(\'' + row.report.imageName + '\')"> Ver imagen </button>';
+                    if (row.imageName != "no image") {
+                        return '<button type="button" class="btn-xs btn-primary" onclick="openModal(\'' + row.imageName + '\')"> Ver imagen </button>';
                     }
                     else
                         return "<button type='button' class='btn-xs btn-danger disabled'> No hay imagen </button>";
