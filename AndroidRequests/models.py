@@ -37,8 +37,8 @@ class ReportInfo(models.Model):
 
     def getDictionary(self):
         dict = {}
-        dict["registrationPlate"] = self.registrationPlate
-        dict["service"] = self.service
+        dict["registrationPlate"] = self.registrationPlate if self.registrationPlate else "No Info."
+        dict["service"] = self.service if self.service else "No Info."
         report = self.report.getDictionary()
         dict["imageName"] = report["imageName"]
         dict["timeStamp"] = report["timeStamp"]
