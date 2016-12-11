@@ -39,6 +39,7 @@ class ReportInfo(models.Model):
         dict = {}
         dict["registrationPlate"] = self.registrationPlate
         dict["service"] = self.service
+        dict["report"] = self.report.getDictionary()
         return dict
 
 class TimePeriod(models.Model):
@@ -738,8 +739,6 @@ class Report(models.Model):
         dictionary['message'] = self.message
         dictionary['imageName'] = ("/media/reported_images/" + self.imageName) if (
         self.imageName and self.imageName != "no image") else "no image"
-        dictionary['registrationPlate'] = self.reportInfo.registrationPlate
-        dictionary['service'] = self.reportInfo.service
         stamp = timezone.localtime(self.timeStamp, pytz.timezone('Chile/Continental'))
         dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
         return dictionary
