@@ -223,7 +223,7 @@ def getPhysicalReport(request):
         query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info")
         if plates:
             plates = json.loads(plates)
-            plateFilter = reduce(lambda x, y: x | y, [Q(busassignment__uuid__registrationPlate=plate) for plate in plates])
+            plateFilter = reduce(lambda x, y: x | y, [Q(busassignment__uuid__registrationPlate__icontains=plate) for plate in plates])
             query = query.filter(plateFilter)
         if serv:
             serv = json.loads(serv)
@@ -254,7 +254,7 @@ def updatePhysical(request):
 def fullTable(request):
     template = loader.get_template('fullTable.html')
     events = Event.objects.filter(eventType="bus").distinct("category")
-    types = [event.category for event in events]
+    types = [event.category.capitalize() for event in events]
     context = {
         'types': types,
     }
@@ -272,7 +272,7 @@ def getFullTable(request):
         query = query.filter(timeCreation__range=[date_init, date_end])
         if types:
             types = json.loads(types)
-            typeFilter = reduce(lambda x, y: x | y, [Q(event__category = type) for type in types])
+            typeFilter = reduce(lambda x, y: x | y, [Q(event__category__icontains = type) for type in types])
             query = query.filter(typeFilter)
 
         data = {

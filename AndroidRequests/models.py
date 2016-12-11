@@ -274,12 +274,12 @@ class EventForBusv2(EventRegistration):
         dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
         dictionary['service'] = self.busassignment.service if self.busassignment else "No info."
         dictionary['plate'] = self.busassignment.uuid.registrationPlate if self.busassignment else "No info."
-        dictionary['type'] = self.event.name
+        dictionary['type'] = self.event.name.capitalize()
         dictionary['busStop1'] = self.busStop1.name if self.busStop1 else "No info."
         dictionary['busStop2'] = self.busStop2.name if self.busStop2 else "No info."
         dictionary['fixed'] = "Si" if self.fixed else "No"
         dictionary['id'] = self.id
-        dictionary['category'] = self.event.category
+        dictionary['category'] = self.event.category.capitalize()
         dictionary['zone777'] = self.zonification.zona if self.zonification else "No info."
         dictionary['commune'] = self.zonification.comuna if self.zonification else "No info."
         dictionary['typeOfDay'] = self.time_period.day_type if self.time_period else "No info."
