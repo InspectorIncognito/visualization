@@ -28,7 +28,7 @@ function init() {
     var i = 0;
     table = $('#example').DataTable({
         scrollX: true,
-        pageLength: 50,
+        pageLength: 15,
         order: [[0, "desc"]],
         dom: 'Bfrtip',
         buttons: [
