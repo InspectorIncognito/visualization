@@ -109,7 +109,7 @@ def getReports(request):
         query = ReportInfo.objects.filter(reportType='bus', report__timeStamp__range=[date_init,date_end])
         query = query.filter(service__in=[service.service for service in services])
         data = {
-            'data': [q.report.getDictionary() for q in query]
+            'data': [q.getDictionary() for q in query]
         }
         return JsonResponse(data, safe=False)
 
