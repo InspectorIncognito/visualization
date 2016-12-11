@@ -51,7 +51,7 @@ function init() {
                         return '<button type="button" class="btn-xs btn-primary" onclick="openModal(\'' + row.imageName + '\')"> Ver imagen </button>';
                     }
                     else
-                        return "<button type='button' class='btn-xs btn-danger disabled'> No hay imagen </button>";
+                        return "No hay Imagen";
                 }
             },
         ],
