@@ -117,7 +117,7 @@ def getReports(request):
 def getDriversReport(request):
     if request.method == 'GET':
         events = Event.objects.filter(category="conductor")
-        events = [event.name for event in events]
+        events = [event.name.capitalize() for event in events]
         pos = range(0, len(events))
         eventToPos = {name: pos for name, pos in zip(events, pos)}
 
