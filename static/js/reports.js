@@ -42,6 +42,7 @@ function init() {
         columns: [
             {title: "Fecha", data: 'timeStamp'},
             {title: "Mensaje", data: 'message'},
+            {title: "Patente", data: 'reportInfo.registrationPlate'},
             {
                 title: 'Imagen',
                 render: function (data, type, row) {

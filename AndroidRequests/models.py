@@ -35,6 +35,11 @@ class ReportInfo(models.Model):
     zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null=True)
     '''Indicates the zonification for the event'''
 
+    def getDictionary(self):
+        dict = {}
+        dict["registrationPlate"] = self.registrationPlate
+        dict["service"] = self.service
+        return dict
 
 class TimePeriod(models.Model):
     """ Time period with standar names """
@@ -733,7 +738,7 @@ class Report(models.Model):
         dictionary['message'] = self.message
         dictionary['imageName'] = ("/media/reported_images/" + self.imageName) if (
         self.imageName and self.imageName != "no image") else "no image"
-        dictionary['reportInfo'] = self.reportInfo
+        dictionary['reportInfo'] = self.reportInfo.getDictionary()
         stamp = timezone.localtime(self.timeStamp, pytz.timezone('Chile/Continental'))
         dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
         return dictionary
