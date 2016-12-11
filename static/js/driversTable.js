@@ -22,7 +22,7 @@ var table;
                     {title: "Fecha", data: 'timeCreation'},
                     {title: "Patente", data: 'plate'},
                     {title: "Servicio", data: 'service'},
-                    {title: "Lugar", data: 'commune'},
+                    {title: "Comuna", data: 'commune'},
                     {title: "Paradero 1", data: 'busStop1'},
                     {title: "Paradero 2", data: 'busStop2'}
                 ],
