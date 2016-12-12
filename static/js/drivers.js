@@ -410,7 +410,8 @@ function myFunction() {
 
     $.getJSON(Dataurl, data)
         .done(function (data) {
-            console.log(data)
+            console.log(data);
+            $(".select2_plate").select2('data', null);
             reloadchart();
             resp = data.reports;
             types = data.types;
