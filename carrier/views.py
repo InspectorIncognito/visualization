@@ -319,14 +319,65 @@ def getUsersActivities(request):
         devices = DevicePositionInTime.objects.filter(timeStamp__range=[date_init, date_end])
         devices = devices.values('userId').annotate(num_positions=Count('timeStamp'))
         #bus and busstops events -> eventFor*
-
+        busevents = EventForBusv2.objects.filter(timeCreation__range=[date_init, date_end])
+        busevents = busevents.values('userId').annotate(num_events=Count('timeCreation'))
+        stopsevents = EventForBusStop.objects.filter(timeCreation__range=[date_init, date_end])
+        stopsevents = stopsevents.values('userId').annotate(num_events=Count('timeCreation'))
         #confirms and declines fro bus and busstops events -> statistic*
+        #TODO: if the timeStamp is the first of the event, is the creation of the event and must not be counted
+        confirmsbus = StadisticDataFromRegistrationBus.objects.filter(timeStamp__range=[date_init, date_end], confirmDecline='confirm')
+        confirmsbus = confirmsbus.values('userId').annotate(num_confirms=Count('timeStamp'))
+        declinesbus = StadisticDataFromRegistrationBus.objects.filter(timeStamp__range=[date_init, date_end], confirmDecline='decline')
+        declinesbus = declinesbus.values('userId').annotate(num_declines=Count('timeStamp'))
 
+        confirmsstop = StadisticDataFromRegistrationBusStop.objects.filter(timeStamp__range=[date_init, date_end], confirmDecline='confirm')
+        confirmsstop = confirmsbus.values('userId').annotate(num_confirms=Count('timeStamp'))
+        declinesstop = StadisticDataFromRegistrationBusStop.objects.filter(timeStamp__range=[date_init, date_end], confirmDecline='decline')
+        declinesstop = declinesbus.values('userId').annotate(num_declines=Count('timeStamp'))
         #tokens
 
         #reports
 
         #busstops checkeds -> nearbyBusesLog
+
+        
         for device in devices:
             response[str(device['userId'])] = {'devicePositionInTimeCount' : device['num_positions']}
+        
+        for busevent in busevents:
+            if str(busevent['userId']) in response:
+                response[str(busevent['userId'])].update({'busEventCreationCount' : busevent['num_events']})
+            else:
+                response[str(busevent['userId'])] = {'busEventCreationCount' : busevent['num_events']}
+        
+        for stopsevent in stopsevents:
+            if str(stopsevent['userId']) in response:
+                response[str(stopsevent['userId'])].update({'stopEventCreationCount' : stopsevent['num_events']})
+            else:
+                response[str(stopsevent['userId'])] = {'stopEventCreationCount' : stopsevent['num_events']}
+        
+        for confirmbus in confirmsbus:
+            if str(confirmbus['userId']) in response:
+                response[str(confirmbus['userId'])].update({'confirmBusCount' : confirmbus['num_confirms']})
+            else:
+                response[str(confirmbus['userId'])] = {'confirmBusCount' : confirmbus['num_confirms']}
+        
+        for declinebus in declinesbus:
+            if str(declinebus['userId']) in response:
+                response[str(declinebus['userId'])].update({'declineBusCount' : declinebus['num_declines']})
+            else:
+                response[str(declinebus['userId'])] = {'declineBusCount' : declinebus['num_declines']}
+        
+        for confirmstop in confirmsstop:
+            if str(confirmstop['userId']) in response:
+                response[str(confirmstop['userId'])].update({'confirmBusStopCount' : confirmstop['num_confirms']})
+            else:
+                response[str(confirmstop['userId'])] = {'confirmBusStopCount' : confirmstop['num_confirms']}
+        
+        for declinestop in declinesstop:
+            if str(declinestop['userId']) in response:
+                response[str(declinestop['userId'])].update({'declineBusStopCount' : declinestop['num_declines']})
+            else:
+                response[str(declinestop['userId'])] = {'declineBusStopCount' : declinestop['num_declines']}
+        
         return JsonResponse(response, safe=False)
