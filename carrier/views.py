@@ -119,8 +119,9 @@ def getPlates(request):
         services = json.loads(request.GET.get('service'))
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
+        serviceArray = [service.service for service in Service.objects.filter(filter(request))]
         query = EventForBusv2.objects.filter(
-            busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
+            busassignment__service__in=serviceArray)
         query = query.filter(event__category="conductor")
         query = query.filter(timeCreation__range=[date_init, date_end])
         query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
@@ -128,7 +129,8 @@ def getPlates(request):
             serviceFilter = reduce(lambda x, y: x | y, [Q(busassignment__service=ser) for ser in services])
             query = query.filter(serviceFilter)
         query = query.distinct("busassignment__uuid__registrationPlate")
-        plates = [q.busassignment__uuid__registrationPlate for q in query]
+        allplates = Busassignment.objects.filter(service__in=serviceArray)
+        plates = [q.busassignment.uuid.registrationPlate for q in query]
         return JsonResponse(plates, safe=False)
 
 @login_required
