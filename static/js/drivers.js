@@ -31,16 +31,6 @@ $(function () {
         if ($(".select2_multiple").val()[0] == "Todos los recorridos") {
             $("#service").select2("val", "");
         }
-        var Dataurl = "http://" + location.host + "/carriers/getPlates/";
-        var data = {
-            date_init: $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD"),
-            date_end: $('#date_end').data("DateTimePicker").date().add(1, 'days').format("YYYY-MM-DD"),
-            service: JSON.stringify($(".select2_multiple").val())
-        }
-        $.getJSON(Dataurl, data)
-        .done(function (data) {
-            console.log(data);
-        });
     });
     $('#plate').on("select2:select", function () {
         if ($(".select2_plate").val()[0] == "Todas las patentes") {

@@ -114,28 +114,6 @@ def getReports(request):
         return JsonResponse(data, safe=False)
 
 @login_required
-def getPlates(request):
-    if request.method == 'GET':
-        services = json.loads(request.GET.get('service'))
-        date_init = request.GET.get('date_init')
-        date_end = request.GET.get('date_end')
-        serviceArray = [service.service for service in Service.objects.filter(filter(request))]
-        query = EventForBusv2.objects.filter(
-            busassignment__service__in=serviceArray)
-        query = query.filter(event__category="conductor")
-        query = query.filter(timeCreation__range=[date_init, date_end])
-        query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
-        if services:
-            serviceFilter = reduce(lambda x, y: x | y, [Q(busassignment__service=ser) for ser in services])
-            query = query.filter(serviceFilter)
-        query = query.distinct("busassignment__uuid__registrationPlate")
-        allplates = {ba.uuid.registrationPlate:False for ba in Busassignment.objects.filter(service__in=serviceArray)}
-        for report in query:
-            plate = report.busassignment.uuid.registrationPlate
-            allplates[plate] = True
-        return JsonResponse(allplates, safe=False)
-
-@login_required
 def getDriversReport(request):
     if request.method == 'GET':
         events = Event.objects.filter(category="conductor")
@@ -156,15 +134,24 @@ def getDriversReport(request):
         query = query.filter(event__category="conductor")
         query = query.filter(timeCreation__range=[date_init, date_end])
         query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
-        if plates:
-            plates = json.loads(plates)
-            plateFilter = reduce(lambda x, y: x | y, [Q(busassignment__uuid__registrationPlate=plate) for plate in plates])
-            query = query.filter(plateFilter)
+        serviceArray = [service.service for service in Service.objects.filter(filter(request))]
+
         if serv:
             serv = json.loads(serv)
             serviceFilter = reduce(lambda x, y: x | y, [Q(busassignment__service=ser) for ser in serv])
             query = query.filter(serviceFilter)
+
+        allplates = {ba.uuid.registrationPlate: False for ba in Busassignment.objects.filter(service__in=serviceArray)}
+        for report in query:
+            plate = report.busassignment.uuid.registrationPlate
+            allplates[plate] = True
+
+        if plates:
+            plates = json.loads(plates)
+            plateFilter = reduce(lambda x, y: x | y, [Q(busassignment__uuid__registrationPlate=plate) for plate in plates])
+            query = query.filter(plateFilter)
         data = {
+            "allplates" : allplates,
             "reports": [change(report.getDictionary()) for report in query],
             "types": events
         }
