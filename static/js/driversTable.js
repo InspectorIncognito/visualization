@@ -23,8 +23,8 @@ var table;
                     {title: "Patente", data: 'plate'},
                     {title: "Servicio", data: 'service'},
                     {title: "Comuna", data: 'commune'},
-                    {title: "Paradero 1", data: 'busStop1'},
-                    {title: "Paradero 2", data: 'busStop2'}
+                    {title: "Paradero más cercano 1", data: 'busStop1'},
+                    {title: "Paradero más cercano 2", data: 'busStop2'}
                 ],
                 language: {
                     "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json",
