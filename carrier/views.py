@@ -56,14 +56,8 @@ def reports(request):
 def drivers(request):
     template = loader.get_template('drivers.html')
     services = Service.objects.filter(filter(request))
-    ba = Busassignment.objects.filter(service__in=[service.service for service in services])
-    ba = ba.values_list('uuid', flat = True)
-    buses = Busv2.objects.filter(id__in=ba)
-    buses = buses.exclude(registrationPlate__icontains='No Info.').order_by("registrationPlate")
-    plates = [bus.registrationPlate for bus in buses]
     context = {
         'services': services,
-        'plates': plates,
     }
     return HttpResponse(template.render(context, request))
 
@@ -134,17 +128,20 @@ def getDriversReport(request):
         query = query.filter(event__category="conductor")
         query = query.filter(timeCreation__range=[date_init, date_end])
         query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
-        serviceArray = [service.service for service in Service.objects.filter(filter(request))]
-
+        busassignment = Busassignment.objects.all()
         if serv:
             serv = json.loads(serv)
             serviceFilter = reduce(lambda x, y: x | y, [Q(busassignment__service=ser) for ser in serv])
             query = query.filter(serviceFilter)
+            busassignment = busassignment.filter(service__in=serv)
 
-        allplates = {ba.uuid.registrationPlate: False for ba in Busassignment.objects.filter(service__in=serviceArray)}
-        for report in query:
+        allplates = {ba.uuid.registrationPlate: False for ba in busassignment.select_related('uuid')}
+        query2 = query.distinct("busassignment__uuid__registrationPlate").select_related("busassignment__uuid")
+        for report in query2:
             plate = report.busassignment.uuid.registrationPlate
             allplates[plate] = True
+
+        #print(allplates)
 
         if plates:
             plates = json.loads(plates)

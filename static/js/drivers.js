@@ -18,14 +18,20 @@ $(function () {
     $("#group :input").change(function () {
         updatechart();
     });
-    $("#filters :input").change(function () {
-        myFunction();
+    $("#service").change(function () {
+        myFunction(true);
+    });
+    $("#plate").change(function () {
+        myFunction(false);
     });
     $("#filters").on("dp.change", function (e) {
-        myFunction();
+        myFunction(true);
     });
-    $("#filters :input").keyup(function () {
-        myFunction();
+    $("#service").keyup(function () {
+        myFunction(true);
+    });
+    $("#plate").keyup(function () {
+        myFunction(false);
     });
     $('#service').on("select2:select", function () {
         if ($(".select2_multiple").val()[0] == "Todos los recorridos") {
@@ -37,7 +43,7 @@ $(function () {
             $("#plate").select2("val", "");
         }
     });
-    myFunction();
+    myFunction(true);
 });
 $(document).ready(function () {
     $(".select2_multiple").select2({
@@ -163,7 +169,7 @@ function updatechart() {
                 break;
 
 
-case "periodTransantiago":
+            case "periodTransantiago":
                 if (chartdata['period'] == null) {
                     chartdata['period'] = {
                         'periods': [],
@@ -193,7 +199,6 @@ case "periodTransantiago":
                 }
                 makechart(cols, chartdata['period']['periods'], null, undefined, null, [], 'category', null);
                 break;
-
 
 
             case "plate":
@@ -393,7 +398,7 @@ function updateDate(n) {
     }
 }
 
-function myFunction() {
+function myFunction(refresh) {
     var Dataurl = "http://" + location.host + "/carriers/getDriversData/";
     var data = {
         date_init: $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD"),
@@ -411,7 +416,23 @@ function myFunction() {
     $.getJSON(Dataurl, data)
         .done(function (data) {
             console.log(data);
-            $(".select2_plate").select2('data', null);
+            if (refresh) {
+                $(".select2_plate").find("option").remove();
+                $('.select2_plate').append($('<option>', {
+                    value: "Todas las patentes",
+                    text: "Todas las patentes",
+                }));
+                $.each(data.allplates, function (key, value) {
+                    var text = key;
+                    if (!value){
+                        text = text + " (No hay datos)";
+                    }
+                    $('.select2_plate').append($('<option>', {
+                        value: key,
+                        text: text
+                    }));
+                })
+            }
             reloadchart();
             resp = data.reports;
             types = data.types;
