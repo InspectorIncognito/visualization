@@ -129,9 +129,11 @@ def getPlates(request):
             serviceFilter = reduce(lambda x, y: x | y, [Q(busassignment__service=ser) for ser in services])
             query = query.filter(serviceFilter)
         query = query.distinct("busassignment__uuid__registrationPlate")
-        allplates = Busassignment.objects.filter(service__in=serviceArray)
-        plates = [q.busassignment.uuid.registrationPlate for q in query]
-        return JsonResponse(plates, safe=False)
+        allplates = {ba.uuid.registrationPlate:False for ba in Busassignment.objects.filter(service__in=serviceArray)}
+        for report in query:
+            plate = report.busassignment.uuid.registrationPlate
+            allplates[plate] = True
+        return JsonResponse(allplates, safe=False)
 
 @login_required
 def getDriversReport(request):
