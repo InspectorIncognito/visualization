@@ -9,6 +9,7 @@ from django.db.models import Q, Count
 from datetime import datetime, date, timedelta, time
 from django.contrib.auth.decorators import login_required
 import json, pytz
+from django.db.models import CharField, ExpressionWrapper, F
 
 def filter(request):
 	user = request.user.getUser()
@@ -440,5 +441,65 @@ def getUsersActivities(request):
 			response[resp]['confirmBusCount'] = response[resp]['confirmBusCount'] - response[resp]['busEventCreationCount']
 			response[resp]['confirmBusStopCount'] = response[resp]['confirmBusStopCount'] - response[resp]['busStopEventCreationCount']
 
+		
+		return JsonResponse(response, safe=False)
+
+def getBusStopInfo(request):
+	if request.method == 'GET':
+		date_init = datetime.strptime(request.GET.get('date_init'),"%Y-%m-%dT%H:%M:%S")
+		date_end = datetime.strptime(request.GET.get('date_end'),"%Y-%m-%dT%H:%M:%S")
+
+		pytz.timezone('America/Santiago').localize(date_init)
+		pytz.timezone('America/Santiago').localize(date_end)
+
+		response = {}
+		#events
+		stopsevents = EventForBusStop.objects.filter(timeCreation__range=[date_init, date_end])
+		stopsevents = stopsevents.values('busStop_id').annotate(num_events=Count('id'))
+		#confirms
+		confirmsstop = StadisticDataFromRegistrationBusStop.objects.filter(timeStamp__range=[date_init, date_end], confirmDecline='confirm')\
+			.annotate(busStop=ExpressionWrapper(F('reportOfEvent__busStop'), output_field=CharField()))
+		confirmsstop = confirmsstop.values('busStop').annotate(num_confirms=Count('id'))
+		#declines
+		declinesstop = StadisticDataFromRegistrationBusStop.objects.filter(timeStamp__range=[date_init, date_end], confirmDecline='decline')\
+			.annotate(busStop=ExpressionWrapper(F('reportOfEvent__busStop'), output_field=CharField()))
+		declinesstop = declinesstop.values('busStop').annotate(num_declines=Count('id'))
+		#touch
+		bschecks = NearByBusesLog.objects.filter(timeStamp__range=[date_init, date_end])
+		bschecks = bschecks.values('busStop').annotate(num_checks=Count('timeStamp'))
+
+
+		for stopevent in stopsevents:
+			response[str(stopevent['busStop_id'])] = {'eventCount' : stopevent['num_events']}
+		
+		for confirmstop in confirmsstop:
+			if str(confirmstop['busStop']) in response:
+				response[str(confirmstop['busStop'])].update({'confirmCount' : confirmstop['num_confirms']})
+			else:
+				response[str(confirmstop['busStop'])] = {'confirmCount' : confirmstop['num_confirms']}
+			
+		for declinestop in declinesstop:
+			if str(declinestop['busStop']) in response:
+				response[str(declinestop['busStop'])].update({'declineCount' : declinestop['num_declines']})
+			else:
+				response[str(declinestop['busStop'])] = {'declineCount' : declinestop['num_declines']}
+			
+		for bscheck in bschecks:
+			if str(bscheck['busStop']) in response:
+				response[str(bscheck['busStop'])].update({'busStopCheckCount' : bscheck['num_checks']})
+			else:
+				response[str(bscheck['busStop'])] = {'busStopCheckCount' : bscheck['num_checks']}
+
+		for resp in response:
+			if 'eventCount' not in response[resp]:
+				response[resp].update({'eventCount' : 0})
+			if 'confirmCount' not in response[resp]:
+				response[resp].update({'confirmCount' : 0})
+			if 'declineCount' not in response[resp]:
+				response[resp].update({'declineCount' : 0})
+			if 'busStopCheckCount' not in response[resp]:
+				response[resp].update({'busStopCheckCount' : 0})
+
+			response[resp]['confirmCount'] = response[resp]['confirmCount'] - response[resp]['eventCount']
 		
 		return JsonResponse(response, safe=False)
