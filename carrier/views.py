@@ -311,8 +311,11 @@ def usersActivities(request):
 #4th function
 def getUsersActivities(request):
 	if request.method == 'GET':
-		date_init = request.GET.get('date_init')
-		date_end = request.GET.get('date_end')
+		date_init = datetime.strptime(request.GET.get('date_init'),"%Y-%m-%dT%H:%M:%S")
+		date_end = datetime.strptime(request.GET.get('date_end'),"%Y-%m-%dT%H:%M:%S")
+
+		pytz.timezone('America/Santiago').localize(date_init)
+		pytz.timezone('America/Santiago').localize(date_end)
 		#ADD TIMEZONE
 		response = {}
 		#Per user id get:
