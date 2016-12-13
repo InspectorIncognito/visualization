@@ -503,3 +503,23 @@ def getBusStopInfo(request):
 			response[resp]['confirmCount'] = response[resp]['confirmCount'] - response[resp]['eventCount']
 		
 		return JsonResponse(response, safe=False)
+
+def getUsersPositions(request):
+	if request.method == 'GET':
+		date_init = datetime.strptime(request.GET.get('date_init'),"%Y-%m-%dT%H:%M:%S")
+		date_end = datetime.strptime(request.GET.get('date_end'),"%Y-%m-%dT%H:%M:%S")
+
+		pytz.timezone('America/Santiago').localize(date_init)
+		pytz.timezone('America/Santiago').localize(date_end)
+
+		response = {}
+
+		devices = DevicePositionInTime.objects.filter(timeStamp__range=[date_init, date_end]).order_by('userId', 'timeStamp').values()
+
+		for device in devices:
+			if str(device['userId']) in response:
+				response[str(device['userId'])].append({'lat' : device['latitud'] , 'lon' : device['longitud'] , 'timeStamp': device['timeStamp']})
+			else:
+				response[str(device['userId'])] = [{'lat' : device['latitud'] , 'lon' : device['longitud'] , 'timeStamp': device['timeStamp']}]
+
+		return JsonResponse(response, safe=False)
