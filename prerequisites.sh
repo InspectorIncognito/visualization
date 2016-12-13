@@ -32,7 +32,7 @@ if $install_packages; then
     sudo ln -s /usr/bin/nodejs /usr/bin/node
     # install bower
     sudo npm install -g bower
-    sudo bower install --allow-root
+    bower install
     # install postgis
     sudo apt-get install postgis
     # install gdal
