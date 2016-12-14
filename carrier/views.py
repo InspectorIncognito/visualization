@@ -10,6 +10,7 @@ from datetime import datetime, date, timedelta, time
 from django.contrib.auth.decorators import login_required
 import json, pytz
 from django.db.models import CharField, ExpressionWrapper, F
+from pytz import timezone
 
 def filter(request):
 	user = request.user.getUser()
@@ -443,6 +444,50 @@ def getUsersActivities(request):
 
 		
 		return JsonResponse(response, safe=False)
+
+@login_required
+def getActiveUsers(request):
+    if request.method == 'GET':
+        tz = timezone('Chile/Continental')
+        date = request.GET.get('date')
+        date_start = datetime.strptime(date+" 00:00:00", "%Y-%m-%d %H:%M:%S")
+        date_start = tz.localize(date_start)
+        date_finish = datetime.strptime(date+" 23:59:59", "%Y-%m-%d %H:%M:%S")
+        date_finish = tz.localize(date_finish)
+        positions = DevicePositionInTime.objects.filter(timeStamp__range=[date_start, date_finish])
+        busstopevents = EventForBusStop.objects.filter(timeCreation__range=[date_start, date_finish])
+        busevents = EventForBusv2.objects.filter(timeCreation__range=[date_start, date_finish])
+        # unique_users = len(list(set([position.userId for position in positions])))
+
+        data = {
+            "half_hours" : []
+        }
+
+
+        for x in xrange(1,48):
+            period_positions = positions.filter(timeStamp__range=[date_start + timedelta(minutes = 30*(x-1)), date_start + timedelta(minutes = 30*x)])
+            period_bus_stop_events = busstopevents.filter(timeCreation__range=[date_start + timedelta(minutes = 30*(x-1)), date_start + timedelta(minutes = 30*x)])
+            period_bus_events = busevents.filter(timeCreation__range=[date_start + timedelta(minutes = 30*(x-1)), date_start + timedelta(minutes = 30*x)])          
+            
+            bus_active_events = []
+            bus_stop_active_events = []
+
+            for be in period_bus_events:
+                if be.timeStamp > (date_start + timedelta(minutes = 30*x) - timedelta(minutes = be.event.lifespam)):
+                    bus_active_events.append(be)
+            for bse in period_bus_stop_events:
+                if bse.timeStamp > (date_start + timedelta(minutes = 30*x) - timedelta(minutes = bse.event.lifespam)):
+                    bus_stop_active_events.append(bse)
+
+            data["half_hours"].append({
+                    "half_hour": str(date_start) + " " + str(date_finish),
+                    "active_users": len(list(set([position.userId for position in period_positions]))),
+                    "reporting_users": len(list(set([event.userId for event in period_bus_stop_events]+[event.userId for event in period_bus_events]))),
+                    "reports": len(period_bus_stop_events) + len(period_bus_events),
+                    "active_events": len(bus_active_events) + len(bus_stop_active_events)
+                })
+        return JsonResponse(data, safe=False)
+
 
 def getBusStopInfo(request):
 	if request.method == 'GET':

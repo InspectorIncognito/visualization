@@ -27,6 +27,7 @@ urlpatterns = [
     url(r'^getUsersActivities/$', views.getUsersActivities, name='getUsersActivities'),
     url(r'^getBusStopInfo/$', views.getBusStopInfo, name='getBusStopInfo'),
     url(r'^getUsersPositions/$', views.getUsersPositions, name='getUsersPositions'),
+    url(r'^getActiveUsers/$', views.getActiveUsers, name='getActiveUsers'),
     
 
 ]
