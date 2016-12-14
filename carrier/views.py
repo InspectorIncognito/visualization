@@ -445,7 +445,8 @@ def getUsersActivities(request):
 		
 		return JsonResponse(response, safe=False)
 
-@login_required
+#@login_required
+#1st function
 def getActiveUsers(request):
     if request.method == 'GET':
         tz = timezone('Chile/Continental')
@@ -488,7 +489,7 @@ def getActiveUsers(request):
                 })
         return JsonResponse(data, safe=False)
 
-
+#5th function
 def getBusStopInfo(request):
 	if request.method == 'GET':
 		date_init = datetime.strptime(request.GET.get('date_init'),"%Y-%m-%dT%H:%M:%S")
@@ -548,7 +549,7 @@ def getBusStopInfo(request):
 			response[resp]['confirmCount'] = response[resp]['confirmCount'] - response[resp]['eventCount']
 		
 		return JsonResponse(response, safe=False)
-
+#2nd function
 def getUsersPositions(request):
 	if request.method == 'GET':
 		date_init = datetime.strptime(request.GET.get('date_init'),"%Y-%m-%dT%H:%M:%S")
@@ -568,3 +569,34 @@ def getUsersPositions(request):
 				response[str(device['userId'])] = [{'lat' : device['latitud'] , 'lon' : device['longitud'] , 'timeStamp': device['timeStamp']}]
 
 		return JsonResponse(response, safe=False)
+
+#3rd function
+def getUsersTravelMap(request):
+	if request.method == 'GET':
+		date_init = datetime.strptime(request.GET.get('date_init'),"%Y-%m-%dT%H:%M:%S")
+		date_end = datetime.strptime(request.GET.get('date_end'),"%Y-%m-%dT%H:%M:%S")
+
+		pytz.timezone('America/Santiago').localize(date_init)
+		pytz.timezone('America/Santiago').localize(date_end)
+
+		response = {}
+
+		tokenposes = PoseInTrajectoryOfToken.objects.filter(timeStamp__range=[date_init, date_end]).order_by('token_id', 'timeStamp').\
+			annotate(service=ExpressionWrapper(F('token__busassignment__service'), output_field=CharField())).\
+			values('latitud', 'longitud', 'timeStamp', 'token_id', 'service')
+
+		for tokenpose in tokenposes:
+			if str(tokenpose['token_id']) not in response:
+				response[str(tokenpose['token_id'])] ={'service': tokenpose['service'], 
+					'origin' : {'latitude' : tokenpose['latitud'], 'longitude': tokenpose['longitud'],'timeStamp' : tokenpose['timeStamp'] } }
+
+		tokenposes = PoseInTrajectoryOfToken.objects.filter(token_id__in=response).order_by('token_id', '-timeStamp')
+
+		for resp in response:
+			response[resp].update( {'destination' : {'latitude' : tokenposes.filter(token_id=resp).first().latitud, 
+				'longitude' : tokenposes.filter(token_id=resp).first().longitud,
+				'timeStamp' : tokenposes.filter(token_id=resp).first().timeStamp }})
+
+
+		return JsonResponse(response, safe=False)		
+
