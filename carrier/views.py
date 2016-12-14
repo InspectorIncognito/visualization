@@ -455,16 +455,16 @@ def getActiveUsers(request):
         date_finish = datetime.strptime(date+" 23:59:59", "%Y-%m-%d %H:%M:%S")
         date_finish = tz.localize(date_finish)
         positions = DevicePositionInTime.objects.filter(timeStamp__range=[date_start, date_finish])
-        busstopevents = EventForBusStop.objects.filter(timeCreation__range=[date_start, date_finish])
-        busevents = EventForBusv2.objects.filter(timeCreation__range=[date_start, date_finish])
-        # unique_users = len(list(set([position.userId for position in positions])))
+        highest_lifespan = Event.objects.all().order_by("-lifespam")[0].lifespam
+        busevents = EventForBusv2.objects.filter(timeCreation__gte=(date_start - timedelta(highest_lifespan)))
+        busstopevents = EventForBusStop.objects.filter(timeCreation__gte=(date_start - timedelta(highest_lifespan)))
 
         data = {
             "half_hours" : []
         }
 
 
-        for x in xrange(1,48):
+        for x in xrange(1,49):
             period_positions = positions.filter(timeStamp__range=[date_start + timedelta(minutes = 30*(x-1)), date_start + timedelta(minutes = 30*x)])
             period_bus_stop_events = busstopevents.filter(timeCreation__range=[date_start + timedelta(minutes = 30*(x-1)), date_start + timedelta(minutes = 30*x)])
             period_bus_events = busevents.filter(timeCreation__range=[date_start + timedelta(minutes = 30*(x-1)), date_start + timedelta(minutes = 30*x)])          
@@ -472,15 +472,15 @@ def getActiveUsers(request):
             bus_active_events = []
             bus_stop_active_events = []
 
-            for be in period_bus_events:
+            for be in busevents:
                 if be.timeStamp > (date_start + timedelta(minutes = 30*x) - timedelta(minutes = be.event.lifespam)):
                     bus_active_events.append(be)
-            for bse in period_bus_stop_events:
+            for bse in busstopevents:
                 if bse.timeStamp > (date_start + timedelta(minutes = 30*x) - timedelta(minutes = bse.event.lifespam)):
                     bus_stop_active_events.append(bse)
 
             data["half_hours"].append({
-                    "half_hour": str(date_start) + " " + str(date_finish),
+                    "half_hour": str(date_start + timedelta(minutes = 30*(x-1))) + " " + str(date_finish + timedelta(minutes = 30*(x))),
                     "active_users": len(list(set([position.userId for position in period_positions]))),
                     "reporting_users": len(list(set([event.userId for event in period_bus_stop_events]+[event.userId for event in period_bus_events]))),
                     "reports": len(period_bus_stop_events) + len(period_bus_events),
