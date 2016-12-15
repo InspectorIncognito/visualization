@@ -104,4 +104,5 @@ visualization/keys/
 static/*
 !static/js
 !static/images
+!static/datasantiago
 visualization/database.py
