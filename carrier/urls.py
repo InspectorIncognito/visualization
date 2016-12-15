@@ -20,6 +20,7 @@ urlpatterns = [
     url(r'^updatePhysical/$', views.updatePhysical, name='updatePhysical'),
     url(r'^fullTable/$', views.fullTable, name='fullTable'),
     url(r'^getFullTable/$', views.getFullTable, name='getFullTable'),
-    url(r'^maptest/$', views.maptest, name='mapTest'),
-    url(r'^getMap/$', views.getMap, name='getMap'),
+    url(r'^busMap/$', views.busMap, name='busMap'),
+    url(r'^getBusMap/$', views.getBusMap, name='getBusMap'),
+    url(r'^getBusMapParameters/$', views.getBusMapParameters, name='getBusMapParameters'),
 ]

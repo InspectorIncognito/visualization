@@ -1,7 +1,7 @@
 /**
  * Created by patricio on 11/29/16.
  */
-var url = 'http://' + location.host + '/carriers/getMap/';
+var url = 'http://' + location.host + '/carriers/getBusMap/';
 var reports;
 var map;
 var categories = {};

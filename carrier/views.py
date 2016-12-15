@@ -123,19 +123,21 @@ def getDriversReport(request):
         date_end = request.GET.get('date_end')
         plates = request.GET.get('plate')
         serv = request.GET.get('service')
+        services = [service.service for service in Service.objects.filter(filter(request))]
         query = EventForBusv2.objects.filter(
-            busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
+            busassignment__service__in=services)
         query = query.filter(event__category="conductor")
         query = query.filter(timeCreation__range=[date_init, date_end])
         query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
-        busassignment = Busassignment.objects.all()
+        busassignment = Busassignment.objects.filter(service__in=services).exclude(uuid__registrationPlate__icontains="No Info.").select_related('uuid')
         if serv:
             serv = json.loads(serv)
             serviceFilter = reduce(lambda x, y: x | y, [Q(busassignment__service=ser) for ser in serv])
             query = query.filter(serviceFilter)
             busassignment = busassignment.filter(service__in=serv)
 
-        allplates = {ba.uuid.registrationPlate: False for ba in busassignment.select_related('uuid')}
+        busassignment = busassignment.distinct("uuid__registrationPlate")
+        allplates = {ba.uuid.registrationPlate: False for ba in busassignment}
         query2 = query.distinct("busassignment__uuid__registrationPlate").select_related("busassignment__uuid")
         for report in query2:
             plate = report.busassignment.uuid.registrationPlate
@@ -287,12 +289,12 @@ def getFullTable(request):
         return JsonResponse(data, safe=False)
 
 @login_required
-def maptest(request):
-    template = loader.get_template('maptest3.html')
+def busMap(request):
+    template = loader.get_template('busMap.html')
     return HttpResponse(template.render(request=request))
 
 @login_required
-def getMap(request):
+def getBusMap(request):
     services = Service.objects.filter(filter(request))
     query = StadisticDataFromRegistrationBus.objects.exclude(reportOfEvent__event__category="estado físico")
     query = query.order_by("reportOfEvent", "-timeStamp").distinct('reportOfEvent')
@@ -302,5 +304,27 @@ def getMap(request):
     data = {
         'data': dict
     }
+    return JsonResponse(data, safe=False)
+
+@login_required
+def getBusMapParameters(request):
+    services = [service.service for service in Service.objects.filter(filter(request))]
+    busassignment = Busassignment.objects.filter(service__in=services).exclude(
+        uuid__registrationPlate__icontains="No Info.").select_related('uuid').distinct('uuid__registrationPlate')
+    plates = [ba.uuid.registrationPlate for ba in busassignment]
+    zones = zonificationTransantiago.objects.distinct("comuna")
+    comunas = [zone.comuna for zone in zones]
+    events = Event.objects.filter(eventType="bus").exclude(category="estado físico")
+    categories = events.distinct("category")
+    types = {cat.category:[] for cat in categories}
+    for event in events:
+        types[event.category].append(event.name)
+    data = {
+        'services': services,
+        'plates': plates,
+        'comunas': comunas,
+        'types': types,
+    }
+
     return JsonResponse(data, safe=False)
 

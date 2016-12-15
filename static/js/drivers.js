@@ -419,7 +419,6 @@ function myFunction(refresh) {
             if (refresh) {
                 $(".select2_plate").find("option").remove().val("");
                 $("#plate").val(null).trigger("change");
-                console.log("dsad");
 
                 $('.select2_plate').append($('<option>', {
                     value: "Todas las patentes",
@@ -445,7 +444,7 @@ function myFunction(refresh) {
                         value: value,
                         text: value,
                     }));
-                }); 
+                });
                 bottom.sort();
                 $.each(bottom, function (index, value) {
                     $('.select2_plate').append($('<option>', {
