@@ -27,12 +27,6 @@ $(function () {
     $("#filters").on("dp.change", function (e) {
         myFunction(true);
     });
-    $("#service").keyup(function () {
-        myFunction(true);
-    });
-    $("#plate").keyup(function () {
-        myFunction(false);
-    });
     $('#service').on("select2:select", function () {
         if ($(".select2_multiple").val()[0] == "Todos los recorridos") {
             $("#service").select2("val", "");
