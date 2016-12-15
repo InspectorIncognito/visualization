@@ -28,7 +28,7 @@ function init() {
     var i = 0;
     table = $('#example').DataTable({
         scrollX: true,
-        pageLength: 50,
+        pageLength: 15,
         order: [[0, "desc"]],
         dom: 'Bfrtip',
         buttons: [
@@ -42,6 +42,8 @@ function init() {
         columns: [
             {title: "Fecha", data: 'timeStamp'},
             {title: "Mensaje", data: 'message'},
+            {title: "Patente", data: 'registrationPlate'},
+            {title: "Servicio", data: 'service'},
             {
                 title: 'Imagen',
                 render: function (data, type, row) {
@@ -49,7 +51,7 @@ function init() {
                         return '<button type="button" class="btn-xs btn-primary" onclick="openModal(\'' + row.imageName + '\')"> Ver imagen </button>';
                     }
                     else
-                        return "<button type='button' class='btn-xs btn-danger disabled'> No hay imagen </button>";
+                        return "<span style='color:red'> No hay imagen </span>";
                 }
             },
         ],

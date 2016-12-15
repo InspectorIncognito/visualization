@@ -56,14 +56,8 @@ def reports(request):
 def drivers(request):
     template = loader.get_template('drivers.html')
     services = Service.objects.filter(filter(request))
-    ba = Busassignment.objects.filter(service__in=[service.service for service in services])
-    ba = ba.values_list('uuid', flat = True)
-    buses = Busv2.objects.filter(id__in=ba)
-    buses = buses.exclude(registrationPlate__icontains='No Info.').order_by("registrationPlate")
-    plates = [bus.registrationPlate for bus in buses]
     context = {
         'services': services,
-        'plates': plates,
     }
     return HttpResponse(template.render(context, request))
 
@@ -109,7 +103,7 @@ def getReports(request):
         query = ReportInfo.objects.filter(reportType='bus', report__timeStamp__range=[date_init,date_end])
         query = query.filter(service__in=[service.service for service in services])
         data = {
-            'data': [q.report.getDictionary() for q in query]
+            'data': [q.getDictionary() for q in query]
         }
         return JsonResponse(data, safe=False)
 
@@ -117,7 +111,7 @@ def getReports(request):
 def getDriversReport(request):
     if request.method == 'GET':
         events = Event.objects.filter(category="conductor")
-        events = [event.name for event in events]
+        events = [event.name.capitalize() for event in events]
         pos = range(0, len(events))
         eventToPos = {name: pos for name, pos in zip(events, pos)}
 
@@ -134,15 +128,27 @@ def getDriversReport(request):
         query = query.filter(event__category="conductor")
         query = query.filter(timeCreation__range=[date_init, date_end])
         query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
-        if plates:
-            plates = json.loads(plates)
-            plateFilter = reduce(lambda x, y: x | y, [Q(busassignment__uuid__registrationPlate=plate) for plate in plates])
-            query = query.filter(plateFilter)
+        busassignment = Busassignment.objects.all()
         if serv:
             serv = json.loads(serv)
             serviceFilter = reduce(lambda x, y: x | y, [Q(busassignment__service=ser) for ser in serv])
             query = query.filter(serviceFilter)
+            busassignment = busassignment.filter(service__in=serv)
+
+        allplates = {ba.uuid.registrationPlate: False for ba in busassignment.select_related('uuid')}
+        query2 = query.distinct("busassignment__uuid__registrationPlate").select_related("busassignment__uuid")
+        for report in query2:
+            plate = report.busassignment.uuid.registrationPlate
+            allplates[plate] = True
+
+        #print(allplates)
+
+        if plates:
+            plates = json.loads(plates)
+            plateFilter = reduce(lambda x, y: x | y, [Q(busassignment__uuid__registrationPlate=plate) for plate in plates])
+            query = query.filter(plateFilter)
         data = {
+            "allplates" : allplates,
             "reports": [change(report.getDictionary()) for report in query],
             "types": events
         }
@@ -223,7 +229,7 @@ def getPhysicalReport(request):
         query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info")
         if plates:
             plates = json.loads(plates)
-            plateFilter = reduce(lambda x, y: x | y, [Q(busassignment__uuid__registrationPlate=plate) for plate in plates])
+            plateFilter = reduce(lambda x, y: x | y, [Q(busassignment__uuid__registrationPlate__icontains=plate) for plate in plates])
             query = query.filter(plateFilter)
         if serv:
             serv = json.loads(serv)
@@ -254,7 +260,7 @@ def updatePhysical(request):
 def fullTable(request):
     template = loader.get_template('fullTable.html')
     events = Event.objects.filter(eventType="bus").distinct("category")
-    types = [event.category for event in events]
+    types = [event.category.capitalize() for event in events]
     context = {
         'types': types,
     }
@@ -272,7 +278,7 @@ def getFullTable(request):
         query = query.filter(timeCreation__range=[date_init, date_end])
         if types:
             types = json.loads(types)
-            typeFilter = reduce(lambda x, y: x | y, [Q(event__category = type) for type in types])
+            typeFilter = reduce(lambda x, y: x | y, [Q(event__category__icontains = type) for type in types])
             query = query.filter(typeFilter)
 
         data = {

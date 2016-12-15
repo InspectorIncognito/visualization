@@ -6,7 +6,7 @@ var table;
             $.fn.dataTable.moment( 'DD-MM-YYYY HH:mm:ss' );
             table = $('#example').dataTable({
                 scrollX: true,
-                pageLength: 100,
+                pageLength: 15,
                 order: [[1, "desc"]],
                 dom: 'Bfrtip',
                 buttons: [
@@ -22,9 +22,9 @@ var table;
                     {title: "Fecha", data: 'timeCreation'},
                     {title: "Patente", data: 'plate'},
                     {title: "Servicio", data: 'service'},
-                    {title: "Lugar", data: 'commune'},
-                    {title: "Paradero 1", data: 'busStop1'},
-                    {title: "Paradero 2", data: 'busStop2'}
+                    {title: "Comuna", data: 'commune'},
+                    {title: "Paradero más cercano 1", data: 'busStop1'},
+                    {title: "Paradero más cercano 2", data: 'busStop2'}
                 ],
                 language: {
                     "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json",

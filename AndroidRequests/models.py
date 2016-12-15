@@ -35,6 +35,15 @@ class ReportInfo(models.Model):
     zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null=True)
     '''Indicates the zonification for the event'''
 
+    def getDictionary(self):
+        dict = {}
+        dict["registrationPlate"] = self.registrationPlate if self.registrationPlate else "No Info."
+        dict["service"] = self.service if self.service else "No Info."
+        report = self.report.getDictionary()
+        dict["imageName"] = report["imageName"]
+        dict["timeStamp"] = report["timeStamp"]
+        dict["message"] = report["message"]
+        return dict
 
 class TimePeriod(models.Model):
     """ Time period with standar names """
@@ -265,12 +274,12 @@ class EventForBusv2(EventRegistration):
         dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
         dictionary['service'] = self.busassignment.service if self.busassignment else "No info."
         dictionary['plate'] = self.busassignment.uuid.registrationPlate if self.busassignment else "No info."
-        dictionary['type'] = self.event.name
+        dictionary['type'] = self.event.name.capitalize()
         dictionary['busStop1'] = self.busStop1.name if self.busStop1 else "No info."
         dictionary['busStop2'] = self.busStop2.name if self.busStop2 else "No info."
         dictionary['fixed'] = "Si" if self.fixed else "No"
         dictionary['id'] = self.id
-        dictionary['category'] = self.event.category
+        dictionary['category'] = self.event.category.capitalize()
         dictionary['zone777'] = self.zonification.zona if self.zonification else "No info."
         dictionary['commune'] = self.zonification.comuna if self.zonification else "No info."
         dictionary['typeOfDay'] = self.time_period.day_type if self.time_period else "No info."
@@ -733,7 +742,6 @@ class Report(models.Model):
         dictionary['message'] = self.message
         dictionary['imageName'] = ("/media/reported_images/" + self.imageName) if (
         self.imageName and self.imageName != "no image") else "no image"
-        dictionary['reportInfo'] = self.reportInfo
         stamp = timezone.localtime(self.timeStamp, pytz.timezone('Chile/Continental'))
         dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
         return dictionary

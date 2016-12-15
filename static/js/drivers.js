@@ -18,14 +18,20 @@ $(function () {
     $("#group :input").change(function () {
         updatechart();
     });
-    $("#filters :input").change(function () {
-        myFunction();
+    $("#service").change(function () {
+        myFunction(true);
+    });
+    $("#plate").change(function () {
+        myFunction(false);
     });
     $("#filters").on("dp.change", function (e) {
-        myFunction();
+        myFunction(true);
     });
-    $("#filters :input").keyup(function () {
-        myFunction();
+    $("#service").keyup(function () {
+        myFunction(true);
+    });
+    $("#plate").keyup(function () {
+        myFunction(false);
     });
     $('#service').on("select2:select", function () {
         if ($(".select2_multiple").val()[0] == "Todos los recorridos") {
@@ -37,7 +43,7 @@ $(function () {
             $("#plate").select2("val", "");
         }
     });
-    myFunction();
+    myFunction(true);
 });
 $(document).ready(function () {
     $(".select2_multiple").select2({
@@ -163,7 +169,7 @@ function updatechart() {
                 break;
 
 
-case "periodTransantiago":
+            case "periodTransantiago":
                 if (chartdata['period'] == null) {
                     chartdata['period'] = {
                         'periods': [],
@@ -193,7 +199,6 @@ case "periodTransantiago":
                 }
                 makechart(cols, chartdata['period']['periods'], null, undefined, null, [], 'category', null);
                 break;
-
 
 
             case "plate":
@@ -393,10 +398,9 @@ function updateDate(n) {
     }
 }
 
-function myFunction() {
+function myFunction(refresh) {
     var Dataurl = "http://" + location.host + "/carriers/getDriversData/";
     var data = {
-        carrier: '3',
         date_init: $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD"),
         date_end: $('#date_end').data("DateTimePicker").date().add(1, 'days').format("YYYY-MM-DD"),
         /*        hour1: $('#hour1').data("DateTimePicker").date().format("HH"),
@@ -411,19 +415,49 @@ function myFunction() {
 
     $.getJSON(Dataurl, data)
         .done(function (data) {
-            console.log(data)
+            console.log(data);
+            if (refresh) {
+                $(".select2_plate").find("option").remove().val("");
+                $("#plate").val(null).trigger("change");
+                console.log("dsad");
+
+                $('.select2_plate').append($('<option>', {
+                    value: "Todas las patentes",
+                    text: "Todas las patentes",
+                }));
+                var top = [];
+                var bottom = [];
+                $.each(data.allplates, function (key, value) {
+                    if (value) {
+                        top.push(key);
+                    }
+                    else {
+                        bottom.push(key);
+                    }
+                })
+                top.sort();
+                values = [];
+                $.each(top, function (index, value) {
+                    if ($.inArray( value, plate ) >= 0){
+                        values.push(value);
+                    };
+                    $('.select2_plate').append($('<option>', {
+                        value: value,
+                        text: value,
+                    }));
+                }); 
+                bottom.sort();
+                $.each(bottom, function (index, value) {
+                    $('.select2_plate').append($('<option>', {
+                        value: value,
+                        text: value + " (No hay datos)",
+                    }));
+                });
+                $("#plate").val(values).trigger("change");
+            }
             reloadchart();
             resp = data.reports;
             types = data.types;
             updatechart();
         });
-    $.getJSON("http://nominatim.openstreetmap.org/search", {format: 'json', q: "-33.3505,-70.5484"})
-        .done(function (data) {
-            console.log(data)
-        });
-    $.getJSON("http://nominatim.openstreetmap.org/search", {format: 'json', q: "-33.4570377,-70.6644547"})
-        .done(function (data) {
-            console.log(data)
-        });
-
 }

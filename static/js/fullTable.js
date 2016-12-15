@@ -41,7 +41,7 @@ function init() {
     $.fn.dataTable.moment('DD-MM-YYYY HH:mm:ss');
     table = $('#example').dataTable({
         scrollX: true,
-        pageLength: 50,
+        pageLength: 15,
         order: [[1, "desc"]],
         dom: 'Bfrtip',
         buttons: [
@@ -63,8 +63,8 @@ function init() {
             {title: "Servicio", data: 'service'},
             {title: "Patente", data: 'plate'},
             {title: "Comuna", data: 'commune'},
-            {title: "Paradero 1", data: 'busStop1'},
-            {title: "Paradero 2", data: 'busStop2'},
+            {title: "Paradero más cercano 1", data: 'busStop1'},
+            {title: "Paradero más cercano 2", data: 'busStop2'},
             {title: "Zona 777-lugar", data: 'zone777'},
             {title: "Período Transantiago", data: 'periodTransantiago'},
         ],
