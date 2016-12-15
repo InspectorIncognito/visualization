@@ -103,4 +103,5 @@ static/components/
 visualization/keys/
 static/*
 !static/js
+!static/images
 visualization/database.py
