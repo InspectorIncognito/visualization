@@ -4,6 +4,7 @@
 var url = 'http://' + location.host + '/carriers/getMap/';
 var reports;
 var map;
+var categories = {};
 
 $(document).ready(function () {
     /**
@@ -29,19 +30,32 @@ function rest() {
     var reportsGroup = L.layerGroup([]);
 
     var overlays = {
-        "ruta": routeGroup,
-        "reportes": reportsGroup
+        "ruta": routeGroup
     };
 
-    L.control.layers({}, overlays).addTo(map);
+    for (var key in reports.data) {
+        if (reports.data.hasOwnProperty(key)) {
+            markers = reports.data[key];
+            for (i = 0; i < markers.length; i++) {
+                if (!(markers[i].report.category in categories)) categories[markers[i].report.category] = {};
+                if (!(markers[i].report.type in categories[markers[i].report.category])) categories[markers[i].report.category][markers[i].report.type] = L.layerGroup([]);
+            }
+        }
+    }
+    L.control.groupedLayers(overlays, categories, {groupCheckboxes: true}).addTo(map);
 
     for (var key in reports.data) {
 
         if (reports.data.hasOwnProperty(key)) {
 
 
-            reports.data[key].reportsLayer = L.layerGroup([]);
-
+            reports.data[key].reportsLayer = {};
+            for (var cat in categories) {
+                reports.data[key].reportsLayer[cat] = {};
+                for (var subcat in categories[cat]) {
+                    reports.data[key].reportsLayer[cat][subcat] = L.layerGroup([]);
+                }
+            }
             $('#service').append($('<option>', {
                 value: key,
                 text: key,
@@ -50,8 +64,8 @@ function rest() {
             markers = reports.data[key];
             for (i = 0; i < markers.length; i++) {
                 var info = markers[i];
-                marker = L.marker([info.lat, info.lon]).bindPopup("Servicio: " + key + "<br>Fecha: " + info.report.timeStamp + "<br>Tipo: " + info.report.category + "-" + info.report.type);
-                reports.data[key].reportsLayer.addLayer(marker);
+                marker = L.marker([info.lat, info.lon], {}).bindPopup("Servicio: " + key + "<br>Fecha: " + info.report.timeStamp + "<br>Tipo: " + info.report.category + "-" + info.report.type);
+                reports.data[key].reportsLayer[markers[i].report.category][markers[i].report.type].addLayer(marker);
             }
             //reportsGroup.addLayer(reports.data[key].reportsLayer);
             //reports.data[key].reportsLayer.addTo(map)
@@ -68,7 +82,6 @@ function rest() {
             try {
                 if (reports.data.hasOwnProperty(key)) {
                     reports.data[key].routeLayer = L.layerGroup([]);
-                    console.log(key)
                     GTFS.drawRoutes(reports.data[key].routeLayer, GTFS.getRoutes([key + "I", key + "R"]));
 
                     //reports.data[key].routeLayer.addTo(map)
@@ -98,12 +111,22 @@ function updatemap(routelayer, reportslayer, rep) {
     routelayer.eachLayer(function (layer) {
         map.removeLayer(layer);
     });
-    reportslayer.eachLayer(function (layer) {
-        map.removeLayer(layer);
-    });
-    var selected = $(".select2_multiple").val()
+
+    for (var cat in categories) {
+        for (var subcat in categories[cat]) {
+            categories[cat][subcat].eachLayer(function (layer) {
+                categories[cat][subcat].removeLayer(layer)
+            });
+        }
+    }
+    var selected = $(".select2_multiple").val();
     for (var i = 0; i < selected.length; i++) {
-        routelayer.addLayer(rep.data[selected[i]].routeLayer)
-        reportslayer.addLayer(rep.data[selected[i]].reportsLayer)
+        console.log(selected[i])
+        routelayer.addLayer(rep.data[selected[i]].routeLayer);
+        for (var cat in categories) {
+            for (var subcat in categories[cat]) {
+                categories[cat][subcat].addLayer(rep.data[selected[i]].reportsLayer[cat][subcat]);
+            }
+        }
     }
 }

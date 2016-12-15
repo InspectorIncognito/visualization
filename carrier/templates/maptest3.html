@@ -11,14 +11,20 @@
     <link href="{% static 'components/gentelella/vendors/select2/dist/css/select2.min.css' %}" rel="stylesheet">
     <!-- Marker Cluster Style -->
     <link href="{% static 'components/leaflet.markercluster/dist/MarkerCluster.css' %}" rel="stylesheet">
+    <link href="{% static 'components/leaflet.markercluster/dist/MarkerCluster.Default.css' %}" rel="stylesheet">
     <!-- Leaflet Scripts -->
     <script src="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.js"></script>
 
     <script src="{% static 'js/Leaflet.GTFS.js' %}"></script>
 
     <!-- markercluster Script -->
-    <script src="{% static 'components/leaflet.markercluster/dist/leaflet.markercluster.js' %}"></script>
+    <script src="{% static 'js/leaflet.markercluster.js' %}"></script>
     <script src="http://200.9.100.91:8080/gpsonline/static/js/Leaflet.polylineDecorator.js"></script>
+
+    <!-- groupedlayercontrol Script -->
+    <link href="{% static 'components/leaflet-groupedlayercontrol/dist/leaflet.groupedlayercontrol.min.css' %}" rel="stylesheet">
+    <script src="{% static 'components/leaflet-groupedlayercontrol/dist/leaflet.groupedlayercontrol.min.js' %}"></script>
+
 
     <style>
         .map {

@@ -3,87 +3,100 @@
  */
 var url = 'http://' + location.host + '/carriers/getMap/';
 var reports;
-var resumen;
-var detalle;
-$.getJSON(url)
-    .done(function (data) {
-        console.log(data)
-        reports = data;
-    });
+var map;
+var categories = {};
 
+var icons = {
+    "ambiente": L.icon({
+        iconUrl: 'http://' + location.host + '/static/images/reporte_bus_hacinamiento.png',
+        iconSize: [20, 20]
+    }),
+    "incidentes en el bus": L.icon({
+        iconUrl: 'http://' + location.host + '/static/images/reporte_bus_ambiente.png',
+        iconSize: [20, 20]
+    }),
+    "desde paradero": L.icon({
+        iconUrl: 'http://' + location.host + '/static/images/reporte_paradero_bus_pasa_vacio.png',
+        iconSize: [20, 20]
+    }),
+    "desde parader0": L.icon({
+        iconUrl: 'http://' + location.host + '/static/images/reporte_paradero_bus_pasa_vacio.png',
+        iconSize: [20, 20]
+    }),
+    "conductor": L.icon({
+        iconUrl: 'http://' + location.host + '/static/images/reporte_bus_conductor.png',
+        iconSize: [20, 20]
+    }),
+    "incidente en la via": L.icon({
+        iconUrl: 'http://' + location.host + '/static/images/reporte_bus_via.png',
+        iconSize: [20, 20]
+    })
+}
 $(document).ready(function () {
     /**
      * SET MAP
      */
+    $(".select2_multiple").select2({
+        allowClear: true
+    });
+    $.getJSON(url)
+        .done(function (data) {
+            reports = data;
+            rest();
 
+
+        });
+})
+
+function rest() {
     var beauchefLocation = L.latLng(-33.4579141, -70.6646977);
-    var map = L.map("mapid", {editable: true}).setView(beauchefLocation, 15);
+    map = L.map("mapid", {editable: true}).setView(beauchefLocation, 15);
 
-
-    var routeLayer1 = L.featureGroup([]);
-    var busStopsLayer1 = L.layerGroup([]);
-    var routeReports = L.layerGroup([]);
+    var routeGroup = L.layerGroup([]);
+    var reportsGroup = L.layerGroup([]);
 
     var overlays = {
-        "servicio": routeLayer1,
-        "paradas": busStopsLayer1,
-        "reportes": routeReports
+        "ruta": routeGroup
     };
-    L.control.layers({}, overlays).addTo(map);
 
-    function drawRoute(service, direction, busStopsLayer, routeLayer) {
-        routeReports.clearLayers();
-        // draw bus stops related to service
-        busStopsLayer = GTFS.drawStopsForService(busStopsLayer, service, direction);
-
-        // draw route
-        var routes = GTFS.getRoutes([service + direction]);
-        console.log(routes);
-        GTFS.drawRoutes(routeLayer, routes);
-
-        var line = [];
-        $.each(routes[0].route, function (i, v) {
-            line.push([v.latitud, v.longitud]);
-        });
-
-        var routeWithArrows = L.polylineDecorator(line, {
-            patterns: [
-                {
-                    offset: 0,
-                    endOffset: 0,
-                    repeat: '40',
-                    symbol: L.Symbol.arrowHead(
-                        {
-                            pixelSize: 10,
-                            polygon: true,
-                            pathOptions: {
-                                fillOpacity: 1,
-                                color: GTFS.getRouteColor(service),
-                                stroke: true
-                            }
-                        })
-                }
-            ]
-        });
-        var popupMessage = "<h4>" + service + direction + "</h4>";
-        routeWithArrows.bindPopup(popupMessage);
-        routeLayer.bindPopup(popupMessage);
-
-        routeLayer.addLayer(routeWithArrows);
-        routeLayer.addTo(map);
-        //busStopsLayer.addTo(map);
-
-        map.fitBounds(routeLayer.getBounds());
-
-        markers = reports.data[service];
-        for (i = 0; i < markers.length; i++) {
-            marker = L.marker([markers[i].lat, markers[i].lon]);
-            routeReports.addLayer(marker);
+    for (var key in reports.data) {
+        if (reports.data.hasOwnProperty(key)) {
+            markers = reports.data[key];
+            for (i = 0; i < markers.length; i++) {
+                if (!(markers[i].report.category in categories)) categories[markers[i].report.category] = {};
+                if (!(markers[i].report.type in categories[markers[i].report.category])) categories[markers[i].report.category][markers[i].report.type] = L.layerGroup([]);
+            }
         }
+    }
+    L.control.groupedLayers(overlays, categories, {groupCheckboxes: true}).addTo(map);
+
+    for (var key in reports.data) {
+
+        if (reports.data.hasOwnProperty(key)) {
 
 
-        console.log("Map updated with service: " + service + direction);
-    };
+            reports.data[key].reportsLayer = {};
+            for (var cat in categories) {
+                reports.data[key].reportsLayer[cat] = {};
+                for (var subcat in categories[cat]) {
+                    reports.data[key].reportsLayer[cat][subcat] = L.layerGroup([]);
+                }
+            }
+            $('#service').append($('<option>', {
+                value: key,
+                text: key,
+            }));
+
+            markers = reports.data[key];
+            for (i = 0; i < markers.length; i++) {
+                var info = markers[i];
+                marker = L.marker([info.lat, info.lon], {icon: icons[markers[i].report.category]}).bindPopup("Servicio: " + key + "<br>Fecha: " + info.report.timeStamp + "<br>Tipo: " + info.report.category + "-" + info.report.type);
+                reports.data[key].reportsLayer[markers[i].report.category][markers[i].report.type].addLayer(marker);
+            }
+            //reportsGroup.addLayer(reports.data[key].reportsLayer);
+            //reports.data[key].reportsLayer.addTo(map)
+        }
+    }
 
 
     /**
@@ -91,48 +104,55 @@ $(document).ready(function () {
      */
     GTFS.loadData(function () {
         var baseLayer = GTFS.setLayerControl(map);
-        // SET BUTTON ACTION
-        var drawServiceButton1 = $("#seeBuses1");
+        for (var key in reports.data) {
+            try {
+                if (reports.data.hasOwnProperty(key)) {
+                    reports.data[key].routeLayer = L.layerGroup([]);
+                    GTFS.drawRoutes(reports.data[key].routeLayer, GTFS.getRoutes([key + "I", key + "R"]));
 
-        var clickFunction = function (e) {
-            var index = $(e.target).attr('id').substr(-1);
-            var serviceCode = $("#serviceCode" + index).val();
-            var direction = $("input[name=direction" + index + "]:checked").val();
+                    //reports.data[key].routeLayer.addTo(map)
+                    //routeGroup.addLayer(reports.data[key].routeLayer);
 
-            drawRoute(serviceCode, direction, busStopsLayer1, routeLayer1);
-
-
-            var serviceInfo = GTFS.data.service[serviceCode];
-            var origin = serviceInfo.origin;
-            var destination = serviceInfo.destiny;
-            if (direction == "I") {
-                $("#serviceOrigin" + index).text(origin);
-                $("#serviceDestination" + index).text(destination);
-            } else {
-                $("#serviceOrigin" + index).text(destination);
-                $("#serviceDestination" + index).text(origin);
+                }
             }
-        };
-
-        drawServiceButton1.click(clickFunction);
-
-        // press enter on serviceCode input
-        var keyPressFunction = function (e) {
-            var key = e.which;
-            // the enter key code
-            if (key == 13) {
-                var index = $(e.target).attr('id').substr(-1);
-                $('#seeBuses' + index).trigger("click");
-                return false;
+            catch (err) {
             }
         }
-        $("#serviceCode1").keypress(keyPressFunction);
 
-        // change radio button
-        $("input[type=radio][name=direction1]").change(function () {
-            if ($("#serviceCode1").val()) {
-                drawServiceButton1.trigger("click");
-            }
+        $("#service").change(function () {
+            updatemap(routeGroup, reportsGroup, reports);
         });
+        var selectedItems = [];
+        var allOptions = $("#service option");
+        allOptions.each(function () {
+            selectedItems.push($(this).val());
+        });
+        $("#service").val(selectedItems).trigger("change");
     }, "/static/", "datasantiago");
-});
+
+
+}
+
+function updatemap(routelayer, reportslayer, rep) {
+    routelayer.eachLayer(function (layer) {
+        map.removeLayer(layer);
+    });
+
+    for (var cat in categories) {
+        for (var subcat in categories[cat]) {
+            categories[cat][subcat].eachLayer(function (layer) {
+                categories[cat][subcat].removeLayer(layer)
+            });
+        }
+    }
+    var selected = $(".select2_multiple").val();
+    for (var i = 0; i < selected.length; i++) {
+        console.log(selected[i])
+        routelayer.addLayer(rep.data[selected[i]].routeLayer);
+        for (var cat in categories) {
+            for (var subcat in categories[cat]) {
+                categories[cat][subcat].addLayer(rep.data[selected[i]].reportsLayer[cat][subcat]);
+            }
+        }
+    }
+}
