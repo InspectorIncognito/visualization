@@ -27,6 +27,8 @@ def fill_table(apps, schema_editor):
 						busUUIDn = buses.objects.get(registrationPlate = plate).uuid
 				if reportJson['bus']['licensePlate'].upper() == "DUMMYLPT":
 					plate = reportJson['bus']['licensePlate'].upper()
+				if len(reportJson['bus']['service']) > 5:
+					reportJson['bus']['service'] = '-'
 				reportinfo = reportsInfo(
 					reportType = 'bus',
 					busUUID = busUUIDn,
