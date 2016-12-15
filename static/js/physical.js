@@ -18,21 +18,18 @@ $(function () {
     $("#group :input").change(function () {
         updatechart();
     });
-    $("#filters :input").change(function () {
-        myFunction();
-    });
     $("#filters").on("dp.change", function (e) {
-        myFunction();
+        myFunction(true);
     });
     $('#plate').on("select2:select", function () {
         if ($(".select2_plate").val()[0] == "Todas las patentes") {
             $("#plate").select2("val", "");
         }
     });
-    $("#filters :input").keyup(function () {
-        myFunction();
+     $("#plate").change(function () {
+        myFunction(false);
     });
-    myFunction();
+    myFunction(true);
 });
 $(document).ready(function () {
     $(".select2_plate").select2({
@@ -282,7 +279,7 @@ function updateDate(n) {
 }
 
 
-function myFunction() {
+function myFunction(refresh) {
     var Dataurl = "http://" + location.host + "/carriers/getPhysicalData/";
     var data = {
         date_init: $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD"),
@@ -295,8 +292,7 @@ function myFunction() {
 
     $.getJSON(Dataurl, data)
         .done(function (data) {
-            console.log(data)
-            /*
+            console.log(data);
             if (refresh) {
                 $(".select2_plate").find("option").remove().val("");
                 $("#plate").val(null).trigger("change");
@@ -314,7 +310,7 @@ function myFunction() {
                     else {
                         bottom.push(key);
                     }
-                })
+                });
                 top.sort();
                 values = [];
                 $.each(top, function (index, value) {
@@ -335,7 +331,7 @@ function myFunction() {
                     }));
                 });
                 $("#plate").val(values).trigger("change");
-            }*/
+            }
             reloadchart();
             resp = data.reports;
             types = data.types;

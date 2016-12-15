@@ -224,11 +224,21 @@ def getPhysicalReport(request):
         serv = request.GET.get('service')
         #hour2 = (hour2 + 24) if hour2 < hour1 else hour2
         #hours = [hour % 24 for hour in range(hour1, hour2 + 1)]
+        services = [service.service for service in Service.objects.filter(filter(request))]
         query = EventForBusv2.objects.filter(
-            busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
+            busassignment__service__in=services)
         query = query.filter(event__category="estado físico", fixed = False)
         query = query.filter(timeCreation__range=[date_init, date_end])
         query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info")
+
+        busassignment = Busassignment.objects.filter(service__in=services).exclude(
+            uuid__registrationPlate__icontains="No Info.").select_related('uuid').distinct("uuid__registrationPlate")
+        allplates = {ba.uuid.registrationPlate: False for ba in busassignment}
+        query2 = query.distinct("busassignment__uuid__registrationPlate").select_related("busassignment__uuid")
+        for report in query2:
+            plate = report.busassignment.uuid.registrationPlate
+            allplates[plate] = True
+
         if plates:
             plates = json.loads(plates)
             plateFilter = reduce(lambda x, y: x | y, [Q(busassignment__uuid__registrationPlate__icontains=plate) for plate in plates])
@@ -241,7 +251,8 @@ def getPhysicalReport(request):
         #query = query.filter(hourFilter)
         data = {
             "reports": [change(report.getDictionary()) for report in query],
-            "types": events
+            "types": events,
+            "allplates": allplates
         }
         return JsonResponse(data, safe=False)
 
