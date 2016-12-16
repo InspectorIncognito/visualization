@@ -81,9 +81,9 @@ def physical(request):
 
 @login_required
 def getPhysicalHeaders(request):
-    events = Event.objects.filter(category="estado físico", eventType="bus")
+    events = Event.objects.filter(category="estado físico", eventType="bus").exclude(id="evn00225")
     events = [event.name for event in events]
-    headerInfo = EventForBusv2.objects.filter(event__category='estado físico')
+    headerInfo = EventForBusv2.objects.filter(event__category='estado físico').exclude(event__id="evn00225")
     headerInfo = headerInfo.filter(
         busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
     today = date.today()
@@ -341,15 +341,36 @@ def busMap(request):
 
 @login_required
 def getBusMap(request):
+    date_init = request.GET.get('date_init')
+    date_end = request.GET.get('date_end')
+    serv = request.GET.get('service')
+    plate = request.GET.get('plate')
+    comunas = request.GET.get('comuna')
+
     services = Service.objects.filter(filter(request))
-    query = StadisticDataFromRegistrationBus.objects.exclude(reportOfEvent__event__category="estado físico")
+    query = StadisticDataFromRegistrationBus.objects.filter(reportOfEvent__timeCreation__range=[date_init, date_end]).exclude(reportOfEvent__event__category="estado físico")
+    query = query.filter(reportOfEvent__busassignment__service__in =[service.service for service in services])
     query = query.order_by("reportOfEvent", "-timeStamp").distinct('reportOfEvent')
-    dict = {}
-    for service in services:
-        dict[service.service] = [stadistic.getDictionary() for stadistic in
-                                 query.filter(reportOfEvent__busassignment__service=service.service)]
+
+    if serv:
+        serv = json.loads(serv)
+        serviceFilter = reduce(lambda x, y: x | y, [Q(reportOfEvent__busassignment__service=ser) for ser in serv])
+        query = query.filter(serviceFilter)
+
+    if plate:
+        plates = json.loads(plate)
+        plateFilter = reduce(lambda x, y: x | y,
+                             [Q(reportOfEvent__busassignment__uuid__registrationPlate=plate) for plate in plates])
+        query = query.filter(plateFilter)
+
+    if comunas:
+        comunas = json.loads(comunas)
+        comunaFilter = reduce(lambda x, y: x | y,
+                             [Q(reportOfEvent__zonification__comuna=comuna) for comuna in comunas])
+        query = query.filter(comunaFilter)
+
     data = {
-        'data': dict
+        'data': [stadistic.getDictionary() for stadistic in query]
     }
     return JsonResponse(data, safe=False)
 
@@ -689,9 +710,9 @@ def getBusMapParameters(request):
     comunas = [zone.comuna for zone in zones]
     events = Event.objects.filter(eventType="bus").exclude(category="estado físico")
     categories = events.distinct("category")
-    types = {cat.category: [] for cat in categories}
+    types = {cat.category.capitalize(): [] for cat in categories}
     for event in events:
-        types[event.category].append(event.name)
+        types[event.category.capitalize()].append(event.name.capitalize())
     data = {
         'services': services,
         'plates': plates,
