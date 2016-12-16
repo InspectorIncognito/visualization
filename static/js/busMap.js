@@ -145,9 +145,15 @@ function reloadData() {
                     });
                 }
             }
-
-            for (var i = 0; i < service.length; i++) {
-                routeGroup.addLayer(reports[service[i]].routeLayer);
+            if (service == null) {
+                for (var key in reports) {
+                    routeGroup.addLayer(reports[key].routeLayer);
+                }
+            }
+            else {
+                for (var i = 0; i < service.length; i++) {
+                    routeGroup.addLayer(reports[service[i]].routeLayer);
+                }
             }
 
             for (var i = 0; i < data.data.length; i++) {
