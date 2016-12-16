@@ -1,132 +1,164 @@
 /**
  * Created by patricio on 11/29/16.
  */
-var url = 'http://' + location.host + '/carriers/getBusMap/';
-var reports;
+var selecturl = 'http://' + location.host + '/carriers/getBusMapParameters';
+var reports = {};
 var map;
+var routeGroup;
 var categories = {};
 
+$(function () {
+    $('#date_init').datetimepicker({
+        defaultDate: moment().subtract(3, 'months'),
+        format: 'LL'
+    });
+    $('#date_end').datetimepicker({
+        defaultDate: moment(),
+        format: 'LL'
+    });
+    $("#filters").on("dp.change", function (e) {
+        reloadData();
+    });
+    $("#service").change(function () {
+        reloadData();
+    });
+    $("#plate").change(function () {
+        reloadData();
+    });
+    $("#comuna").change(function () {
+        reloadData();
+    });
+
+});
+
+
 $(document).ready(function () {
-    /**
-     * SET MAP
-     */
-    $(".select2_multiple").select2({
+    $(".select2_service").select2({
+        placeholder: "Todos los recorridos",
         allowClear: true
     });
-    $.getJSON(url)
+    $(".select2_plate").select2({
+        placeholder: "Todas las patentes",
+        allowClear: true
+    });
+    $(".select2_comuna").select2({
+        placeholder: "Todas las comunas",
+        allowClear: true
+    });
+
+    $.getJSON(selecturl)
         .done(function (data) {
-            reports = data;
-            rest();
-
-
+            console.log(data.types)
+            for (var key in data.types) {
+                categories[key] = {}
+                for (var i = 0; i < data.types[key].length; i++) {
+                    categories[key][data.types[key][i]] = L.layerGroup([]);
+                }
+            }
+            for (var i = 0; i < data.services.length; i++) {
+                reports[data.services[i]] = {};
+                reports[data.services[i]].routeLayer = L.layerGroup([]);
+                reports[data.services[i]].reportsLayer = {};
+                for (var cat in categories) {
+                    reports[data.services[i]].reportsLayer[cat] = {};
+                    for (var subcat in categories[cat]) {
+                        reports[data.services[i]].reportsLayer[cat][subcat] = L.layerGroup([]);
+                    }
+                }
+            }
+            fillSelect(data);
+            createMap();
         });
-})
-
-function rest() {
+});
+function createMap() {
     var beauchefLocation = L.latLng(-33.4579141, -70.6646977);
     map = L.map("mapid", {editable: true}).setView(beauchefLocation, 15);
 
-    var routeGroup = L.layerGroup([]);
-    var reportsGroup = L.layerGroup([]);
+
+    routeGroup = L.layerGroup([]);
+
 
     var overlays = {
         "ruta": routeGroup
     };
 
-    for (var key in reports.data) {
-        if (reports.data.hasOwnProperty(key)) {
-            markers = reports.data[key];
-            for (i = 0; i < markers.length; i++) {
-                if (!(markers[i].report.category in categories)) categories[markers[i].report.category] = {};
-                if (!(markers[i].report.type in categories[markers[i].report.category])) categories[markers[i].report.category][markers[i].report.type] = L.layerGroup([]);
-            }
-        }
-    }
     L.control.groupedLayers(overlays, categories, {groupCheckboxes: true}).addTo(map);
-
-    for (var key in reports.data) {
-
-        if (reports.data.hasOwnProperty(key)) {
-
-
-            reports.data[key].reportsLayer = {};
-            for (var cat in categories) {
-                reports.data[key].reportsLayer[cat] = {};
-                for (var subcat in categories[cat]) {
-                    reports.data[key].reportsLayer[cat][subcat] = L.layerGroup([]);
-                }
-            }
-            $('#service').append($('<option>', {
-                value: key,
-                text: key,
-            }));
-
-            markers = reports.data[key];
-            for (i = 0; i < markers.length; i++) {
-                var info = markers[i];
-                marker = L.marker([info.lat, info.lon], {}).bindPopup("Servicio: " + key + "<br>Fecha: " + info.report.timeStamp + "<br>Tipo: " + info.report.category + "-" + info.report.type);
-                reports.data[key].reportsLayer[markers[i].report.category][markers[i].report.type].addLayer(marker);
-            }
-            //reportsGroup.addLayer(reports.data[key].reportsLayer);
-            //reports.data[key].reportsLayer.addTo(map)
-        }
-    }
-
-
-    /**
-     * LOAD DATA
-     */
     GTFS.loadData(function () {
         var baseLayer = GTFS.setLayerControl(map);
-        for (var key in reports.data) {
+        for (var key in reports) {
             try {
-                if (reports.data.hasOwnProperty(key)) {
-                    reports.data[key].routeLayer = L.layerGroup([]);
-                    GTFS.drawRoutes(reports.data[key].routeLayer, GTFS.getRoutes([key + "I", key + "R"]));
-
-                    //reports.data[key].routeLayer.addTo(map)
-                    //routeGroup.addLayer(reports.data[key].routeLayer);
-
-                }
+                reports[key].routeLayer = L.layerGroup([]);
+                GTFS.drawRoutes(reports[key].routeLayer, GTFS.getRoutes([key + "I", key + "R"]));
             }
             catch (err) {
             }
         }
-
-        $("#service").change(function () {
-            updatemap(routeGroup, reportsGroup, reports);
-        });
-        var selectedItems = [];
-        var allOptions = $("#service option");
-        allOptions.each(function () {
-            selectedItems.push($(this).val());
-        });
-        $("#service").val(selectedItems).trigger("change");
     }, "/static/", "datasantiago");
 
-
+    reloadData();
 }
 
-function updatemap(routelayer, reportslayer, rep) {
-    routelayer.eachLayer(function (layer) {
-        map.removeLayer(layer);
-    });
+function fillSelect(d) {
+    for (var i = 0; i < d.services.length; i++) {
+        $('#service').append($('<option>', {
+            value: d.services[i],
+            text: d.services[i]
+        }));
+    }
+    for (var i = 0; i < d.plates.length; i++) {
+        $('#plate').append($('<option>', {
+            value: d.plates[i],
+            text: d.plates[i]
+        }));
+    }
+    for (var i = 0; i < d.comunas.length; i++) {
+        $('#comuna').append($('<option>', {
+            value: d.comunas[i],
+            text: d.comunas[i]
+        }));
+    }
+}
 
-    for (var cat in categories) {
-        for (var subcat in categories[cat]) {
-            categories[cat][subcat].eachLayer(function (layer) {
-                categories[cat][subcat].removeLayer(layer)
+function reloadData() {
+    var Dataurl = 'http://' + location.host + '/carriers/getBusMap/';
+    var data = {
+        date_init: $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD"),
+        date_end: $('#date_end').data("DateTimePicker").date().add(1, 'days').format("YYYY-MM-DD")
+    };
+    var service = $(".select2_service").val();
+    console.log(service)
+    var plate = $(".select2_plate").val();
+    var comuna = $(".select2_comuna").val();
+    if (service != null) data['service'] = JSON.stringify(service);
+    if (plate != null) data['plate'] = JSON.stringify(plate);
+    if (comuna != null) data['comuna'] = JSON.stringify(comuna);
+
+    $.getJSON(Dataurl, data)
+        .done(function (data) {
+            console.log(data);
+            routeGroup.eachLayer(function (layer) {
+                map.removeLayer(layer);
             });
-        }
-    }
-    var selected = $(".select2_multiple").val();
-    for (var i = 0; i < selected.length; i++) {
-        console.log(selected[i])
-        routelayer.addLayer(rep.data[selected[i]].routeLayer);
-        for (var cat in categories) {
-            for (var subcat in categories[cat]) {
-                categories[cat][subcat].addLayer(rep.data[selected[i]].reportsLayer[cat][subcat]);
+            for (var cat in categories) {
+                for (var subcat in categories[cat]) {
+                    categories[cat][subcat].eachLayer(function (layer) {
+                        categories[cat][subcat].removeLayer(layer)
+                    });
+                }
             }
-        }
-    }
+
+            for (var i = 0; i < service.length; i++) {
+                routeGroup.addLayer(reports[service[i]].routeLayer);
+            }
+
+            for (var key in data.data) {
+                for (var i = 0; i < data.data[key].length; i++) {
+                    var report = data.data[key][i];
+                    console.log(report)
+                    marker = L.marker([report.lat, report.lon], {}).bindPopup("Servicio: " + key + "<br>Fecha: " + report.report.timeStamp + "<br>Tipo: " + report.report.category + "-" + report.report.type);
+                    categories[report.report.category][report.report.type].addLayer(marker);
+                }
+            }
+
+        });
 }
