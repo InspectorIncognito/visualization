@@ -22,7 +22,7 @@ from pytz import timezone
 def add_time_periods(timestamp, minutes_to_filter):
 	counter = 0
 
-	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter), Q(transformed = False)|Q(transformed__isnull = True)):
+	for ev in EventForBusv2.objects.filter( Q(transformed = False)|Q(transformed__isnull = True) , timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter)):
 		# time_to_match = ev.timeCreation
 		# print(time_to_match)
 		time = ev.timeCreation.time().replace(microsecond=0)
@@ -46,7 +46,7 @@ def add_time_periods(timestamp, minutes_to_filter):
 	sys.stdout.flush()
 	counter = 0
 
-	for ev in EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter), Q(transformed = False)|Q(transformed__isnull = True)):
+	for ev in EventForBusStop.objects.filter(Q(transformed = False)|Q(transformed__isnull = True), timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter)):
 		# time_to_match = ev.timeCreation
 		# print(time_to_match)
 		time = ev.timeCreation.time().replace(microsecond=0)
@@ -78,6 +78,7 @@ def validate_plates(timestamp):
 		if bus.registrationPlate.upper() == 'DUMMYLPT':
 			bus.registrationPlate = "No Info."
 			counter = counter + 1
+			bus.transformed = True
 			bus.save()
 		elif regex.match(bus.registrationPlate.upper()) != None:
 			aa = bus.registrationPlate[:2].upper()
@@ -85,6 +86,7 @@ def validate_plates(timestamp):
 			num = bus.registrationPlate[4:]
 			bus.registrationPlate = aa+" "+bb+" "+num
 			counter = counter + 1
+			bus.transformed = True
 			bus.save()
 		else:
 			pass
@@ -96,7 +98,7 @@ def add_half_hour_periods(timestamp, minutes_to_filter):
 	
 	counter = 0
 
-	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter), Q(transformed = False)|Q(transformed__isnull = True)):
+	for ev in EventForBusv2.objects.filter(Q(transformed = False)|Q(transformed__isnull = True), timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter)):
 		time = ev.timeCreation.time().replace(microsecond=0)
 		hhperiod = HalfHourPeriod.objects.get(initial_time__lte = time , end_time__gte = time)
 		ev.half_hour_period = hhperiod
@@ -107,7 +109,7 @@ def add_half_hour_periods(timestamp, minutes_to_filter):
 	sys.stdout.flush()
 	counter = 0
 
-	for ev in EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter), Q(transformed = False)|Q(transformed__isnull = True)):
+	for ev in EventForBusStop.objects.filter(Q(transformed = False)|Q(transformed__isnull = True), timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter)):
 		time = ev.timeCreation.time().replace(microsecond=0)
 		hhperiod = HalfHourPeriod.objects.get(initial_time__lte = time , end_time__gte = time)
 		ev.half_hour_period = hhperiod
@@ -122,7 +124,7 @@ def add_report_info(timestamp, minutes_to_filter):
 
 	counter = 0
 
-	for report1 in Report.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter), Q(transformed = False)|Q(transformed__isnull = True)):
+	for report1 in Report.objects.filter(Q(transformed = False)|Q(transformed__isnull = True), timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter)):
 		try:
 			reportJson = json.loads(report1.reportInfo)
 			if 'bus' in reportJson:
@@ -138,6 +140,8 @@ def add_report_info(timestamp, minutes_to_filter):
 						busUUIDn = Busv2.objects.get(registrationPlate = plate).uuid
 				if reportJson['bus']['licensePlate'].upper() == "DUMMYLPT":
 					plate = reportJson['bus']['licensePlate'].upper()
+				if len(reportJson['bus']['service']) > 5:
+					reportJson['bus']['service'] = 'JAVA'
 				reportinfo = ReportInfo(
 					reportType = 'bus',
 					busUUID = busUUIDn,
@@ -169,6 +173,7 @@ def add_report_info(timestamp, minutes_to_filter):
 					)
 				reportinfo.save()
 				counter = counter + 1
+			report1.transformed = True
 		except ValueError:
 			pass
 
@@ -180,7 +185,7 @@ def add_county(timestamp, minutes_to_filter):
 
 	counter = 0
 
-	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp- timedelta(minutes=minutes_to_filter), Q(transformed = False)|Q(transformed__isnull = True)):
+	for ev in EventForBusv2.objects.filter(Q(transformed = False)|Q(transformed__isnull = True), timeStamp__gt = timestamp- timedelta(minutes=minutes_to_filter)):
 		zon = None
 		try:
 			statistic_data = StadisticDataFromRegistrationBus.objects.filter(reportOfEvent = ev).order_by('-timeStamp')[0]
@@ -198,7 +203,7 @@ def add_county(timestamp, minutes_to_filter):
 	sys.stdout.flush()
 	counter = 0
 	
-	for ev in EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter), Q(transformed = False)|Q(transformed__isnull = True)):
+	for ev in EventForBusStop.objects.filter(Q(transformed = False)|Q(transformed__isnull = True), timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter)):
 		zon = None
 		try:
 			statistic_data = StadisticDataFromRegistrationBusStop.objects.filter(reportOfEvent = ev).order_by('-timeStamp')[0]
@@ -207,6 +212,7 @@ def add_county(timestamp, minutes_to_filter):
 			pnt = Point(ev_long, ev_lat)
 			zon = zonificationTransantiago.objects.filter(geom__intersects = pnt)[0]
 			ev.zonification = zon
+			ev.transformed = True
 			ev.save()
 			counter = counter + 1
 		except:
@@ -225,6 +231,7 @@ def add_county(timestamp, minutes_to_filter):
 		except:
 			pass
 		ev.zonification = zon
+		ev.transformed = True
 		ev.save()
 
 	sys.stdout.write("\n ReportInfo rows modified: "+str(counter) + "\n")
@@ -238,9 +245,10 @@ def add_nearest_busstops(timestamp, minutes_to_filter):
 	counter = 0
 	last_bus_stop_events = EventForBusStop.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter)).values_list('busStop_id', flat=True)
 
-	for busstop in BusStop.objects.filter(code__in = last_bus_stop_events, Q(transformed = False)|Q(transformed__isnull = True)):
+	for busstop in BusStop.objects.filter(Q(transformed = False)|Q(transformed__isnull = True), code__in = last_bus_stop_events):
 		busstop.point = Point(busstop.longitud, busstop.latitud)
 		#print("creando point")
+		busstop.transformed = True
 		busstop.save()
 		counter = counter + 1
 		if counter%100==0:
@@ -253,7 +261,7 @@ def add_nearest_busstops(timestamp, minutes_to_filter):
 	sys.stdout.write("\r Rows modified: 0")
 	sys.stdout.flush()
 	counter = 0
-	for ev in EventForBusv2.objects.filter(timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter), Q(transformed = False)|Q(transformed__isnull = True)):
+	for ev in EventForBusv2.objects.filter(Q(transformed = False)|Q(transformed__isnull = True), timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter)):
 		nearest = []
 		statistic_data = StadisticDataFromRegistrationBus.objects.filter(reportOfEvent = ev).order_by('-timeStamp')[0]
 		ev_lat = statistic_data.latitud
@@ -264,6 +272,7 @@ def add_nearest_busstops(timestamp, minutes_to_filter):
 		nearest = sorted(busstopsdict, key = lambda busstop: busstop['distance'])
 		ev.busStop1 = BusStop.objects.get(code = nearest[0]['code'])
 		ev.busStop2 = BusStop.objects.get(code = nearest[1]['code'])
+		ev.transformed = True
 		ev.save()
 		counter = counter +1
 		if counter%100==0:
