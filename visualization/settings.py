@@ -143,11 +143,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
-#STATIC_ROOT = os.path.join(BASE_DIR, 'static/') #TODO USE STATIC ROOT IN PRODUCTION
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, 'static'),
 )
-
 LOGIN_URL = '/'
 
 MEDIA_URL = '/media/'
@@ -164,4 +162,3 @@ CRONTAB_COMMAND_SUFFIX = '2>&1'
 from visualization.keys.android_requests_backups import ANDROID_REQUESTS_BACKUPS
 from visualization.keys.android_requests_backups import android_requests_backups_update_jobs
 CRONJOBS = android_requests_backups_update_jobs(CRONJOBS)
-

@@ -27,12 +27,6 @@ $(function () {
     $("#filters").on("dp.change", function (e) {
         myFunction(true);
     });
-    $("#service").keyup(function () {
-        myFunction(true);
-    });
-    $("#plate").keyup(function () {
-        myFunction(false);
-    });
     $('#service').on("select2:select", function () {
         if ($(".select2_multiple").val()[0] == "Todos los recorridos") {
             $("#service").select2("val", "");
@@ -417,21 +411,42 @@ function myFunction(refresh) {
         .done(function (data) {
             console.log(data);
             if (refresh) {
-                $(".select2_plate").find("option").remove();
+                $(".select2_plate").find("option").remove().val("");
+                $("#plate").val(null).trigger("change");
+
                 $('.select2_plate').append($('<option>', {
                     value: "Todas las patentes",
                     text: "Todas las patentes",
                 }));
+                var top = [];
+                var bottom = [];
                 $.each(data.allplates, function (key, value) {
-                    var text = key;
-                    if (!value){
-                        text = text + " (No hay datos)";
+                    if (value) {
+                        top.push(key);
                     }
-                    $('.select2_plate').append($('<option>', {
-                        value: key,
-                        text: text
-                    }));
+                    else {
+                        bottom.push(key);
+                    }
                 })
+                top.sort();
+                values = [];
+                $.each(top, function (index, value) {
+                    if ($.inArray( value, plate ) >= 0){
+                        values.push(value);
+                    };
+                    $('.select2_plate').append($('<option>', {
+                        value: value,
+                        text: value,
+                    }));
+                });
+                bottom.sort();
+                $.each(bottom, function (index, value) {
+                    $('.select2_plate').append($('<option>', {
+                        value: value,
+                        text: value + " (No hay datos)",
+                    }));
+                });
+                $("#plate").val(values).trigger("change");
             }
             reloadchart();
             resp = data.reports;

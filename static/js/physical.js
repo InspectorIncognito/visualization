@@ -7,32 +7,35 @@ $(function () {
         defaultDate: moment(),
         format: 'LL'
     });
-    $('#hour1').datetimepicker({
-        defaultDate: moment().set({'hour': 0, 'minute': 0}),
-        format: 'LT'
-    });
-    $('#hour2').datetimepicker({
-        defaultDate: moment().set({'hour': 23, 'minute': 59}),
-        format: 'LT'
-    });
+    /*$('#hour1').datetimepicker({
+     defaultDate: moment().set({'hour': 0, 'minute': 0}),
+     format: 'LT'
+     });
+     $('#hour2').datetimepicker({
+     defaultDate: moment().set({'hour': 23, 'minute': 59}),
+     format: 'LT'
+     });*/
     $("#group :input").change(function () {
         updatechart();
     });
-    $("#filters :input").change(function () {
-        myFunction();
-    });
     $("#filters").on("dp.change", function (e) {
-        myFunction();
+        myFunction(true);
     });
-    $("#filters :input").keyup(function () {
-        myFunction();
+    $('#plate').on("select2:select", function () {
+        if ($(".select2_plate").val()[0] == "Todas las patentes") {
+            $("#plate").select2("val", "");
+        }
     });
-    myFunction();
+     $("#plate").change(function () {
+        myFunction(false);
+    });
+    myFunction(true);
 });
 $(document).ready(function () {
-    $(".select2_single").select2({});
-    $(".select2_group").select2({});
-    $(".select2_multiple").select2({});
+    $(".select2_plate").select2({
+        placeholder: "Todas las patentes",
+        allowClear: true
+    });
 });
 var resp = null;
 var types = 0;
@@ -276,27 +279,59 @@ function updateDate(n) {
 }
 
 
-function myFunction() {
+function myFunction(refresh) {
     var Dataurl = "http://" + location.host + "/carriers/getPhysicalData/";
     var data = {
-        carrier: '3',
         date_init: $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD"),
         date_end: $('#date_end').data("DateTimePicker").date().add(1, 'days').format("YYYY-MM-DD"),
-        hour1: 00,
-        hour2: 23,
-        minute1: 00,
-        minute2: 59
     };
-    /*
-     var service = $(".select2_multiple").val();
-     var plate = $(".select2_plate").val();
-     if (service != null) data['service'] = JSON.stringify(service);
-     if (plate != null) data['plate'] = JSON.stringify(plate);
-     */
+
+    var plate = $(".select2_plate").val();
+    if (plate != null) data['plate'] = JSON.stringify(plate);
+
 
     $.getJSON(Dataurl, data)
         .done(function (data) {
-            console.log(data)
+            console.log(data);
+            if (refresh) {
+                $(".select2_plate").find("option").remove().val("");
+                $("#plate").val(null).trigger("change");
+
+                $('.select2_plate').append($('<option>', {
+                    value: "Todas las patentes",
+                    text: "Todas las patentes",
+                }));
+                var top = [];
+                var bottom = [];
+                $.each(data.allplates, function (key, value) {
+                    if (value) {
+                        top.push(key);
+                    }
+                    else {
+                        bottom.push(key);
+                    }
+                });
+                top.sort();
+                values = [];
+                $.each(top, function (index, value) {
+                    if ($.inArray(value, plate) >= 0) {
+                        values.push(value);
+                    }
+                    ;
+                    $('.select2_plate').append($('<option>', {
+                        value: value,
+                        text: value,
+                    }));
+                });
+                bottom.sort();
+                $.each(bottom, function (index, value) {
+                    $('.select2_plate').append($('<option>', {
+                        value: value,
+                        text: value + " (No hay datos)",
+                    }));
+                });
+                $("#plate").val(values).trigger("change");
+            }
             reloadchart();
             resp = data.reports;
             types = data.types;

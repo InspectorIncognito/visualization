@@ -22,6 +22,7 @@ var table;
                     {title: "Fecha", data: 'timeCreation'},
                     {title: "Patente", data: 'plate'},
                     {title: "Servicio", data: 'service'},
+                    {title: "Dirección", data: 'direction'},
                     {title: "Comuna", data: 'commune'},
                     {title: "Paradero más cercano 1", data: 'busStop1'},
                     {title: "Paradero más cercano 2", data: 'busStop2'}

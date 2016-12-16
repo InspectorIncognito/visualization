@@ -61,6 +61,7 @@ function init() {
             {title: "Tipo de día", data: 'typeOfDay'},
             {title: "Período media hora", data: 'periodHour'},
             {title: "Servicio", data: 'service'},
+            {title: "Dirección", data: 'direction'},
             {title: "Patente", data: 'plate'},
             {title: "Comuna", data: 'commune'},
             {title: "Paradero más cercano 1", data: 'busStop1'},
