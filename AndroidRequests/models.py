@@ -34,6 +34,8 @@ class ReportInfo(models.Model):
     """ Link to the report """
     zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null=True)
     '''Indicates the zonification for the event'''
+    transformed = models.NullBooleanField(default=False, verbose_name=b'Transformed')
+    '''Indicates if the current row was transformed '''
 
     def getDictionary(self):
         dict = {}
@@ -213,6 +215,8 @@ class EventForBusStop(EventRegistration):
     '''Indicates the half hour time period of the event'''
     zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null=True)
     '''Indicates the zonification for the event'''
+    transformed = models.NullBooleanField(default=False, verbose_name=b'Transformed')
+    '''Indicates if the current row was transformed '''
 
 
 class EventForBus(EventRegistration):
@@ -324,7 +328,8 @@ class BusStop(Location):
     name = models.CharField('Name', max_length=70, null=False, blank=False)
     """ Name of the bus stop, indicating the streets """
     events = models.ManyToManyField(Event, verbose_name='Events', through=EventForBusStop)
-
+    transformed = models.NullBooleanField(default=False, verbose_name=b'Transformed')
+    '''Indicates if the current row was transformed '''
     point = models.PointField(srid=32140, verbose_name='The point', null=True)
 
     def getDictionary(self):
@@ -520,6 +525,8 @@ class Busv2(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     """ Unique ID to primarily identify Buses created without registrationPlate """
     # events = models.ManyToManyField(Event,  verbose_name='the event' ,through=EventForBus)
+    transformed = models.NullBooleanField(default=False, verbose_name=b'Transformed')
+    '''Indicates if the current row was transformed '''
 
 
 class Busassignment(models.Model):
@@ -745,6 +752,8 @@ class Report(models.Model):
     """ Aditinal information regarding the report. For example the user location."""
     userId = models.UUIDField()
     """ To identify the AndroidRequests owner """
+    transformed = models.NullBooleanField(default=False, verbose_name=b'Transformed')
+    '''Indicates if the current row was transformed '''
 
     def getDictionary(self):
         """ Return a dictionary with the event information """
