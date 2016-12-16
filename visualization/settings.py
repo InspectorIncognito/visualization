@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_crontab',
     'django.contrib.gis',
+    'AndroidRequestsBackups.apps.AndroidrequestsbackupsConfig',
 ]
 
 MIDDLEWARE = [
