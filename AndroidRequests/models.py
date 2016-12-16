@@ -294,7 +294,7 @@ class EventForBusv2(EventRegistration):
         #    direction = pose.token.direction
         #except:
         #    direction = "No info."
-        #dictionary['direction'] = direction if direction else "No info."
+        dictionary['direction'] = self.direction if self.direction else "No info."
         return dictionary
 
 
