@@ -145,18 +145,24 @@ function reloadData() {
                     });
                 }
             }
-
-            for (var i = 0; i < service.length; i++) {
-                routeGroup.addLayer(reports[service[i]].routeLayer);
-            }
-
-            for (var key in data.data) {
-                for (var i = 0; i < data.data[key].length; i++) {
-                    var report = data.data[key][i];
-                    marker = L.marker([report.lat, report.lon], {}).bindPopup("Servicio: " + key + "<br>Fecha: " + report.report.timeStamp + "<br>Tipo: " + report.report.category + "-" + report.report.type);
-                    categories[report.report.category][report.report.type].addLayer(marker);
+            if (service == null) {
+                for (var key in reports) {
+                    routeGroup.addLayer(reports[key].routeLayer);
                 }
             }
+            else {
+                for (var i = 0; i < service.length; i++) {
+                    routeGroup.addLayer(reports[service[i]].routeLayer);
+                }
+            }
+
+            for (var i = 0; i < data.data.length; i++) {
+                var report = data.data[i];
+                console.log(report)
+                marker = L.marker([report.lat, report.lon], {}).bindPopup("Servicio: " + report.report.service + "<br>Fecha: " + report.report.timeStamp + "<br>Tipo: " + report.report.category + "-" + report.report.type);
+                categories[report.report.category][report.report.type].addLayer(marker);
+            }
+
 
         });
 }
