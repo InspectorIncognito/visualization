@@ -135,7 +135,6 @@ function reloadData() {
 
     $.getJSON(Dataurl, data)
         .done(function (data) {
-            console.log(data);
             routeGroup.eachLayer(function (layer) {
                 map.removeLayer(layer);
             });
