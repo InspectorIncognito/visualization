@@ -81,9 +81,9 @@ def physical(request):
 
 @login_required
 def getPhysicalHeaders(request):
-    events = Event.objects.filter(category="estado físico", eventType="bus")
+    events = Event.objects.filter(category="estado físico", eventType="bus").exclude(id="evn00225")
     events = [event.name for event in events]
-    headerInfo = EventForBusv2.objects.filter(event__category='estado físico')
+    headerInfo = EventForBusv2.objects.filter(event__category='estado físico').exclude(event__id="evn00225")
     headerInfo = headerInfo.filter(
         busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
     today = date.today()
@@ -367,7 +367,7 @@ def getBusMap(request):
         comunas = json.loads(comunas)
         comunaFilter = reduce(lambda x, y: x | y,
                              [Q(reportOfEvent__zonification__comuna=comuna) for comuna in comunas])
-        query = query.filter(comunaFilter)  
+        query = query.filter(comunaFilter)
 
     data = {
         'data': [stadistic.getDictionary() for stadistic in query]
