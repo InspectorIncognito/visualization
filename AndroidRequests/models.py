@@ -291,6 +291,7 @@ class EventForBusv2(EventRegistration):
         #except:
         #    direction = "No info."
         #dictionary['direction'] = direction if direction else "No info."
+        dictionary['direction'] = "DOING"
         return dictionary
 
 
