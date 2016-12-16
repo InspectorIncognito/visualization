@@ -34,7 +34,7 @@ $(function () {
 
 $(document).ready(function () {
     $(".select2_service").select2({
-        placeholder: "Todos los recorridos",
+        placeholder: "Todos los servicios",
         allowClear: true
     });
     $(".select2_plate").select2({
