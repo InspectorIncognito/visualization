@@ -285,12 +285,12 @@ class EventForBusv2(EventRegistration):
         dictionary['typeOfDay'] = self.time_period.day_type if self.time_period else "No info."
         dictionary['periodHour'] = self.half_hour_period.name if self.half_hour_period else "No info."
         dictionary['periodTransantiago'] = self.time_period.name if self.time_period else "No info."
-        pose = PoseInTrajectoryOfToken.objects.filter(timeStamp__lte = self.timeStamp, token__userId=self.userId).order_by('-timeStamp').first()
-        try:
-            direction = pose.token.direction
-        except:
-            direction = "No info."
-        dictionary['direction'] = direction if direction else "No info."
+        #pose = PoseInTrajectoryOfToken.objects.filter(timeStamp__lte = self.timeStamp, token__userId=self.userId).order_by('-timeStamp').first()
+        #try:
+        #    direction = pose.token.direction
+        #except:
+        #    direction = "No info."
+        #dictionary['direction'] = direction if direction else "No info."
         return dictionary
 
 

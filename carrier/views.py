@@ -213,11 +213,20 @@ def getPhysicalTable(request):
         year = year - 1
     else:
         last_month = today.month - 3
+
+    events = Event.objects.filter(eventType="bus", category= "estado físico").exclude(id="evn00225")
+    events = events.distinct("name")
+
     query = query.filter(timeCreation__gte=date(year, last_month, today.day)).exclude(
         busassignment__uuid__registrationPlate__icontains="No Info.")
     query = query.order_by("event__name", "busassignment__uuid__registrationPlate", "-timeStamp").distinct(
         "event__name", "busassignment__uuid__registrationPlate")
-    query = query.filter(fixed=False)
+    query = query.filter(fixed=False).select_related("event")
+
+    name = request.GET.get('name')
+    if not name == "all":
+        query = query.filter(event__name__icontains = name)
+
     data = {
         'data': [report.getDictionary() for report in query]
     }
