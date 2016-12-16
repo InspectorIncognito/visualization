@@ -2,18 +2,18 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import uuid
+
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('AndroidRequests', '0006_auto_20160928_1306'),
+        ('AndroidRequests', '0011_auto_20161026_1241'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='token',
-            name='uuid',
-            field=models.UUIDField(default=uuid.uuid4, unique=True, editable=False),
+            model_name='report',
+            name='imageName',
+            field=models.CharField(default=None, max_length=100, null=True),
         ),
     ]
