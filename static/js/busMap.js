@@ -153,7 +153,7 @@ function reloadData() {
             for (var i = 0; i < data.data.length; i++) {
                 var report = data.data[i];
                 console.log(report)
-                marker = L.marker([report.lat, report.lon], {}).bindPopup("Servicio: " + key + "<br>Fecha: " + report.report.timeStamp + "<br>Tipo: " + report.report.category + "-" + report.report.type);
+                marker = L.marker([report.lat, report.lon], {}).bindPopup("Servicio: " + report.report.service + "<br>Fecha: " + report.report.timeStamp + "<br>Tipo: " + report.report.category + "-" + report.report.type);
                 categories[report.report.category][report.report.type].addLayer(marker);
             }
 
