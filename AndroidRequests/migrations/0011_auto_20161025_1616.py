@@ -37,17 +37,11 @@ def fill_tables(apps, schema_editor):
 	timeperiods(day_type = 'Domingo', name = 'Transicion domingo', initial_time = '21:00:00', end_time = '22:59:59').save()
 	timeperiods(day_type = 'Domingo', name = 'Pre nocturno domingo', initial_time = '23:00:00', end_time = '23:59:59').save()
 
-def getLastMigration():
-	cursor = connection.cursor()
-	cursor.execute(''' SELECT name FROM django_migrations WHERE app = 'AndroidRequests' ORDER BY id DESC''')
-	row = cursor.fetchone()
-	return row[0]
-
 
 class Migration(migrations.Migration):
 
     dependencies = [
-    	('AndroidRequests', getLastMigration()),
+    	('AndroidRequests', 'CHANGE_ME'),
     ]
 
     operations = [
