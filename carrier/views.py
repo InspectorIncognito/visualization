@@ -374,19 +374,6 @@ def getBusMap(request):
     }
     return JsonResponse(data, safe=False)
 
-
-@login_required
-def usageRecords(request):
-    # todo
-    pass
-
-
-@login_required
-def usersActivities(request):
-    # todo
-    pass
-
-
 # 4th function
 def getUsersActivities(request):
     if request.method == 'GET':
