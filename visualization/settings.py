@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/1.10/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
+import json
 import database
 import os
 
@@ -22,6 +23,29 @@ print (BASE_DIR)
 # SECURITY WARNING: keep the secret key used in production secret!
 with open(os.path.join(os.path.dirname(__file__), 'keys/secret_key.txt')) as file:
     SECRET_KEY = file.read().strip()
+
+# Define the user will receive email when server has an error
+with open(os.path.join(os.path.dirname(__file__), 'keys/admins.json')) as file:
+    adminsJson = json.load(file)['admins']
+    # print jsonAdmins
+    ADMINS = []
+    for user in adminsJson:
+        admin = (user['name'], user['email'])
+        ADMINS.append(admin)
+
+# Set email configuration to report errors
+with open(os.path.join(os.path.dirname(__file__), 'keys/email_config.json')) as file:
+    emailConfigJson = json.load(file)
+    EMAIL_HOST = emailConfigJson["EMAIL_HOST"]
+    EMAIL_PORT = emailConfigJson["EMAIL_PORT"]
+    EMAIL_USE_TSL = emailConfigJson["EMAIL_USE_TLS"]
+
+    EMAIL_HOST_USER = emailConfigJson["EMAIL_HOST_USER"]
+    EMAIL_HOST_PASSWORD = emailConfigJson["EMAIL_HOST_PASSWORD"]
+    SERVER_EMAIL = emailConfigJson["SERVER_EMAIL"]
+
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -43,6 +67,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_crontab',
     'django.contrib.gis',
+    'AndroidRequestsBackups.apps.AndroidrequestsbackupsConfig',
 ]
 
 MIDDLEWARE = [
@@ -129,37 +154,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_IMAGE = os.path.join(MEDIA_ROOT, "reported_images/")
 
 
-## ----------------------------------------------------------------------------
-## VIZ_BACKUP_APP
-## see also: AndroidRequestsBackups/REAME.md
-
-# Folder (full path) where to put backups on remote (TranSappViz) server.
-# Any file older than ANDROID_REQUESTS_BACKUPS_BKPS_LIFETIME days
-# will be deleted!
-# This value MUST match the one on the other server!, otherwise
-# really bad stuff might happen
-ANDROID_REQUESTS_BACKUPS_REMOTE_BKP_FLDR = "/home/transapp/bkps"
-
-# Amount of minutes to send to the remote (TranSappViz) server.
-# This value MUST match the one on the other server!, otherwise
-# some data can be lost
-ANDROID_REQUESTS_BACKUPS_TIME            = "5"
-
-# Amount of days to keep "complete backup" files. Older files are deleted.
-# This value is only valid for complete backups. Partial backups are only
-# kept for 1 day
-ANDROID_REQUESTS_BACKUPS_BKPS_LIFETIME   = "4"
-
-## ----------------------------------------------------------------------------
-
 # cron settings
-CRONJOBS = [
-
-    # check for complete updates every one hour
-    ('0 */1 * * *', 'AndroidRequestsBackups.jobs.complete_loaddata', '> /tmp/android_request_bkps_complete_loaddata_log.txt'),
-
-    # check for partial updates every 1 minute
-    ('*/1 * * * *', 'AndroidRequestsBackups.jobs.partial_loaddata',  '> /tmp/android_request_bkps_partial_loaddata_log.txt'),
-]
+CRONJOBS = []
 CRONTAB_LOCK_JOBS = True
 CRONTAB_COMMAND_SUFFIX = '2>&1'
+
+## load AndroidRequestsBackups settings
+from visualization.keys.android_requests_backups import ANDROID_REQUESTS_BACKUPS
+from visualization.keys.android_requests_backups import android_requests_backups_update_jobs
+CRONJOBS = android_requests_backups_update_jobs(CRONJOBS)

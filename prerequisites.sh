@@ -1,39 +1,32 @@
 
 #####################################################################
-# CONFIGURATION
-#####################################################################
-
-install_packages=true
-postgresql_configuration=true
-project_configuration=true
-apache_configuration=true
-import_data=true
-
-#####################################################################
 # REQUIREMENTS
 #####################################################################
-
-if $install_packages; then
-  sudo apt-get update
-  #install python and pip
-  sudo apt-get install python-pip python-dev libpq-dev
-  #install django
-  pip install django psycopg2
-  #install apache
-  sudo apt-get install apache2
-  #install postgres
-  sudo apt-get install postgresql postgresql-contrib
-  #install npm
-  sudo apt-get install nodejs
-  sudo apt-get install npm
-  #install bower
-  sudo npm install -g bower
-  bower install
-  #install postgis
-  sudo apt-get install postgis
-  #install gdal
-  sudo apt-get install binutils libproj-dev gdal-bin
-fi
+# Install all necesary things
+sudo apt-get update
+# install python and pip
+sudo apt-get --yes install python-pip python-dev libpq-dev
+# install django
+pip install -U Django
+# install postgres
+sudo apt-get --yes install postgresql postgresql-contrib
+# install npm
+sudo apt-get --yes install nodejs
+sudo apt-get --yes install npm
+sudo ln -s /usr/bin/nodejs /usr/bin/node
+# install bower
+sudo npm install -g bower
+bower install
+# install postgis
+sudo apt-get install postgis
+# install gdal
+sudo apt-get install --yes binutils libproj-dev gdal-bin
+sudo apt-get install --yes openssh-server
+pip install django-crontab
+pip install psycopg2
+pip install pytz
+# install apache
+sudo apt-get install --yes apache2 libapache2-mod-wsgi
 
 
 
