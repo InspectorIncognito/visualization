@@ -261,6 +261,10 @@ class EventForBusv2(EventRegistration):
     '''Indicates the 1 nearest bus stop'''
     busStop2 = models.ForeignKey('BusStop', verbose_name='Bus Stop2', related_name='busStop2', null=True)
     '''Indicates the 2 nearest bus stop'''
+    transformed = models.NullBooleanField(default=False, verbose_name=b'Transformed')
+    '''Indicates if the current row was transformed '''
+    direction = models.CharField(max_length=1, null=True)
+    ''' route direction that the bus was doing. It can be 'R' or 'I' '''
 
     def getDictionary(self):
         '''A dictionary with the event information'''
