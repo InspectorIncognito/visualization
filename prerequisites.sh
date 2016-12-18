@@ -16,7 +16,15 @@ sudo apt-get --yes install npm
 sudo ln -s /usr/bin/nodejs /usr/bin/node
 # install bower
 sudo npm install -g bower
-bower install
+# if scripts received a parameter, it is the linux user name where
+# will be installed the project. Bower doesn't let you install with 
+# sudo privileges
+if [ -z "$1" ]; then
+    LINUX_USER_NAME=$1
+    sudo -u "$LINUX_USER_NAME" bower install
+else
+    bower install
+fi
 # install postgis
 sudo apt-get install postgis
 # install gdal
