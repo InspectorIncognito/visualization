@@ -9,7 +9,11 @@ sudo apt-get --yes install python-pip python-dev libpq-dev
 # install django
 pip install -U Django
 # install postgres
-sudo apt-get --yes install postgresql postgresql-contrib
+sudo apt-get --yes install postgresql postgresql-contrib 
+# install phppgadmin
+sudo apt-get --yes install phppgadmin
+# configure phppgadmin to be accessible from public ip
+sed -i -e 's/Require local/Allow From all/g' /etc/apache2/conf-available/phppgadmin.conf
 # install npm
 sudo apt-get --yes install nodejs
 sudo apt-get --yes install npm
