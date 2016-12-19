@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.templatetags.static import static
 from django import forms
 from django.contrib.auth import authenticate
+from django.db.models import Q
 
 class Carrier(models.Model):
     name = models.CharField(max_length=100)
@@ -23,10 +24,10 @@ class CarrierUser(models.Model):
         return self.user.username
 
     def color(self):
-        return self.carrier.color_id
+        return Q(color_id=self.carrier.color_id)
 
-    def type(self):
-        return "carrier"
+    def isTransapp(self):
+        return False
 
     @property
     def string(self):
@@ -43,15 +44,15 @@ class TransappUser(models.Model):
     def __unicode__(self):
         return self.user.username
 
-    def type(self):
-        return "transapp"
+    def isTransapp(self):
+        return True
 
     def color(self):
-        return "all"
+        return Q()
 
     @property
     def string(self):
-        return self.user.username
+        return self.user.username.capitalize()
 
     @property
     def image(self):
@@ -64,15 +65,15 @@ class TransantiagoUser(models.Model):
     def __unicode__(self):
         return self.user.username
 
-    def type(self):
-        return "transantiago"
+    def isTransapp(self):
+        return False
 
     def color(self):
-        return "all"
+        return Q()
 
     @property
     def string(self):
-        return self.user.username
+        return self.user.username.capitalize()
 
     @property
     def image(self):

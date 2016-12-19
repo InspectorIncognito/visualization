@@ -47,9 +47,9 @@ $(document).ready(function () {
     $.fn.dataTable.moment('DD-MM-YYYY HH:mm:ss');
     table = $('#example').DataTable({
         scrollX: true,
-        "pageLength": 15,
+        pageLength: 15,
+        dom: 'Bfrtip',
         order: [[2, 'desc']],
-        responsive: true,
         ajax: 'http://' + location.host + '/carriers/getPhysicalTable/?name=all',
         columns: [
             {title: "Reporte", data: 'type'},
@@ -91,7 +91,7 @@ function fix() {
 setInterval(function () {
     updateheaders();
     table.ajax.reload();
-}, 30000);
+}, 3000);
 
 function changeUrl(key) {
     table.ajax.url('http://' + location.host + '/carriers/getPhysicalTable/?name=' + key).load();
