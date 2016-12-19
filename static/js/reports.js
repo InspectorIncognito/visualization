@@ -44,6 +44,7 @@ function init() {
             {title: "Mensaje", data: 'message'},
             {title: "Patente", data: 'registrationPlate'},
             {title: "Servicio", data: 'service'},
+            {title: "Dirección", data: 'direction'},
             {
                 title: 'Imagen',
                 render: function (data, type, row) {
@@ -70,7 +71,7 @@ function init() {
 }
 
 function openModal(imageName) {
-    $('#confirmationtext').html('<img src="'+imageName+'" alt="My image" style="display:block; width: auto; max-width: 100%; height: auto;"/>');
+    $('#confirmationtext').html('<img src="' + imageName + '" alt="My image" style="display:block; width: auto; max-width: 100%; height: auto;"/>');
     console.log(imageName);
     $("#myModal").modal();
 }
