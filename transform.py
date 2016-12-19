@@ -139,7 +139,7 @@ def add_report_info(timestamp, minutes_to_filter):
                     if reportJson['bus']['licensePlate'].upper() != "DUMMYLPT":
                         busUUIDn = Busv2.objects.get(registrationPlate = plate).uuid
                 if reportJson['bus']['licensePlate'].upper() == "DUMMYLPT":
-                    plate = reportJson['bus']['licensePlate'].upper()
+                    plate = reportJson['bus']['licensePlate'] = 'No Info.'
                 if len(reportJson['bus']['service']) > 5:
                     reportJson['bus']['service'] = 'JAVA'
                 reportinfo = ReportInfo(
