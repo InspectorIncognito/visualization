@@ -239,20 +239,35 @@ def add_county(timestamp, minutes_to_filter):
     sys.stdout.write("\n ReportInfo rows modified: "+str(counter) + "\n")
     sys.stdout.flush()
 
-def add_direction_eventforbus(timestamp, minutes_to_filter):
+def add_direction_eventforbus_reportinfo(timestamp, minutes_to_filter):
     counter = 0
     for ev in EventForBusv2.objects.filter(Q(transformed = False)|Q(transformed__isnull = True), timeStamp__gt = timestamp - timedelta(minutes=minutes_to_filter)):
         direction = None
         pose = PoseInTrajectoryOfToken.objects.filter(timeStamp__lte = ev.timeStamp, token__userId=ev.userId).order_by('-timeStamp').first()
         try:
             direction = pose.token.direction
-            counter = counter + 100
+            counter = counter + 1
         except:
             pass
         ev.direction = direction
         ev.save()
     sys.stdout.write("\n EventForBus rows modified: "+str(counter) + "\n")
     sys.stdout.flush()
+
+    counter = 0
+    for report in ReportInfo.objects.filter(Q(transformed = False)|Q(transformed__isnull = True), reportType='bus'):
+        direction = None
+        pose = PoseInTrajectoryOfToken.objects.filter(timeStamp__lte = report.report.timeStamp, token__userId=report.report.userId).order_by('-timeStamp').first()
+        try:
+            direction = pose.token.direction
+            counter = counter + 1
+        except:
+            pass
+        report.direction = direction
+        report.save()
+    sys.stdout.write("\n ReportInfo rows modified: "+str(counter) + "\n")
+    sys.stdout.flush()
+
 
 def add_nearest_busstops(timestamp, minutes_to_filter):
     sys.stdout.write("\nBusStop iteration\nTotal rows: "+str(BusStop.objects.all().count())+"\n")
@@ -329,5 +344,5 @@ if __name__ == '__main__':
     add_half_hour_periods(dttz, minutes_to_filter)
     add_report_info(dttz, minutes_to_filter)
     add_county(dttz, minutes_to_filter)
-    add_direction_eventforbus(dttz, minutes_to_filter)
+    add_direction_eventforbus_reportinfo(dttz, minutes_to_filter)
     add_nearest_busstops(dttz, minutes_to_filter)

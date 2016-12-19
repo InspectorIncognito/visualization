@@ -8,6 +8,7 @@ def fill_tables(apps, schema_editor):
 
     tokentrajectory =  apps.get_model('AndroidRequests', 'PoseInTrajectoryOfToken')
     evs =  apps.get_model('AndroidRequests', 'EventForBusv2')
+    reports =  apps.get_model('AndroidRequests', 'ReportInfo')
 
     for ev in evs.objects.all():
         direction = None
@@ -19,6 +20,15 @@ def fill_tables(apps, schema_editor):
         ev.direction = direction
         ev.save()
 
+    for report in reports.objects.filter(reportType='bus'):
+        direction = None
+        pose = tokentrajectory.objects.filter(timeStamp__lte = report.report.timeStamp, token__userId=report.report.userId).order_by('-timeStamp').first()
+        try:
+            direction = pose.token.direction
+        except:
+            pass
+        report.direction = direction
+        report.save()
 
 
 class Migration(migrations.Migration):
@@ -30,6 +40,11 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='eventforbusv2',
+            name='direction',
+            field=models.CharField(max_length=1, null=True),
+        ),
+        migrations.AddField(
+            model_name='reportinfo',
             name='direction',
             field=models.CharField(max_length=1, null=True),
         ),

@@ -14,11 +14,11 @@ def fill_tables(apps, schema_editor):
     statisticsfrombusstop = apps.get_model('AndroidRequests', 'StadisticDataFromRegistrationBusStop')
     zonification = apps.get_model('AndroidRequests', 'zonificationTransantiago')
 
-    for st in statisticsfrombus.objects.all():
-        aux = st.latitud
-        st.latitud = st.longitud
-        st.longitud = aux
-        st.save()
+    # for st in statisticsfrombus.objects.all():
+    #     aux = st.latitud
+    #     st.latitud = st.longitud
+    #     st.longitud = aux
+    #     st.save()
 
     print("ZONIFICACION DE EVENTS FOR BUS")
     for ev in eventsforbusv2.objects.all():

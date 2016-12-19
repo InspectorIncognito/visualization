@@ -36,6 +36,8 @@ class ReportInfo(models.Model):
     '''Indicates the zonification for the event'''
     transformed = models.NullBooleanField(default=False, verbose_name=b'Transformed')
     '''Indicates if the current row was transformed '''
+    direction = models.CharField(max_length=1, null=True)
+    ''' route direction that the bus was doing. It can be 'R' or 'I' '''
 
     def getDictionary(self):
         dict = {}
