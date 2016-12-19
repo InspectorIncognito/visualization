@@ -47,6 +47,7 @@ class ReportInfo(models.Model):
         dict["imageName"] = report["imageName"]
         dict["timeStamp"] = report["timeStamp"]
         dict["message"] = report["message"]
+        dict["direction"] = self.direction if self.direction else "No Info."
         return dict
 
 class TimePeriod(models.Model):
