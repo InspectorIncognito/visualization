@@ -11,7 +11,7 @@ import pytz
 django.setup()
 from AndroidRequests.models import EventForBusv2, EventForBusStop, TimePeriod, \
     Busv2, HalfHourPeriod, Report, ReportInfo, StadisticDataFromRegistrationBus, \
-    StadisticDataFromRegistrationBusStop, BusStop, zonificationTransantiago
+    StadisticDataFromRegistrationBusStop, BusStop, zonificationTransantiago, PoseInTrajectoryOfToken
 from django.contrib.gis.geos import Point
 from django.db.models import Q
 from datetime import datetime, time, date, timedelta
