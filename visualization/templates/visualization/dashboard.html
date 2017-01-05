@@ -25,7 +25,7 @@
         <div class="col-md-3 left_col menu_fixed">
             <div class="left_col scroll-view">
                 <div class="navbar nav_title" style="border: 0;">
-                    <a href="/" class="site_title"></i> <span>Menu</span></a>
+                    <a href="/" class="site_title"><i class="fa fa-desktop" style="border: 0;"> </i> <span> TranSapp </span></a>
                 </div>
 
                 <div class="clearfix"></div>
@@ -34,39 +34,57 @@
 
                 <!-- sidebar menu -->
                 <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-                    <div class="menu_section">
-                        <h3>General</h3>
+                    <div class="menu_section active">
+                        <h3>Monitoreo</h3>
                         <ul class="nav side-menu">
                             <li><a><i class="fa fa-user"></i> Conductor <span
                                     class="fa fa-chevron-down"></span></a>
                                 <ul class="nav child_menu">
-                                    <li><a href={% url 'driversTable' %}>Monitoreo</a>
+                                    <li><a href="{% url 'driversTable' %}">Lista de Reportes</a>
                                     </li>
-                                    <li><a href="{% url 'drivers' %}">Visualización</a>
+                                    <li><a href="{% url 'drivers' %}">Resumen de Conducta</a>
                                     </li>
                                 </ul>
                             </li>
                             <li><a><i class="fa fa-bus"></i> Bus <span
                                     class="fa fa-chevron-down"></span></a>
                                 <ul class="nav child_menu">
-                                    <li><a href={% url 'physicalTable' %}>Monitoreo</a></li>
-                                    <li><a href="{% url 'physical' %}">Visualización</a></li>
-
+                                    <li><a href="{% url 'physicalTable' %}">Lista de Eventos</a></li>
+                                    <li><a href="{% url 'physical' %}">Resumen de Eventos</a></li>
+                                    <li><a href="{% url 'reports' %}">Reportes Libres</a></li>
                                 </ul>
                             </li>
-                            <li><a><i class="fa fa-book"></i> Reportes Libres <span
+                            <li><a><i class="fa fa-road"></i> Paraderos <span
                                     class="fa fa-chevron-down"></span></a>
                                 <ul class="nav child_menu">
-                                    <li><a href={% url 'reports' %}>Bus</a></li>
-                                    <li><a href="#">Paradero</a></li>
-
+                                    <li><a href="#">Consultas de Paraderos</a></li>
+                                    <li><a href="#">Reportes Libres</a></li>
                                 </ul>
                             </li>
-                            <li><a><i class="fa fa-desktop"></i> General <span
+                            <li><a><i class="fa fa-users"></i> Usuarios <span
                                     class="fa fa-chevron-down"></span></a>
                                 <ul class="nav child_menu">
-                                    <li><a href="{% url 'busMap' %}">Mapa</a></li>
-                                    <li><a href="{% url 'fullTable' %}">Descarga de Datos</a></li>
+                                    <li><a href="#">Actividad</a></li>
+                                    <li><a href="#">Viajes</a></li>
+                                    <li><a href="#">Reportes</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="menu_section">
+                        <h3>Herramientas</h3>
+                        <ul class="nav side-menu">
+                            <li><a><i class="fa fa-map"></i> Mapas <span
+                                    class="fa fa-chevron-down"></span></a>
+                                <ul class="nav child_menu">
+                                    <li><a href="{% url 'busMap' %}">Mapa de Reportes</a></li>
+                                </ul>
+                            </li>
+                            <li><a><i class="fa fa-download"></i> Descargas <span
+                                    class="fa fa-chevron-down"></span></a>
+                                <ul class="nav child_menu">
+                                    <li><a href="{% url 'fullTable' %}">Descarga de Reportes</a></li>
                                 </ul>
                             </li>
                         </ul>
