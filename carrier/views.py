@@ -56,8 +56,13 @@ def getCount(request):
 
 
 @login_required
-def reports(request):
-    template = loader.get_template('reports.html')
+def busReports(request):
+    template = loader.get_template('busReports.html')
+    return HttpResponse(template.render(request=request))
+
+@login_required
+def busStopReports(request):
+    template = loader.get_template('busStopReports.html')
     return HttpResponse(template.render(request=request))
 
 
@@ -108,13 +113,26 @@ def getPhysicalHeaders(request):
 
 
 @login_required
-def getReports(request):
+def getBusReports(request):
     if request.method == 'GET':
         services = Service.objects.filter(filter(request))
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
         query = ReportInfo.objects.filter(reportType='bus', report__timeStamp__range=[date_init, date_end])
         query = query.filter(service__in=[service.service for service in services])
+        data = {
+            'data': [q.getDictionary() for q in query]
+        }
+        return JsonResponse(data, safe=False)
+
+@login_required
+def getBusStopReports(request):
+    if request.method == 'GET':
+        busstops = BusStop.objects.filter(filter(request))
+        date_init = request.GET.get('date_init')
+        date_end = request.GET.get('date_end')
+        query = ReportInfo.objects.filter(reportType='busStop', report__timeStamp__range=[date_init, date_end])
+        query = query.filter(busStopCode__in=[busstop.code for busstop in busstops])
         data = {
             'data': [q.getDictionary() for q in query]
         }
@@ -127,10 +145,10 @@ def getDriversReport(request):
         events = Event.objects.filter(category="conductor")
         events = [event.name.capitalize() for event in events]
         pos = range(0, len(events))
-        eventToPos = {name: pos for name, pos in zip(events, pos)}
+        event_to_pos = {name: pos for name, pos in zip(events, pos)}
 
         def change(dict):
-            dict["type"] = eventToPos[dict["type"]]
+            dict["type"] = event_to_pos[dict["type"]]
             return dict
 
         date_init = request.GET.get('date_init')

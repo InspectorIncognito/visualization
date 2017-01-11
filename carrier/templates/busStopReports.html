@@ -1,7 +1,7 @@
 {% extends 'visualization/dashboard.html' %}
 {% load staticfiles %}
 {% block title %}
-    <title>Visualizador TranSapp</title>
+    <title>Reportes Libres de Paraderos - TranSapp</title>
 {% endblock title %}
 
 {% block topimports %}
@@ -27,7 +27,7 @@
     <div class="col-md-12 col-sm-12 col-xs-12">
     <div class="x_panel">
         <div class="x_title">
-            <h2>Reportes Libres</h2>
+            <h2>Reportes Libres de Paraderos - <i class="fa fa-wrench"></i> en desarrollo <i class="fa fa-wrench"></i></h2>
             <ul class="nav navbar-right panel_toolbox">
                 <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                 </li>
@@ -96,6 +96,8 @@
             </div>
         </div>
     </div>
+    </div>
+    </div>
 {% endblock maincontent %}
 
 {% block bottomimports %}
@@ -113,6 +115,6 @@
             src="https://cdn.datatables.net/v/bs/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.12/b-1.2.2/b-colvis-1.2.2/b-flash-1.2.2/b-html5-1.2.2/b-print-1.2.2/r-2.1.0/datatables.min.js"></script>
     <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script>
 
-    <script src="{% static 'js/reports.js' %}"></script>
+    <script src="{% static 'js/busStopReports.js' %}"></script>
 
 {% endblock bottomimports %}

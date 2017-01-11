@@ -1,11 +1,26 @@
-from django.conf.urls import url, include
-from django.contrib import admin
+from django.conf.urls import url
+# , include
+# from django.contrib import admin
 
 from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
-    url(r'^reports/$', views.reports, name='reports'),
+
+    # Driver
+
+    # Bus
+    url(r'^busReports/$', views.busReports, name='busReports'),
+    url(r'^getBusReports/$', views.getBusReports, name='getBusReports'),
+
+    # BusStop
+    url(r'^busStopReports/$', views.busStopReports, name='busStopReports'),
+    url(r'^getBusStopReports/$', views.getBusStopReports, name='getBusStopReports'),
+
+    # User
+
+
+    # Other
     url(r'^getCount/$', views.getCount, name='getCount'),
     url(r'^drivers/$', views.drivers, name='drivers'),
     url(r'^physical/$', views.physical, name='physical'),
@@ -15,7 +30,6 @@ urlpatterns = [
     url(r'^getPhysicalData/$', views.getPhysicalReport, name='gePhysicalReport'),
     url(r'^getDriversTable/$', views.getDriversTable, name='getDriversTable'),
     url(r'^getPhysicalTable/$', views.getPhysicalTable, name='getPhysicalTable'),
-    url(r'^getReports/$', views.getReports, name='getReports'),
     url(r'^getPhysicalHeaders/$', views.getPhysicalHeaders, name='getPhysicalHeaders'),
     url(r'^updatePhysical/$', views.updatePhysical, name='updatePhysical'),
     url(r'^fullTable/$', views.fullTable, name='fullTable'),

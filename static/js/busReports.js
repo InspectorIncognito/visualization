@@ -18,7 +18,7 @@ $(function () {
 
 var table;
 var fileName = "Reportes Libres";
-var url = 'http://' + location.host + '/carriers/getReports/';
+var url = 'http://' + location.host + '/carriers/getBusReports/';
 
 function init() {
     var date_init = $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD");

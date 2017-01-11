@@ -51,14 +51,18 @@
                                 <ul class="nav child_menu">
                                     <li><a href="{% url 'physicalTable' %}">Lista de Eventos</a></li>
                                     <li><a href="{% url 'physical' %}">Resumen de Eventos</a></li>
-                                    <li><a href="{% url 'reports' %}">Reportes Libres</a></li>
+                                    <li><a href="{% url 'busReports' %}">Reportes Libres</a></li>
+                                    <li><a href="{% url 'busMap' %}">Mapa de Reportes</a></li>
                                 </ul>
                             </li>
                             <li><a><i class="fa fa-road"></i> Paraderos <span
                                     class="fa fa-chevron-down"></span></a>
                                 <ul class="nav child_menu">
+                                    <li><a href="#">Lista de Eventos</a></li>
+                                    <li><a href="#">Resumen de Eventos</a></li>
                                     <li><a href="#">Consultas de Paraderos</a></li>
-                                    <li><a href="#">Reportes Libres</a></li>
+                                    <li><a href="{% url 'busStopReports' %}">Reportes Libres</a></li>
+                                    <li><a href="#">Mapa de Reportes</a></li>
                                 </ul>
                             </li>
                             <li><a><i class="fa fa-users"></i> Usuarios <span
@@ -75,16 +79,10 @@
                     <div class="menu_section">
                         <h3>Herramientas</h3>
                         <ul class="nav side-menu">
-                            <li><a><i class="fa fa-map"></i> Mapas <span
-                                    class="fa fa-chevron-down"></span></a>
-                                <ul class="nav child_menu">
-                                    <li><a href="{% url 'busMap' %}">Mapa de Reportes</a></li>
-                                </ul>
-                            </li>
                             <li><a><i class="fa fa-download"></i> Descargas <span
                                     class="fa fa-chevron-down"></span></a>
                                 <ul class="nav child_menu">
-                                    <li><a href="{% url 'fullTable' %}">Descarga de Reportes</a></li>
+                                    <li><a href="{% url 'fullTable' %}">Todos los Reportes</a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -110,7 +108,7 @@
                         <li class="">
                             <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
                                aria-expanded="false">
-                                <img src={{ user.getUser.image }} alt="" style="border-radius: 0px; width: 50px">
+                                <img src="{{ user.getUser.image }}" alt="" style="border-radius: 0; width: 50px">
                                 {{ user.getUser.string }}
                                 <span class=" fa fa-angle-down"></span>
                             </a>
