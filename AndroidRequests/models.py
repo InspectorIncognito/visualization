@@ -9,7 +9,7 @@ import logging
 
 
 # Create your models here.
-# Remembre to add new models to admin.py
+# Remember to add new models to admin.py
 
 class ReportInfo(models.Model):
     """ Table for the report info data in Report """
@@ -43,12 +43,15 @@ class ReportInfo(models.Model):
         dict = {}
         dict["registrationPlate"] = self.registrationPlate if self.registrationPlate else "No Info."
         dict["service"] = self.service if self.service else "No Info."
+        dict["busStopCode"] = self.busStopCode if self.busStopCode else "No Info."
         report = self.report.getDictionary()
         dict["imageName"] = report["imageName"]
         dict["timeStamp"] = report["timeStamp"]
         dict["message"] = report["message"]
+        dict["commune"] = self.zonification.comuna
         dict["direction"] = self.direction if self.direction else "No Info."
         return dict
+
 
 class TimePeriod(models.Model):
     """ Time period with standar names """

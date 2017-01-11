@@ -128,13 +128,13 @@ def getBusReports(request):
 @login_required
 def getBusStopReports(request):
     if request.method == 'GET':
-        busstops = BusStop.objects.filter(filter(request))
+        bus_stops = BusStop.objects.filter(filter(request))
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
         query = ReportInfo.objects.filter(reportType='busStop', report__timeStamp__range=[date_init, date_end])
-        query = query.filter(busStopCode__in=[busstop.code for busstop in busstops])
+        query = query.filter(busStopCode__in=[bus_stop.code for bus_stop in bus_stops])
         data = {
-            'data': [q.getDictionary() for q in query]
+            'data': [report_info.getDictionary() for report_info in query]
         }
         return JsonResponse(data, safe=False)
 
