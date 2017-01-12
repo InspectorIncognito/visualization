@@ -48,7 +48,7 @@ class ReportInfo(models.Model):
         dict["imageName"] = report["imageName"]
         dict["timeStamp"] = report["timeStamp"]
         dict["message"] = report["message"]
-        dict["commune"] = self.zonification.comuna
+        dict["commune"] = self.zonification.comuna if self.zonification else "No Info."
         dict["direction"] = self.direction if self.direction else "No Info."
         return dict
 

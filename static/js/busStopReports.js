@@ -51,7 +51,7 @@ function init() {
                     else
                         return "<span style='color:red'> No hay imagen </span>";
                 }
-            },
+            }
         ],
         language: {
             "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json",
@@ -64,7 +64,6 @@ function init() {
             }
         }
     });
-
 }
 
 function openModal(imageName) {

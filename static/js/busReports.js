@@ -32,11 +32,9 @@ function init() {
         order: [[0, "desc"]],
         dom: 'Bfrtip',
         buttons: [
-            {extend: 'copy', text: 'Copiar'}, {
-                extend: 'csv',
-                filename: fileName
-            }, {extend: 'excel', filename: fileName},
-
+            {extend: 'copy', text: 'Copiar'},
+            {extend: 'csv', filename: fileName},
+            {extend: 'excel', filename: fileName}
         ],
         ajax: url + params,
         columns: [
@@ -71,7 +69,7 @@ function init() {
 }
 
 function openModal(imageName) {
-    $('#confirmationtext').html('<img src="' + imageName + '" alt="My image" style="display:block; width: auto; max-width: 100%; height: auto;"/>');
+    $('#confirmationtext').html('<img src="' + imageName + '" alt="No se puede cargar la imagen" style="display:block; width: auto; max-width: 100%; height: auto;"/>');
     console.log(imageName);
     $("#myModal").modal();
 }

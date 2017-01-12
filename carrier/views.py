@@ -5,7 +5,7 @@ from django.template import loader
 from AndroidRequests.models import *
 from django.http import JsonResponse
 from django.db.models import Q, Count
-from datetime import datetime, date, timedelta, time
+from datetime import datetime, date, timedelta
 from django.contrib.auth.decorators import login_required, user_passes_test
 import json, pytz
 from django.db.models import CharField, ExpressionWrapper, F
@@ -15,6 +15,7 @@ from pytz import timezone
 def filter(request):
     user = request.user.getUser()
     return user.color()
+
 
 def is_transapp(user):
     if user.is_authenticated:
