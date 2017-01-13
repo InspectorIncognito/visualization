@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 import uuid
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -11,7 +12,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-    	migrations.AlterField(
+        migrations.AlterField(
             model_name='bus',
             name='uuid',
             field=models.UUIDField(default=uuid.uuid4, editable=False),

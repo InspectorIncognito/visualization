@@ -5,36 +5,36 @@ from __future__ import unicode_literals
 from django.db import migrations
 
 def fill_tables(apps, schema_editor):
-	eventsforbusv2 = apps.get_model('AndroidRequests', 'EventForBusv2')
-	eventsforbusstop = apps.get_model('AndroidRequests', 'EventForBusStop')
-	busv2 = apps.get_model('AndroidRequests', 'Busv2')
-	reports = apps.get_model('AndroidRequests', 'Report')
-	reportsinfo = apps.get_model('AndroidRequests', 'ReportInfo')
-	busesstops = apps.get_model('AndroidRequests', 'BusStop')
+    eventsforbusv2 = apps.get_model('AndroidRequests', 'EventForBusv2')
+    eventsforbusstop = apps.get_model('AndroidRequests', 'EventForBusStop')
+    busv2 = apps.get_model('AndroidRequests', 'Busv2')
+    reports = apps.get_model('AndroidRequests', 'Report')
+    reportsinfo = apps.get_model('AndroidRequests', 'ReportInfo')
+    busesstops = apps.get_model('AndroidRequests', 'BusStop')
 
-	for ev in eventsforbusv2.objects.all():
-		ev.transformed = True
-		ev.save()
+    for ev in eventsforbusv2.objects.all():
+        ev.transformed = True
+        ev.save()
 
-	for ev in eventsforbusstop.objects.all():
-		ev.transformed = True
-		ev.save()
+    for ev in eventsforbusstop.objects.all():
+        ev.transformed = True
+        ev.save()
 
-	for ev in busv2.objects.all():
-		ev.transformed = True
-		ev.save()
+    for ev in busv2.objects.all():
+        ev.transformed = True
+        ev.save()
 
-	for ev in reports.objects.all():
-		ev.transformed = True
-		ev.save()
+    for ev in reports.objects.all():
+        ev.transformed = True
+        ev.save()
 
-	for ev in reportsinfo.objects.all():
-		ev.transformed = True
-		ev.save()
+    for ev in reportsinfo.objects.all():
+        ev.transformed = True
+        ev.save()
 
-	for ev in busesstops.objects.all():
-		ev.transformed = True
-		ev.save()
+    for ev in busesstops.objects.all():
+        ev.transformed = True
+        ev.save()
 
 class Migration(migrations.Migration):
 
@@ -43,5 +43,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-    	migrations.RunPython(fill_tables, reverse_code=migrations.RunPython.noop),
+        migrations.RunPython(fill_tables, reverse_code=migrations.RunPython.noop),
     ]

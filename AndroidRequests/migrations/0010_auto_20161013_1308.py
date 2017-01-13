@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -22,6 +23,9 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='stadisticdatafromregistrationbus',
             name='reportOfEvent',
-            field=models.ForeignKey(verbose_name=b'Bus Event', to='AndroidRequests.EventForBusv2', null=False),
+            field=models.ForeignKey(
+                verbose_name=b'Bus Event',
+                to='AndroidRequests.EventForBusv2',
+                null=False),
         ),
     ]

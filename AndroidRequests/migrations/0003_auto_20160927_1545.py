@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
+from django.db import migrations
 import uuid
 import AndroidRequests.constants as Constants
 
-#Generate an unique UUID for every distinct license plate except the dummy ones
 
 def gen_uuid(apps, schema_editor):
     MyModel = apps.get_model('AndroidRequests', 'bus')
@@ -22,6 +21,7 @@ def gen_uuid(apps, schema_editor):
             uuidsArray[row.registrationPlate] = puuid
         row.save()
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -29,5 +29,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-    	migrations.RunPython(gen_uuid, reverse_code=migrations.RunPython.noop),
+        migrations.RunPython(gen_uuid, reverse_code=migrations.RunPython.noop),
     ]

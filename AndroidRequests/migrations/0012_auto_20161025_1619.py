@@ -16,15 +16,24 @@ def fill_tables(apps, schema_editor):
         time = ev.timeCreation.time().replace(microsecond=0)
         timeperiod = None
         if ev.timeCreation.strftime("%A") == 'Saturday':
-            timeperiod = timeperiods.objects.get(day_type = 'Sabado',\
-                initial_time__lte = time , end_time__gte = time)
+            timeperiod = timeperiods.objects.get(
+                day_type = 'Sabado',
+                initial_time__lte = time ,
+                end_time__gte = time
+            )
         elif ev.timeCreation.strftime("%A") == 'Sunday':
-            timeperiod = timeperiods.objects.get(day_type = 'Domingo',\
-                initial_time__lte = time , end_time__gte = time)
+            timeperiod = timeperiods.objects.get(
+                day_type = 'Domingo',
+                initial_time__lte = time,
+                end_time__gte = time
+            )
         else:
             #Working day
-            timeperiod = timeperiods.objects.get(day_type = 'Laboral',\
-                initial_time__lte = time , end_time__gte = time)
+            timeperiod = timeperiods.objects.get(
+                day_type = 'Laboral',
+                initial_time__lte = time ,
+                end_time__gte = time
+            )
 
         ev.time_period = timeperiod
         ev.save()
@@ -35,15 +44,24 @@ def fill_tables(apps, schema_editor):
         time = ev.timeCreation.time().replace(microsecond=0)
         timeperiod = None
         if ev.timeCreation.strftime("%A") == 'Saturday':
-            timeperiod = timeperiods.objects.get(day_type = 'Sabado',\
-                initial_time__lte = time , end_time__gte = time)
+            timeperiod = timeperiods.objects.get(
+                day_type = 'Sabado',
+                initial_time__lte = time ,
+                end_time__gte = time
+            )
         elif ev.timeCreation.strftime("%A") == 'Sunday':
-            timeperiod = timeperiods.objects.get(day_type = 'Domingo',\
-                initial_time__lte = time , end_time__gte = time)
+            timeperiod = timeperiods.objects.get(
+                day_type = 'Domingo',
+                initial_time__lte = time ,
+                end_time__gte = time
+            )
         else:
             #Working day
-            timeperiod = timeperiods.objects.get(day_type = 'Laboral',\
-                initial_time__lte = time , end_time__gte = time)
+            timeperiod = timeperiods.objects.get(
+                day_type = 'Laboral',
+                initial_time__lte = time ,
+                end_time__gte = time
+            )
 
         ev.time_period = timeperiod
         ev.save()
@@ -58,13 +76,17 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='eventforbusv2',
             name='time_period',
-            field=models.ForeignKey(verbose_name=b'Time Period', to='AndroidRequests.TimePeriod', null = True),
+            field=models.ForeignKey(verbose_name=b'Time Period',
+                                    to='AndroidRequests.TimePeriod',
+                                    null = True),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='eventforbusstop',
             name='time_period',
-            field=models.ForeignKey(verbose_name=b'Time Period', to='AndroidRequests.TimePeriod', null = True),
+            field=models.ForeignKey(verbose_name=b'Time Period',
+                                    to='AndroidRequests.TimePeriod',
+                                    null = True),
             preserve_default=False,
         ),
         migrations.RunPython(fill_tables, reverse_code=migrations.RunPython.noop),
@@ -72,12 +94,16 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='eventforbusv2',
             name='time_period',
-            field=models.ForeignKey(verbose_name=b'Time Period', to='AndroidRequests.TimePeriod', null = False),
+            field=models.ForeignKey(verbose_name=b'Time Period',
+                                    to='AndroidRequests.TimePeriod',
+                                    null = False),
         ),
         migrations.AlterField(
             model_name='eventforbusstop',
             name='time_period',
-            field=models.ForeignKey(verbose_name=b'Time Period', to='AndroidRequests.TimePeriod', null = False),
+            field=models.ForeignKey(verbose_name=b'Time Period',
+                                    to='AndroidRequests.TimePeriod',
+                                    null = False),
         ),
         migrations.AddField(
             model_name='eventforbus',
