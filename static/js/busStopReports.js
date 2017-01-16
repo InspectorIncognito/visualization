@@ -25,7 +25,7 @@ function init() {
     var date_end = $('#date_end').data("DateTimePicker").date().add(1, 'days').format("YYYY-MM-DD");
     var params = '?date_init=' + date_init + '&date_end=' + date_end;
     $.fn.dataTable.moment('DD-MM-YYYY HH:mm:ss');
-    table = $('#example').DataTable({
+    table = $('#bus-stop-reports-table').DataTable({
         scrollX: true,
         pageLength: 15,
         order: [[0, "desc"]],
@@ -37,19 +37,38 @@ function init() {
         ],
         ajax: url + params,
         columns: [
-            {title: "Fecha", data: 'timeStamp'},
-            {title: "Mensaje", data: 'message'},
-            {title: "Paradero", data: 'busStopCode'},
-            {title: "Ubicación", data: 'busStopName'},
-            {title: "Comuna", data: 'commune'},
+            {
+                title: "Fecha",
+                data: 'timeStamp'
+            },
+            {
+                title: "Mensaje",
+                data: 'message',
+                render: $.fn.dataTable.render.ellipsis( 40, true, false)
+            },
+            {
+                title: "Paradero",
+                data: 'busStopCode'
+            },
+            {
+                title: "Ubicación",
+                data: 'busStopName',
+                render: $.fn.dataTable.render.ellipsis( 30, true, false)
+            },
+            {
+                title: "Comuna",
+                data: 'commune'
+            },
             {
                 title: 'Imagen',
+                class: "text-center",
                 render: function (data, type, row) {
                     if (row.imageName != "no image") {
-                        return '<button type="button" class="btn-xs btn-primary" onclick="openModal(\'' + row.imageName + '\')"> Ver imagen </button>';
+                        return '<button type="button" class="btn-xs btn-primary" onclick="openModal(\'' + row.imageName + '\')"> Ver Imagen </button>';
                     }
                     else
-                        return "<span style='color:red'> No hay imagen </span>";
+                        // return "<span style='color:red'> No hay </span>";
+                        return "No hay";
                 }
             }
         ],

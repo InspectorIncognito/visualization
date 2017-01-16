@@ -48,8 +48,10 @@ class ReportInfo(models.Model):
         res["busStopName"] = "No Info."
         if self.busStop:
             busstop = self.busStop.getDictionary()
-            res["busStopCode"] = busstop["codeBusStop"]
-            res["busStopName"] = busstop["nameBusStop"]
+            code = busstop["codeBusStop"]
+            name = busstop["nameBusStop"]
+            res["busStopCode"] = code
+            res["busStopName"] = name.replace(code + "-", "", 1)
 
         report = self.report.getDictionary()
         res["imageName"] = report["imageName"]
