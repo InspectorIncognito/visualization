@@ -156,7 +156,7 @@ def add_report_info(timestamp, minutes_to_filter):
             elif 'bus_stop' in reportJson:
                 reportinfo = ReportInfo(
                     reportType = 'busStop',
-                    busStopCode = reportJson['bus_stop']['id'],
+                    busStop_id = reportJson['bus_stop']['id'],
                     latitud = reportJson['bus_stop']['latitude'],
                     longitud = reportJson['bus_stop']['longitude'],
                     report = report1,
@@ -166,7 +166,7 @@ def add_report_info(timestamp, minutes_to_filter):
             elif 'busStop' in reportJson:
                 reportinfo = ReportInfo(
                     reportType = 'busStop',
-                    busStopCode = reportJson['busStop']['id'],
+                    busStop_id = reportJson['busStop']['id'],
                     latitud = reportJson['busStop']['latitude'],
                     longitud = reportJson['busStop']['longitude'],
                     report = report1,

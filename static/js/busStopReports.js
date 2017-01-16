@@ -10,7 +10,7 @@ $(function () {
     $("#filters :input").change(function () {
         myFunction();
     });
-    $("#filters").on("dp.change", function (e) {
+    $("#filters").on("dp.change", function () {
         myFunction();
     });
     init();
@@ -25,7 +25,6 @@ function init() {
     var date_end = $('#date_end').data("DateTimePicker").date().add(1, 'days').format("YYYY-MM-DD");
     var params = '?date_init=' + date_init + '&date_end=' + date_end;
     $.fn.dataTable.moment('DD-MM-YYYY HH:mm:ss');
-    var i = 0;
     table = $('#example').DataTable({
         scrollX: true,
         pageLength: 15,
@@ -41,6 +40,7 @@ function init() {
             {title: "Fecha", data: 'timeStamp'},
             {title: "Mensaje", data: 'message'},
             {title: "Paradero", data: 'busStopCode'},
+            {title: "Ubicación", data: 'busStopName'},
             {title: "Comuna", data: 'commune'},
             {
                 title: 'Imagen',

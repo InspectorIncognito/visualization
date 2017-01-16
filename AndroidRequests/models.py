@@ -24,7 +24,7 @@ class ReportInfo(models.Model):
     """ Bus service """
     registrationPlate = models.CharField(max_length=8)
     """ Bus registrationplate """
-    busStopCode = models.CharField('Code', max_length=6, null=True)  # For example PA443    
+    busStop = models.ForeignKey('BusStop', null=True)
     """ Bus stop code"""
     longitud = models.FloatField('Longitude', null=False, blank=False)
     """ longitude from the geolocation """
@@ -40,17 +40,26 @@ class ReportInfo(models.Model):
     ''' route direction that the bus was doing. It can be 'R' or 'I' '''
 
     def getDictionary(self):
-        dict = {}
-        dict["registrationPlate"] = self.registrationPlate if self.registrationPlate else "No Info."
-        dict["service"] = self.service if self.service else "No Info."
-        dict["busStopCode"] = self.busStopCode if self.busStopCode else "No Info."
+        res = dict()
+        res["registrationPlate"] = self.registrationPlate if self.registrationPlate else "No Info."
+        res["service"] = self.service if self.service else "No Info."
+
+        res["busStopCode"] = "No Info."
+        res["busStopName"] = "No Info."
+        if self.busStop:
+            busstop = self.busStop.getDictionary()
+            res["busStopCode"] = busstop["codeBusStop"]
+            res["busStopName"] = busstop["nameBusStop"]
+
         report = self.report.getDictionary()
-        dict["imageName"] = report["imageName"]
-        dict["timeStamp"] = report["timeStamp"]
-        dict["message"] = report["message"]
-        dict["commune"] = self.zonification.comuna if self.zonification else "No Info."
-        dict["direction"] = self.direction if self.direction else "No Info."
-        return dict
+        res["imageName"] = report["imageName"]
+        res["timeStamp"] = report["timeStamp"]
+        res["message"] = report["message"]
+        res["reportType"] = self.reportType
+
+        res["commune"] = self.zonification.comuna if self.zonification else "No Info."
+        res["direction"] = self.direction if self.direction else "No Info."
+        return res
 
 
 class TimePeriod(models.Model):
@@ -122,7 +131,7 @@ class Event(models.Model):
 
     def getDictionary(self):
         """ Return a dictionary with the event information """
-        dictionary = {}
+        dictionary = dict()
         dictionary['name'] = self.name
         dictionary['description'] = self.description
         dictionary['eventcode'] = self.id
@@ -162,7 +171,7 @@ class StadisticDataFromRegistrationBus(StadisticDataFromRegistration):
     """ distance from the report to the bus GPS """
 
     def getDictionary(self):
-        dictionary = {}
+        dictionary = dict()
         dictionary["lat"] = self.latitud
         dictionary["lon"] = self.longitud
         dictionary["report"] = self.reportOfEvent.getDictionary()
@@ -175,7 +184,7 @@ class StadisticDataFromRegistrationBusStop(StadisticDataFromRegistration):
 
 
 class EventRegistration(models.Model):
-    '''This model stores the reports of events coming from the passagers of the system of public transport buses.'''
+    """This model stores the reports of events coming from the passagers of the system of public transport buses."""
     timeStamp = models.DateTimeField('Time Stamp')  # lastime it was updated
     """ Specific date time when the server received the event registration """
     timeCreation = models.DateTimeField('Creation Time')  # the date and time when it was first reported
@@ -194,8 +203,8 @@ class EventRegistration(models.Model):
         abstract = True
 
     def getDictionary(self):
-        '''A dictionary with the event information, just what was of interest to return to the app.'''
-        dictionary = {}
+        """A dictionary with the event information, just what was of interest to return to the app."""
+        dictionary = dict()
 
         dictionary['eventConfirm'] = self.eventConfirm
         dictionary['eventDecline'] = self.eventDecline
@@ -210,7 +219,7 @@ class EventRegistration(models.Model):
 
 
 class EventForBusStop(EventRegistration):
-    '''This model stores the reported events for the busStop'''
+    """This model stores the reported events for the busStop"""
     busStop = models.ForeignKey('BusStop', verbose_name='Bus Stop')
     '''Indicates the bus stop to which the event refers'''
     aditionalInfo = models.CharField('Additional Information', max_length=140, default='nothing')
@@ -226,13 +235,13 @@ class EventForBusStop(EventRegistration):
 
 
 class EventForBus(EventRegistration):
-    '''This model stores the reported events for the Bus'''
+    """This model stores the reported events for the Bus"""
     bus = models.ForeignKey('Bus', verbose_name='the bus')
     '''Indicates the bus to which the event refers'''
 
     def getDictionary(self):
-        '''A dictionary with the event information'''
-        dictionary = {}
+        """A dictionary with the event information"""
+        dictionary = dict()
 
         dictionary['eventConfirm'] = self.eventConfirm
         dictionary['eventDecline'] = self.eventDecline
@@ -258,7 +267,7 @@ class EventForBus(EventRegistration):
 
 
 class EventForBusv2(EventRegistration):
-    '''This model stores the reported events for the Bus'''
+    """This model stores the reported events for the Bus"""
     busassignment = models.ForeignKey('Busassignment', verbose_name='the bus')
     '''Indicates the bus to which the event refers'''
     time_period = models.ForeignKey('TimePeriod', verbose_name=b'Time Period', null=True)
@@ -277,8 +286,8 @@ class EventForBusv2(EventRegistration):
     ''' route direction that the bus was doing. It can be 'R' or 'I' '''
 
     def getDictionary(self):
-        '''A dictionary with the event information'''
-        dictionary = {}
+        """A dictionary with the event information"""
+        dictionary = dict()
 
         dictionary['eventConfirm'] = self.eventConfirm
         dictionary['eventDecline'] = self.eventDecline
@@ -299,11 +308,16 @@ class EventForBusv2(EventRegistration):
         dictionary['typeOfDay'] = self.time_period.day_type if self.time_period else "No info."
         dictionary['periodHour'] = self.half_hour_period.name if self.half_hour_period else "No info."
         dictionary['periodTransantiago'] = self.time_period.name if self.time_period else "No info."
-        #pose = PoseInTrajectoryOfToken.objects.filter(timeStamp__lte = self.timeStamp, token__userId=self.userId).order_by('-timeStamp').first()
-        #try:
-        #    direction = pose.token.direction
-        #except:
-        #    direction = "No info."
+
+        # pose = PoseInTrajectoryOfToken.objects.filter(
+        #               timeStamp__lte = self.timeStamp,
+        #               token__userId=self.userId)
+        #           .order_by('-timeStamp').first()
+        # try:
+        #     direction = pose.token.direction
+        # except:
+        #     direction = "No info."
+
         dictionary['direction'] = self.direction if self.direction else "No info."
         return dictionary
 
@@ -340,7 +354,7 @@ class BusStop(Location):
 
     def getDictionary(self):
         """usefull information regarding the bus."""
-        dictionary = {}
+        dictionary = dict()
 
         dictionary['codeBusStop'] = self.code
         dictionary['nameBusStop'] = self.name
@@ -388,7 +402,7 @@ class Bus(models.Model):
         unique_together = ('registrationPlate', 'service')
 
     def getDirection(self, pBusStop, pDistance):
-        """ Given a bus stop and the distance from the bus to the bus stop, return the address to which point the bus """
+        """Given a bus stop and the distance from the bus to the bus stop, return the address to which point the bus """
         try:
             serviceCode = ServicesByBusStop.objects.get(busStop=pBusStop, service=self.service).code
         except ServicesByBusStop.DoesNotExist:
@@ -397,7 +411,7 @@ class Bus(models.Model):
         try:
             serviceDistance = ServiceStopDistance.objects.get(busStop=pBusStop, service=serviceCode).distance
         except ServiceStopDistance.DoesNotExist:
-            raise ServiceDistanceNotFoundException( \
+            raise ServiceDistanceNotFoundException(
                 "The distance is not possible getting for bus stop '{}' and service '{}'".format(pBusStop, serviceCode))
 
         distance = serviceDistance - int(pDistance)
@@ -408,6 +422,8 @@ class Bus(models.Model):
         # get 2 locations lower than current location
 
         # we need two point to detect the bus direction (left, right, up, down)
+        greater = 0
+        lower = 0
         if len(greaters) > 0 and len(lowers) > 0:
             greater = greaters[0]
             lower = lowers[0]
@@ -434,12 +450,12 @@ class Bus(models.Model):
 
         epsilon = 0.00008
         x1 = lower.longitud
-        # y1 = lower.latitud
         x2 = greater.longitud
+        # y1 = lower.latitud
         # y2 = greater.latitud
 
-        if (abs(x2 - x1) >= epsilon):
-            if (x2 - x1 > 0):
+        if abs(x2 - x1) >= epsilon:
+            if x2 - x1 > 0:
                 return "right"
             else:
                 return "left"
@@ -447,7 +463,7 @@ class Bus(models.Model):
             # we compare bus location with bus stop location
             busStopObj = BusStop.objects.get(code=pBusStop)
             xBusStop = busStopObj.longitud
-            if (x2 - xBusStop > 0):
+            if x2 - xBusStop > 0:
                 return "left"
             else:
                 return "right"
@@ -461,13 +477,13 @@ class Bus(models.Model):
         lon = -500
         random = True
         for token in tokens:
-            if (not hasattr(token, 'activetoken')):
+            if not hasattr(token, 'activetoken'):
                 continue
             passengers += 1
             trajectoryQuery = PoseInTrajectoryOfToken.objects.filter(token=token)
             if trajectoryQuery.exists():
-                lastPose = trajectoryQuery.latest('timeStamp');
-                if (lastPose.timeStamp >= lastDate):
+                lastPose = trajectoryQuery.latest('timeStamp')
+                if lastPose.timeStamp >= lastDate:
                     lastDate = lastPose.timeStamp
                     lat = lastPose.latitud
                     lon = lastPose.longitud
@@ -480,7 +496,7 @@ class Bus(models.Model):
                 }
 
     def getEstimatedLocation(self, busstop, distance):
-        '''Given a distace from the bus to the busstop, this method returns the global position of the machine.'''
+        """Given a distance from the bus to the busstop, this method returns the global position of the machine."""
         try:
             serviceCode = ServicesByBusStop.objects.get(busStop=busstop, service=self.service).code
         except ServicesByBusStop.DoesNotExist:
@@ -499,7 +515,7 @@ class Bus(models.Model):
         except:
             closest_lt = 0
 
-        if (abs(closest_gt - ssd) < abs(closest_lt - ssd)):
+        if abs(closest_gt - ssd) < abs(closest_lt - ssd):
             closest = closest_gt
         else:
             closest = closest_lt
@@ -511,8 +527,8 @@ class Bus(models.Model):
                 }
 
     def getDictionary(self):
-        """ Return a dictionary with useful information about the bus """
-        dictionary = {}
+        """Return a dictionary with useful information about the bus"""
+        dictionary = dict()
 
         dictionary['serviceBus'] = self.service
         dictionary['registrationPlateBus'] = self.registrationPlate
@@ -523,7 +539,7 @@ class Bus(models.Model):
 class Busv2(models.Model):
     """Represent a bus like the unique combination of registration plate and service as one.
     So there can be two buses with the same service and two buses with the same registration plate.
-    The last thing means that one fisical bus can work in two different services."""
+    The last thing means that one physical bus can work in two different services."""
     registrationPlate = models.CharField(max_length=8)
     """ It's the registration plate for the bus, without hyphen """
     # service = models.CharField(max_length=5, null=False, blank=False)
@@ -538,7 +554,7 @@ class Busv2(models.Model):
 class Busassignment(models.Model):
     """Represent a bus like the unique combination of registration plate and service as one.
     So there can be two buses with the same service and two buses with the same registration plate.
-    The last thing means that one fisical bus can work in two different services."""
+    The last thing means that one physical bus can work in two different services."""
     # registrationPlate = models.CharField(max_length=8)
     """ It's the registration plate for the bus, without hyphen """
     service = models.CharField(max_length=5, null=False, blank=False)
@@ -551,7 +567,7 @@ class Busassignment(models.Model):
     #    unique_together = ('registrationPlate', 'service')
 
     def getDirection(self, pBusStop, pDistance):
-        """ Given a bus stop and the distance from the bus to the bus stop, return the address to which point the bus """
+        """Given a bus stop and the distance from the bus to the bus stop, return the address to which point the bus."""
         try:
             serviceCode = ServicesByBusStop.objects.get(busStop=pBusStop, service=self.service).code
         except ServicesByBusStop.DoesNotExist:
@@ -560,7 +576,7 @@ class Busassignment(models.Model):
         try:
             serviceDistance = ServiceStopDistance.objects.get(busStop=pBusStop, service=serviceCode).distance
         except ServiceStopDistance.DoesNotExist:
-            raise ServiceDistanceNotFoundException( \
+            raise ServiceDistanceNotFoundException(
                 "The distance is not possible getting for bus stop '{}' and service '{}'".format(pBusStop, serviceCode))
 
         distance = serviceDistance - int(pDistance)
@@ -571,6 +587,8 @@ class Busassignment(models.Model):
         # get 2 locations lower than current location
 
         # we need two point to detect the bus direction (left, right, up, down)
+        lower = 0
+        greater = 0
         if len(greaters) > 0 and len(lowers) > 0:
             greater = greaters[0]
             lower = lowers[0]
@@ -602,8 +620,8 @@ class Busassignment(models.Model):
         x2 = greater.longitud
         # y2 = greater.latitud
 
-        if (abs(x2 - x1) >= epsilon):
-            if (x2 - x1 > 0):
+        if abs(x2 - x1) >= epsilon:
+            if x2 - x1 > 0:
                 return "right"
             else:
                 return "left"
@@ -611,13 +629,14 @@ class Busassignment(models.Model):
             # we compare bus location with bus stop location
             busStopObj = BusStop.objects.get(code=pBusStop)
             xBusStop = busStopObj.longitud
-            if (x2 - xBusStop > 0):
+            if x2 - xBusStop > 0:
                 return "left"
             else:
                 return "right"
 
     def getLocation(self):
-        """This method estimate the location of a bus given one user that is inside or gives a geolocation estimated."""
+        """This method estimate the location of a bus given one user that is inside or gives a geo-location
+        estimated."""
         tokens = Token.objects.filter(busassignment=self)
         lastDate = timezone.now() - timezone.timedelta(minutes=5)
         passengers = 0
@@ -625,13 +644,13 @@ class Busassignment(models.Model):
         lon = -500
         random = True
         for token in tokens:
-            if (not hasattr(token, 'activetoken')):
+            if not hasattr(token, 'activetoken'):
                 continue
             passengers += 1
             trajectoryQuery = PoseInTrajectoryOfToken.objects.filter(token=token)
             if trajectoryQuery.exists():
-                lastPose = trajectoryQuery.latest('timeStamp');
-                if (lastPose.timeStamp >= lastDate):
+                lastPose = trajectoryQuery.latest('timeStamp')
+                if lastPose.timeStamp >= lastDate:
                     lastDate = lastPose.timeStamp
                     lat = lastPose.latitud
                     lon = lastPose.longitud
@@ -644,7 +663,7 @@ class Busassignment(models.Model):
                 }
 
     def getEstimatedLocation(self, busstop, distance):
-        '''Given a distace from the bus to the busstop, this method returns the global position of the machine.'''
+        """Given a distance from the bus to the bus stop, this method returns the global position of the machine."""
         try:
             serviceCode = ServicesByBusStop.objects.get(busStop=busstop, service=self.service).code
         except ServicesByBusStop.DoesNotExist:
@@ -663,7 +682,7 @@ class Busassignment(models.Model):
         except:
             closest_lt = 0
 
-        if (abs(closest_gt - ssd) < abs(closest_lt - ssd)):
+        if abs(closest_gt - ssd) < abs(closest_lt - ssd):
             closest = closest_gt
         else:
             closest = closest_lt
@@ -677,7 +696,7 @@ class Busassignment(models.Model):
 
     def getDictionary(self):
         """ Return a dictionary with useful information about the bus """
-        dictionary = {}
+        dictionary = dict()
 
         dictionary['serviceBus'] = self.service
         dictionary['registrationPlateBus'] = self.uuid.registrationPlate
@@ -686,8 +705,8 @@ class Busassignment(models.Model):
 
 
 class ServiceLocation(Location):
-    '''This models stores the position along the route of every bus at 20 meters apart.
-    You can give the distance from the start of the travel and it return the position at that distance.'''
+    """This models stores the position along the route of every bus at 20 meters apart.
+    You can give the distance from the start of the travel and it return the position at that distance."""
     service = models.CharField('Service Code', max_length=6, null=False, blank=False)  # Service code i.e. 506I or 506R
     """ Service code where the last character indicates its direction """
     distance = models.IntegerField('Route Distance')
@@ -698,8 +717,8 @@ class ServiceLocation(Location):
 
 
 class ServiceStopDistance(models.Model):
-    '''This model stores the distance for every bustop in every bus route for every service.
-    Given a bus direction code xxxI or xxxR or something alike.'''
+    """This model stores the distance for every busStop in every bus route for every service.
+    Given a bus direction code xxxI or xxxR or something alike."""
     busStop = models.ForeignKey(BusStop, verbose_name='Bus Stop')
     """ Bus stops where the service is stopped """
     service = models.CharField('Service Code', max_length=6, null=False, blank=False)  # Service code i.e. 506I or 506R
@@ -709,7 +728,7 @@ class ServiceStopDistance(models.Model):
 
 
 class Token(models.Model):
-    '''This table has all the tokens that have been used ever.'''
+    """This table has all the tokens that have been used ever."""
     token = models.CharField('Token', max_length=128, primary_key=True)
     '''Identifier for an incognito trip'''
     busassignment = models.ForeignKey(Busassignment, verbose_name='Bus')
@@ -721,18 +740,13 @@ class Token(models.Model):
     userId = models.UUIDField()
     """ To identify the data owner """
 
-    # uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    # ''' UUID to identify a dummy bus'''
-    def getBusesIn(self, pListOfServices):
-        """ return a list of buses that match with buses given as parameter """
-
 
 class PoseInTrajectoryOfToken(Location):
-    '''This stores all the poses of a trajectory. The trajectory can start on foot and end on foot.'''
+    """This stores all the poses of a trajectory. The trajectory can start on foot and end on foot."""
     timeStamp = models.DateTimeField(null=False, blank=False, db_index=True)
     """ Specific date time when the server received a pose in the trajectory """
     inVehicleOrNot = models.CharField(max_length=15)  # vehicle, non_vehicle
-    """ Identify if a pose was sended inside a vehicle or not """
+    """ Identify if a pose was sent inside a vehicle or not """
     token = models.ForeignKey(Token, verbose_name='Token')
 
     class Meta:
@@ -740,7 +754,7 @@ class PoseInTrajectoryOfToken(Location):
 
 
 class ActiveToken(models.Model):
-    '''This are the tokens that are currently beeing use to upload positions.'''
+    """This are the tokens that are currently being in use to upload positions."""
     timeStamp = models.DateTimeField('Time Stamp', null=False, blank=False)
     """ Specific date time when the server received the first pose in the trajectory, i.e. when the trip started """
     token = models.OneToOneField(Token, verbose_name='Token')
@@ -755,18 +769,21 @@ class Report(models.Model):
     imageName = models.CharField(max_length=100, default="no image", null=True)
     """ image name that was saved """
     reportInfo = models.TextField()
-    """ Aditinal information regarding the report. For example the user location."""
+    """ Additional information regarding the report. For example the user location."""
     userId = models.UUIDField()
     """ To identify the AndroidRequests owner """
     transformed = models.NullBooleanField(default=False, verbose_name=b'Transformed')
     '''Indicates if the current row was transformed '''
 
     def getDictionary(self):
-        """ Return a dictionary with the event information """
-        dictionary = {}
+        """Returns a dictionary with the event information"""
+        dictionary = dict()
         dictionary['message'] = self.message
-        dictionary['imageName'] = ("/media/reported_images/" + self.imageName) if (
-        self.imageName and self.imageName != "no image") else "no image"
+
+        if self.imageName and self.imageName != "no image":
+            dictionary['imageName'] = ("/media/reported_images/" + self.imageName)
+        else:
+            dictionary['imageName'] = "no image"
         stamp = timezone.localtime(self.timeStamp, pytz.timezone('Chile/Continental'))
         dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
         return dictionary
@@ -778,7 +795,7 @@ class Report(models.Model):
 #
 ##
 class NearByBusesLog(models.Model):
-    """ Register user request for bus stop """
+    """Registers an user request for bus stop"""
     timeStamp = models.DateTimeField('Time Stamp', null=False, blank=False)
     """ Specific date time when the server received the request """
     busStop = models.ForeignKey(BusStop, verbose_name='Bus Stop')
@@ -788,19 +805,15 @@ class NearByBusesLog(models.Model):
 
 
 class Route(Location):
-    """ Route for each service """
+    """Route for each service"""
     serviceCode = models.CharField(db_index=True, max_length=11, null=False, blank=False)
     """ Bus identifier """
     sequence = models.IntegerField('Sequence')
     """ point position in a route """
 
 
-##
-#
-# Zonification
-#
-##
 class zonificationTransantiago(models.Model):
+    """Zonification"""
     id = models.IntegerField(primary_key=True)
     area = models.FloatField()
     zona = models.FloatField()
