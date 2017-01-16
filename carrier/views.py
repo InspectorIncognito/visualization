@@ -133,7 +133,7 @@ def getBusStopReports(request):
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
         query = ReportInfo.objects.filter(reportType='busStop', report__timeStamp__range=[date_init, date_end])
-        #query = query.exclude(busStop_id=True)
+        query = query.exclude(busStop__isnull=True)
         data = {
             'data': [report_info.getDictionary() for report_info in query]
         }
