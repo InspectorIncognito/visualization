@@ -1,0 +1,16 @@
+
+
+.spinner {
+
+}
+
+.spinner:before {
+  background-color: rgba(23, 44, 49, 0.1);
+  border-radius: 6px;
+  top: -70px;
+  left: -70px;
+  height: 140px;
+  width: 140px;
+  position: absolute;
+  content: " ";
+}
