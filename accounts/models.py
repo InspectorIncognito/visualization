@@ -56,7 +56,7 @@ class TransappUser(models.Model):
 
     @property
     def image(self):
-        return static("images/bus01.png")
+        return static("carrier/images/bus01.png")
 
 
 class TransantiagoUser(models.Model):
@@ -77,7 +77,7 @@ class TransantiagoUser(models.Model):
 
     @property
     def image(self):
-        return static("images/bus01.png")
+        return static("carrier/images/bus01.png")
 
 class ProxyUser(User):
     class Meta:
