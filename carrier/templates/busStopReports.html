@@ -5,6 +5,7 @@
 {% endblock title %}
 
 {% block topimports %}
+
     <!-- Select2 -->
     <link href="{% static 'components/gentelella/vendors/select2/dist/css/select2.min.css' %}" rel="stylesheet">
     <!-- jQuery Script -->
@@ -15,6 +16,10 @@
     <!-- DataTables -->
     <link rel="stylesheet" type="text/css"
           href="https://cdn.datatables.net/v/bs/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.12/b-1.2.2/b-colvis-1.2.2/b-flash-1.2.2/b-html5-1.2.2/b-print-1.2.2/r-2.1.0/datatables.min.css"/>
+
+    <!-- baseline -->
+    <link href="{% static 'css/baseline.css' %}" rel="stylesheet">
+
 {% endblock topimports %}
 
 {% block toptiles %}
@@ -25,7 +30,7 @@
 {% block maincontent %}
     <div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
-    <div class="x_panel">
+    <div class="x_panel" id="main-content-panel">
         <div class="x_title">
             <h2>Reportes Libres de Paraderos</h2>
             <ul class="nav navbar-right panel_toolbox">
@@ -102,6 +107,9 @@
 
 {% block bottomimports %}
 
+    <!-- spinner -->
+    <script src="{% static 'components/spin.js/spin.min.js' %}"></script>
+
     <!-- bootstrap-datetimepicker -->
     <script src="{% static 'components/gentelella/vendors/moment/min/moment.min.js' %}"></script>
     <script src="{% static 'components/gentelella/vendors/moment/locale/es.js' %}"></script>
@@ -116,6 +124,11 @@
     <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script>
     <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.13/dataRender/ellipsis.js"></script>
 
+
+    <!-- TranSapp baseline -->
+    <script src="{% static 'js/baseline.js' %}"></script>
+
+    <!-- This view -->
     <script src="{% static 'js/busStopReports.js' %}"></script>
 
 {% endblock bottomimports %}

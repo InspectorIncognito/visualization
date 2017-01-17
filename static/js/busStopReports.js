@@ -1,3 +1,8 @@
+
+
+var spinner = new Spinner(spinner_options)
+    .spin(document.getElementById('main-content-panel'));
+
 $(function () {
     $('#date_init').datetimepicker({
         defaultDate: moment().subtract(3, 'months'),
@@ -82,7 +87,7 @@ function init() {
                 }
             }
         }
-    });
+    }).on("init.dt", function () { spinner.stop(); });
 }
 
 function openModal(imageName) {
