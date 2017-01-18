@@ -38,6 +38,10 @@ class ReportInfo(models.Model):
     '''Indicates if the current row was transformed '''
     direction = models.CharField(max_length=1, null=True)
     ''' route direction that the bus was doing. It can be 'R' or 'I' '''
+    userLatitude = models.FloatField(null=True)
+    """ the latitude of user who reported this """
+    userLongitude = models.FloatField(null=True)
+    """ the longitude of user who reported this """
 
     def getDictionary(self):
         res = dict()
@@ -58,7 +62,8 @@ class ReportInfo(models.Model):
         res["timeStamp"] = report["timeStamp"]
         res["message"] = report["message"]
         res["reportType"] = self.reportType
-
+        res["userLatitude"] = self.userLatitude
+        res["userLongitude"] = self.userLongitude
         res["commune"] = self.zonification.comuna if self.zonification else "No Info."
         res["direction"] = self.direction if self.direction else "No Info."
         return res

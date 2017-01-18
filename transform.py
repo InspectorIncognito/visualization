@@ -15,7 +15,6 @@ from AndroidRequests.models import EventForBusv2, EventForBusStop, TimePeriod, \
 from django.contrib.gis.geos import Point
 from django.db.models import Q
 from datetime import datetime, time, date, timedelta
-from sys import argv
 from pytz import timezone
 
 
@@ -156,6 +155,25 @@ def add_report_info(timestamp, minutes_to_filter):
         try:
             report_json = json.loads(report1.reportInfo)
 
+            # user location fields
+            user_latitude = None
+            user_longitude = None
+            if 'locationUser' in report_json:
+                user_location = report_json['locationUser']
+                if 'latitude' in user_location:
+                    lat_str = user_location['latitude']
+                    try:
+                        user_latitude = float(lat_str[2:])
+                    except:
+                        pass
+
+                if 'longitude' in user_location:
+                    lon_str = user_location['longitude']
+                    try:
+                        user_longitude = float(lon_str[2:])
+                    except:
+                        pass
+
             # bus and bus stop fields
             if 'bus' in report_json:
                 aa = report_json['bus']['licensePlate'][:2].upper()
@@ -181,6 +199,8 @@ def add_report_info(timestamp, minutes_to_filter):
                     registrationPlate=plate,
                     latitud=report_json['bus']['latitude'],
                     longitud=report_json['bus']['longitude'],
+                    userLatitude=user_latitude,
+                    userLongitude=user_longitude,
                     report=report1,
                 )
                 report_info.save()
@@ -192,6 +212,8 @@ def add_report_info(timestamp, minutes_to_filter):
                     busStop_id=report_json['bus_stop']['id'],
                     latitud=report_json['bus_stop']['latitude'],
                     longitud=report_json['bus_stop']['longitude'],
+                    userLatitude=user_latitude,
+                    userLongitude=user_longitude,
                     report=report1,
                 )
                 report_info.save()
@@ -203,6 +225,8 @@ def add_report_info(timestamp, minutes_to_filter):
                     busStop_id=report_json['busStop']['id'],
                     latitud=report_json['busStop']['latitude'],
                     longitud=report_json['busStop']['longitude'],
+                    userLatitude=user_latitude,
+                    userLongitude=user_longitude,
                     report=report1,
                 )
                 report_info.save()
@@ -379,7 +403,7 @@ def add_nearest_busstops(timestamp, minutes_to_filter):
 
 if __name__ == '__main__':
 
-    ts1 = argv[1].split('.')[0]
+    ts1 = sys.argv[1].split('.')[0]
     ts2 = ts1.split('__')[0]
     ts_time = ts1.split('__')[1]
     ts_date = ts2.split('_')[1]
@@ -390,7 +414,7 @@ if __name__ == '__main__':
     minute = ts_time.split('_')[1]
     second = ts_time.split('_')[2]
 
-    arg_minutes_to_filter = int(argv[2])
+    arg_minutes_to_filter = int(sys.argv[2])
 
     ddate = date(int(year), int(month), int(day))
     # print(ddate)
