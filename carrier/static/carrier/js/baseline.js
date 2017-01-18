@@ -24,3 +24,22 @@ var spinner_options = {
 , hwaccel: false // Whether to use hardware acceleration
 , position: 'absolute' // Element positioning
 };
+
+
+
+// mapping
+
+/**
+ * loads the GTFS options JSON file from carrier/datasantiago static files
+ */
+function loadGTFSOptions(callback, callback_failed) {
+
+  var filename = '/static/carrier/datasantiago/options.json';
+  $.getJSON(filename, function (data) {
+      console.log('options data loaded successfully');
+      callback(data);
+  }).fail(function () {
+      console.log("we could not load options file.");
+      callback_failed();
+  });
+}

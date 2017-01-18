@@ -113,17 +113,65 @@ function init() {
     }).on("init.dt", function () { spinner.stop(); });
 }
 
+var modal_map = null;
 function openMapModal(user_lat, user_lon, bus_stop_lat, bus_stop_lon) {
-    $('#modal-title').text("Ubicación del usuario y paradero");
-    $('#modal-body').html('<p>' + user_lat + ", " + user_lon + ", "  + bus_stop_lat + ", " + bus_stop_lon+ '</p>');
+    $('#modal-map-content-top').html('<p>' + user_lat + ", " + user_lon + ", "  + bus_stop_lat + ", " + bus_stop_lon+ '</p>');
+
+    // make sure the map recomputes the modal size, otherwise some tiles
+    // will not be shown
+    $('#modal-map-view').on('shown.bs.modal', function (e) {
+        modal_map.invalidateSize();
+    })
+    $("#modal-map-view").modal();
+
+    // create map on request
+    if (modal_map == null) {
+
+         var userLatLng = L.latLng(user_lat, user_lon);
+         var busStopLatLng = L.latLng(bus_stop_lat, bus_stop_lon);
+         var boundingBox = L.latLngBounds(userLatLng, busStopLatLng);
+
+         modal_map = L.map('modal-map-leaflet').setView(boundingBox.getCenter(), 18);
+
+         function loadDefaultMapboxTiles(options) {
+            L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}?access_token={accessToken}', {
+                attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+                maxZoom: 18,
+                accessToken: options.token
+            }).addTo(modal_map);
+         }
+         loadGTFSOptions(loadDefaultMapboxTiles, null);
+
+         var bus_stop_marker = L.marker([bus_stop_lat, bus_stop_lon]).addTo(modal_map);
+
+         var user_marker = L.circle([user_lat, user_lon], {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: 0.5,
+            radius: 15
+        }).addTo(modal_map);
+
+
+        // console.log(gtfs_options);
+        // if (gtfs_options != null) {
+        //
+        // } else {
+        //     // destroy map
+        //     // modal_map.
+        //     $('#modal-map-content-bottom').html('<p> No se puede cargar el mapa.</p>');
+        // }
+        //
+    }
+
     //$('#modal-body').html('<img src="' + imageName + '" alt="No se puede cargar la imagen" style="display:block; width: auto; max-width: 100%; height: auto;"/>');
-    $("#carrier-modal").modal();
+
+
+    //
 }
 
 function openModal(imageName) {
-    $('#modal-title').text("Imagen del Evento")
-    $('#modal-body').html('<img src="' + imageName + '" alt="No se puede cargar la imagen" style="display:block; width: auto; max-width: 100%; height: auto;"/>');
-    $("#carrier-modal").modal();
+    $('#modal-image-content').html('<img src="' + imageName + '" alt="No se puede cargar la imagen" style="display:block; width: auto; max-width: 100%; height: auto;"/>');
+    $("#modal-image-view").modal();
 }
 
 function myFunction() {

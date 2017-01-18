@@ -17,6 +17,9 @@
     <link rel="stylesheet" type="text/css"
           href="https://cdn.datatables.net/v/bs/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.12/b-1.2.2/b-colvis-1.2.2/b-flash-1.2.2/b-html5-1.2.2/b-print-1.2.2/r-2.1.0/datatables.min.css"/>
 
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+
     <!-- baseline -->
     <link href="{% static 'carrier/css/baseline.css' %}" rel="stylesheet">
 
@@ -83,14 +86,35 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" role="dialog" id="carrier-modal">
+    <div class="modal fade" role="dialog" id="modal-image-view">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title" id="modal-title"></h4>
+                    <h4 class="modal-title">Imagen del Evento</h4>
                 </div>
-                <div class="modal-body" id="modal-body">
+                <div class="modal-body">
+                    <div id="modal-image-content"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">
+                        Salir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" role="dialog" id="modal-map-view">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Ubicación del usuario y paradero</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="modal-map-content-top"></div>
+                    <div id="modal-map-leaflet"></div>
+                    <div id="modal-map-content-bottom"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-dismiss="modal">
@@ -102,6 +126,11 @@
     </div>
     </div>
     </div>
+
+    <style>
+        #modal-map-leaflet { height: 380px; }
+    </style>
+
 {% endblock maincontent %}
 
 {% block bottomimports %}
@@ -123,6 +152,8 @@
     <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script>
     <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.13/dataRender/ellipsis.js"></script>
 
+    <!-- Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.js"></script>
 
     <!-- TranSapp baseline -->
     <script src="{% static 'carrier/js/baseline.js' %}"></script>
