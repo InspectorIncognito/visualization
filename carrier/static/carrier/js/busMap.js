@@ -48,7 +48,7 @@ $(document).ready(function () {
 
     $.getJSON(selecturl)
         .done(function (data) {
-            console.log(data.types)
+            //console.log(data.types)
             for (var key in data.types) {
                 categories[key] = {}
                 for (var i = 0; i < data.types[key].length; i++) {
@@ -93,7 +93,7 @@ function createMap() {
             catch (err) {
             }
         }
-    }, "/static/", "datasantiago");
+    }, "/static/carrier/", "datasantiago");
 
     reloadData();
 }
@@ -126,7 +126,7 @@ function reloadData() {
         date_end: $('#date_end').data("DateTimePicker").date().add(1, 'days').format("YYYY-MM-DD")
     };
     var service = $(".select2_service").val();
-    console.log(service)
+    //console.log(service)
     var plate = $(".select2_plate").val();
     var comuna = $(".select2_comuna").val();
     if (service != null) data['service'] = JSON.stringify(service);
@@ -158,7 +158,7 @@ function reloadData() {
 
             for (var i = 0; i < data.data.length; i++) {
                 var report = data.data[i];
-                console.log(report)
+                //console.log(report)
                 marker = L.marker([report.lat, report.lon], {}).bindPopup("Servicio: " + report.report.service +
                         "<br>Sentido: " + report.report.direction +
                         "<br>Fecha: " + report.report.timeStamp +

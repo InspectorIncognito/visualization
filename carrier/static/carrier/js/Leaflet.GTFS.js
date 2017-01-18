@@ -183,7 +183,7 @@ var options;
      * @return service routes based on service list
      */
     getRoutes: function (services) {
-        console.log(options)
+        //console.log(options)
         var routes = [];
         var routeData = this.data.route;
 
@@ -240,7 +240,7 @@ var options;
 
         var stopIcon = this.getBusStopIcon();
         var stops = this.data.service[service]['stops' + direction].split('-');
-        console.log(stops);
+        //console.log(stops);
         var stopData = this.data.busStop;
         $.each(stops, function (i, code) {
             var stop = stopData[code];
