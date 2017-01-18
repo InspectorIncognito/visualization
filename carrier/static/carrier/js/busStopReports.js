@@ -58,7 +58,25 @@ function init() {
             {
                 title: "Ubicación",
                 data: 'busStopName',
-                render: $.fn.dataTable.render.ellipsis( 30, true, false)
+                render: $.fn.dataTable.render.ellipsis(30, true, false)
+            },
+            {
+                title: "Mapa",
+                class: "text-center",
+                render: function (data, type, row) {
+                    try {
+                        return '<a ' +
+                                    'class="btn btn-default" ' +
+                                    'onclick="openMapModal(' +
+                                        row.userLatitude + ',' + row.userLongitude + ',' +
+                                        row.latitude + ',' + row.longitude +
+                                    ')">' +
+                                '<i class="fa fa-map-marker"></i>' +
+                                '</a>';
+                    } catch (err) {
+                        return " - "
+                    }
+                }
             },
             {
                 title: "Comuna",
@@ -69,11 +87,16 @@ function init() {
                 class: "text-center",
                 render: function (data, type, row) {
                     if (row.imageName != "no image") {
-                        return '<button type="button" class="btn-xs btn-primary" onclick="openModal(\'' + row.imageName + '\')"> Ver Imagen </button>';
+                        return '<button ' +
+                                    'type="button" ' +
+                                    'class="btn btn-default" ' +
+                                    'onclick="openModal(\'' + row.imageName + '\')"' +
+                                '>' +
+                                ' Ver Imagen ' +
+                                '</button>';
                     }
-                    else
-                        // return "<span style='color:red'> No hay </span>";
-                        return "No hay";
+                    // return "<span style='color:red'> No hay </span>";
+                    return "No hay";
                 }
             }
         ],
@@ -90,9 +113,17 @@ function init() {
     }).on("init.dt", function () { spinner.stop(); });
 }
 
+function openMapModal(user_lat, user_lon, bus_stop_lat, bus_stop_lon) {
+    $('#modal-title').text("Ubicación del usuario y paradero");
+    $('#modal-body').html('<p>' + user_lat + ", " + user_lon + ", "  + bus_stop_lat + ", " + bus_stop_lon+ '</p>');
+    //$('#modal-body').html('<img src="' + imageName + '" alt="No se puede cargar la imagen" style="display:block; width: auto; max-width: 100%; height: auto;"/>');
+    $("#carrier-modal").modal();
+}
+
 function openModal(imageName) {
-    $('#confirmationtext').html('<img src="' + imageName + '" alt="No se puede cargar la imagen" style="display:block; width: auto; max-width: 100%; height: auto;"/>');
-    $("#myModal").modal();
+    $('#modal-title').text("Imagen del Evento")
+    $('#modal-body').html('<img src="' + imageName + '" alt="No se puede cargar la imagen" style="display:block; width: auto; max-width: 100%; height: auto;"/>');
+    $("#carrier-modal").modal();
 }
 
 function myFunction() {

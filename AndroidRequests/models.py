@@ -62,6 +62,8 @@ class ReportInfo(models.Model):
         res["timeStamp"] = report["timeStamp"]
         res["message"] = report["message"]
         res["reportType"] = self.reportType
+        res["latitude"] = self.userLatitude
+        res["longitude"] = self.userLongitude
         res["userLatitude"] = self.userLatitude
         res["userLongitude"] = self.userLongitude
         res["commune"] = self.zonification.comuna if self.zonification else "No Info."
