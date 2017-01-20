@@ -247,7 +247,7 @@ function openMapModal(user_lat, user_lon, bus_stop_lat, bus_stop_lon) {
 }
 
 function openModal(imageName) {
-    $('#modal-image-content').html('<img src="' + imageName + '" alt="No se puede cargar la imagen" style="display:block; width: auto; max-width: 100%; height: auto;"/>');
+    $('#modal-image-content').html('<img src="' + imageName + '" alt="No se puede cargar la imagen" style="display:block; margin: auto; width: auto; max-width: 100%; height: auto; max-height: 400px"/>');
     $("#modal-image-view").modal();
 }
 
