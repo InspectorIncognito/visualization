@@ -25,6 +25,25 @@ var spinner_options = {
 , position: 'absolute' // Element positioning
 };
 
+var spinner = new Spinner(spinner_options)
+    .spin(document.getElementById('right_col_page_content'));
+
+
+// Data exports
+var exportButtonCommon = {
+    exportOptions: {
+        // format: {
+        //     body: function (data, row, column, node) {
+        //         // row: row number
+        //         // column: column number
+        //         // node: cell DOM node: <td>, <td class="text-center">, ...
+        //         // data:
+        //         return data;
+        //     }
+        // },
+        orthogonal: 'export'
+    }
+};
 
 
 // mapping

@@ -1,8 +1,4 @@
 
-
-var spinner = new Spinner(spinner_options)
-    .spin(document.getElementById('right_col_page_content'));
-
 $(function () {
     $('#date_init').datetimepicker({
         defaultDate: moment().subtract(3, 'months'),
@@ -24,20 +20,6 @@ $(function () {
 var table;
 var url = 'http://' + location.host + '/carriers/getBusStopReports/';
 var exportFileName = "ReportesLibresDeParaderos";
-var exportButtonCommon = {
-    exportOptions: {
-        // format: {
-        //     body: function (data, row, column, node) {
-        //         // row: row number
-        //         // column: column number
-        //         // node: cell DOM node: <td>, <td class="text-center">, ...
-        //         // data:
-        //         return data;
-        //     }
-        // },
-        orthogonal: 'export'
-    }
-};
 
 function init() {
     var date_init = $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD");
@@ -51,7 +33,6 @@ function init() {
         order: [[0, "desc"]],
         dom: 'Bfrtip',
         buttons: [
-
             $.extend(true, {}, exportButtonCommon, {
                 extend: 'copy',
                 text: 'Copiar'
@@ -129,7 +110,7 @@ function init() {
                         return '<button ' +
                                     'type="button" ' +
                                     'class="btn btn-default" ' +
-                                    'onclick="openModal(\'' + image_filename + '\')"' +
+                                    'onclick="openImageModal(\'' + image_filename + '\')"' +
                                 ' style="margin-bottom: 0; margin-right: 0">' +
                                 ' Ver Imagen ' +
                                 '</button>';
@@ -257,7 +238,7 @@ function openMapModal(user_lat, user_lon, bus_stop_lat, bus_stop_lon) {
     }
 }
 
-function openModal(imageName) {
+function openImageModal(imageName) {
     $('#modal-image-content').html('<img src="' + imageName + '" alt="No se puede cargar la imagen" style="display:block; margin: auto; width: auto; max-width: 100%; height: auto; max-height: 400px"/>');
     $("#modal-image-view").modal();
 }

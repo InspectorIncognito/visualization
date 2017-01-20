@@ -10,12 +10,19 @@
 
     {% block title %}{% endblock %}
     <link rel="shortcut icon" href="http://www.transapp.cl/wp-content/iso.png">
+
     <!-- Bootstrap -->
     <link href="{% static 'components/gentelella/vendors/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
+
     <!-- Font Awesome -->
     <link href="{% static 'components/gentelella/vendors/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+
     <!-- Custom Theme Style -->
     <link href="{% static 'components/gentelella/build/css/custom.min.css' %}" rel="stylesheet">
+
+    <!-- baseline -->
+    <link href="{% static 'carrier/css/baseline.css' %}" rel="stylesheet">
+
     {% block topimports %}{% endblock %}
 </head>
 
@@ -27,10 +34,6 @@
                 <div class="navbar nav_title" style="border: 0;">
                     <a href="/" class="site_title"><i class="fa fa-desktop" style="border: 0;"> </i> <span> TranSapp </span></a>
                 </div>
-{#                    <a href="/" class="">#}
-{#                        <img src="/static/carrier/images/drawable-mdpi/launch_logo.png" alt="" style="border-radius: 0; height: 60px">#}
-{#                    </a>#}
-
                 <div class="clearfix"></div>
 
                 <br/>
@@ -143,10 +146,16 @@
 
 <!-- jQuery -->
 <script src="{% static 'components/gentelella/vendors/jquery/dist/jquery.min.js' %}"></script>
+
 <!-- Bootstrap -->
 <script src="{% static 'components/gentelella/vendors/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+
 <!-- Custom Theme Scripts -->
 <script src="{% static 'components/gentelella/build/js/custom.min.js' %}"></script>
+
+<!-- spinner -->
+<script src="{% static 'components/spin.js/spin.min.js' %}"></script>
+
 {% block bottomimports %}{% endblock %}
 
 </body>
