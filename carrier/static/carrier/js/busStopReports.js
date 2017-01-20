@@ -22,23 +22,48 @@ $(function () {
 });
 
 var table;
-var fileName = "Reportes Libres";
 var url = 'http://' + location.host + '/carriers/getBusStopReports/';
+var exportFileName = "ReportesLibresDeParaderos";
+var exportButtonCommon = {
+    exportOptions: {
+        format: {
+            body: function (data, row, column, node) {
+                // row: row number
+                // column: column number
+                // node: cell DOM node: <td>, <td class="text-center">, ...
+                // data:
+                return data;
+            }
+        },
+        orthogonal: 'export'
+    }
+};
 
 function init() {
     var date_init = $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD");
     var date_end = $('#date_end').data("DateTimePicker").date().add(1, 'days').format("YYYY-MM-DD");
     var params = '?date_init=' + date_init + '&date_end=' + date_end;
     $.fn.dataTable.moment('DD-MM-YYYY HH:mm:ss');
+
     table = $('#bus-stop-reports-table').DataTable({
         scrollX: true,
         pageLength: 15,
         order: [[0, "desc"]],
         dom: 'Bfrtip',
         buttons: [
-            {extend: 'copy', text: 'Copiar'},
-            {extend: 'csv', filename: fileName},
-            {extend: 'excel', filename: fileName}
+
+            $.extend(true, {}, exportButtonCommon, {
+                extend: 'copy',
+                text: 'Copiar'
+            }),
+            $.extend(true, {}, exportButtonCommon, {
+                extend: 'csv',
+                filename: exportFileName
+            }),
+            $.extend(true, {}, exportButtonCommon, {
+                extend: 'excel',
+                filename: exportFileName
+            })
         ],
         ajax: url + params,
         columns: [
@@ -49,7 +74,7 @@ function init() {
             {
                 title: "Mensaje",
                 data: 'message',
-                render: $.fn.dataTable.render.ellipsis( 40, true, false)
+                render: $.fn.dataTable.render.ellipsis(40, true, false)
             },
             {
                 title: "Paradero",
@@ -65,6 +90,11 @@ function init() {
                 class: "text-center",
                 render: function (data, type, row) {
                     try {
+                        if (type == 'export') {
+                            // export as JSON {user: [-33.2423, -70.23234], bus_stop: [-33.2423, -70.23234]}
+                            return '{user: [' + row.userLatitude + ', ' + row.userLongitude + '], bus_stop: [' +
+                                        row.latitude + ', ' + row.longitude + ']}';
+                        }
                         return '<a ' +
                                     'class="btn btn-default" ' +
                                     'onclick="openMapModal(' +
@@ -87,7 +117,14 @@ function init() {
                 title: 'Imagen',
                 class: "text-center",
                 render: function (data, type, row) {
+                    if (type == 'export') {
+                        if (row.imageName != "no image") {
+                            return row.imageName;
+                        }
+                        return "";
+                    }
                     if (row.imageName != "no image") {
+                        // export only imageName
                         return '<button ' +
                                     'type="button" ' +
                                     'class="btn btn-default" ' +
