@@ -195,7 +195,18 @@ function openMapModal(user_lat, user_lon, bus_stop_lat, bus_stop_lon) {
     // --------------------------------------------------------------------------
 
     // distance bus_stop - user
-    $('#modal-map-distance-info').text(Number(user_lat_lng.distanceTo(bus_stop_lat_lng)).toFixed(1));
+    var user_bus_stop_distance = user_lat_lng.distanceTo(bus_stop_lat_lng);
+    $('#modal-map-distance-info')
+        .text(Number(user_bus_stop_distance).toFixed(1))
+        .parent()
+        .removeClass("text-info")
+        .removeClass("text-warning")
+        .addClass(function() {
+            if (user_bus_stop_distance < 100) {
+                return "text-info";
+            }
+            return "text-warning";
+        });
 
     // bus_stop and user coordinates
     $('#modal-bus-stop-lat').text(bus_stop_lat);
