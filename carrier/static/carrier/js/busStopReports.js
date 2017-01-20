@@ -155,7 +155,7 @@ function openMapModal(user_lat, user_lon, bus_stop_lat, bus_stop_lon) {
 
         // bus stop marker
         var bus_stop_icon = L.icon({
-            iconUrl: '/static/carrier/images/drawable-xhdpi/paradero.png',
+            iconUrl: '/static/carrier/images/paradero.png',
             shadowUrl: null,
 
             iconSize:     [32, 48], // size of the icon
@@ -168,7 +168,7 @@ function openMapModal(user_lat, user_lon, bus_stop_lat, bus_stop_lon) {
 
         // user marker
         var user_icon = L.icon({
-            iconUrl: '/static/carrier/images/drawable-xhdpi/usuario.png',
+            iconUrl: '/static/carrier/images/usuario.png',
             shadowUrl: null,
 
             iconSize:     [30, 38], // size of the icon
