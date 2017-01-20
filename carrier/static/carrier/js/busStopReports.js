@@ -26,15 +26,15 @@ var url = 'http://' + location.host + '/carriers/getBusStopReports/';
 var exportFileName = "ReportesLibresDeParaderos";
 var exportButtonCommon = {
     exportOptions: {
-        format: {
-            body: function (data, row, column, node) {
-                // row: row number
-                // column: column number
-                // node: cell DOM node: <td>, <td class="text-center">, ...
-                // data:
-                return data;
-            }
-        },
+        // format: {
+        //     body: function (data, row, column, node) {
+        //         // row: row number
+        //         // column: column number
+        //         // node: cell DOM node: <td>, <td class="text-center">, ...
+        //         // data:
+        //         return data;
+        //     }
+        // },
         orthogonal: 'export'
     }
 };
@@ -100,7 +100,7 @@ function init() {
                                     'onclick="openMapModal(' +
                                         row.userLatitude + ',' + row.userLongitude + ',' +
                                         row.latitude + ',' + row.longitude +
-                                    ')"' +
+                                    ')" ' +
                                 'style="margin-bottom: 0; margin-right: 0">' +
                                 '<i class="fa fa-map-marker"></i>' +
                                 '</a>';
@@ -117,19 +117,20 @@ function init() {
                 title: 'Imagen',
                 class: "text-center",
                 render: function (data, type, row) {
+                    var image_filename = row.imageName;
                     if (type == 'export') {
-                        if (row.imageName != "no image") {
-                            return row.imageName;
+                        if (image_filename != "no image") {
+                            return image_filename;
                         }
                         return "";
                     }
-                    if (row.imageName != "no image") {
+                    if (image_filename != "no image") {
                         // export only imageName
                         return '<button ' +
                                     'type="button" ' +
                                     'class="btn btn-default" ' +
-                                    'onclick="openModal(\'' + row.imageName + '\')"' +
-                                'style="margin-bottom: 0; margin-right: 0">' +
+                                    'onclick="openModal(\'' + image_filename + '\')"' +
+                                ' style="margin-bottom: 0; margin-right: 0">' +
                                 ' Ver Imagen ' +
                                 '</button>';
                     }
@@ -152,34 +153,73 @@ function init() {
 }
 
 var modal_map = null;
+var bus_stop_marker = null;
+var user_marker = null;
+
+// bus stop marker
+var bus_stop_icon = L.icon({
+    iconUrl: '/static/carrier/images/paradero.png',
+    shadowUrl: null,
+
+    iconSize:     [32, 48], // size of the icon
+    shadowSize:   [ 0,  0], // size of the shadow
+    iconAnchor:   [16, 48], // point of the icon which will correspond to marker's location
+    shadowAnchor: [ 0,  0],  // the same for the shadow
+    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
+
+// user marker
+var user_icon = L.icon({
+    iconUrl: '/static/carrier/images/usuario.png',
+    shadowUrl: null,
+
+    iconSize:     [30, 38], // size of the icon
+    shadowSize:   [ 0,  0], // size of the shadow
+    iconAnchor:   [15, 38], // point of the icon which will correspond to marker's location
+    shadowAnchor: [ 0,  0],  // the same for the shadow
+    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
+
+
 function openMapModal(user_lat, user_lon, bus_stop_lat, bus_stop_lon) {
 
     var user_lat_lng = L.latLng(user_lat, user_lon);
     var bus_stop_lat_lng = L.latLng(bus_stop_lat, bus_stop_lon);
+    var map_bounding_box = L.latLngBounds(user_lat_lng, bus_stop_lat_lng);
 
+    // testing
+    // user_lat_lng = L.latLng(user_lat + 0.01, user_lon + 0.01);
+    // map_bounding_box = L.latLngBounds(user_lat_lng, bus_stop_lat_lng);
+
+    // RENDER MODAL INFORMATION
+    // --------------------------------------------------------------------------
+
+    // distance bus_stop - user
     $('#modal-map-distance-info').text(Number(user_lat_lng.distanceTo(bus_stop_lat_lng)).toFixed(1));
-    // $('#modal-map-content-bottom').html('');
 
-    // modal table data
+    // bus_stop and user coordinates
     $('#modal-bus-stop-lat').text(bus_stop_lat);
     $('#modal-bus-stop-lon').text(bus_stop_lon);
     $('#modal-user-lat').text(user_lat);
     $('#modal-user-lon').text(user_lon);
 
 
+    // RENDER MODAL MAP
+    // --------------------------------------------------------------------------
+
     // make sure the map recomputes the modal size, otherwise some tiles
     // will not be shown
-    $('#modal-map-view').on('shown.bs.modal', function (e) {
+    var modal_map_view = $('#modal-map-view');
+    modal_map_view.on('shown.bs.modal', function () {
         modal_map.invalidateSize();
-    })
-    $("#modal-map-view").modal();
+        modal_map.fitBounds(map_bounding_box);
+    });
+    modal_map_view.modal();
 
     // create map on request
     if (modal_map == null) {
 
-        var boundingBox = L.latLngBounds(user_lat_lng, bus_stop_lat_lng);
-
-        modal_map = L.map('modal-map-leaflet').setView(boundingBox.getCenter(), 18);
+        modal_map = L.map('modal-map-leaflet').setView(map_bounding_box.getCenter(), 17);
 
         function loadDefaultMapboxTiles(options) {
             L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}?access_token={accessToken}', {
@@ -191,54 +231,19 @@ function openMapModal(user_lat, user_lon, bus_stop_lat, bus_stop_lon) {
         loadGTFSOptions(loadDefaultMapboxTiles, null);
 
         // bus stop marker
-        var bus_stop_icon = L.icon({
-            iconUrl: '/static/carrier/images/paradero.png',
-            shadowUrl: null,
-
-            iconSize:     [32, 48], // size of the icon
-            shadowSize:   [ 0,  0], // size of the shadow
-            iconAnchor:   [16, 48], // point of the icon which will correspond to marker's location
-            shadowAnchor: [ 0,  0],  // the same for the shadow
-            popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-        });
-        var bus_stop_marker = L.marker([bus_stop_lat, bus_stop_lon], {icon: bus_stop_icon}).addTo(modal_map);
+        bus_stop_marker = L.marker(bus_stop_lat_lng, {icon: bus_stop_icon}).addTo(modal_map);
 
         // user marker
-        var user_icon = L.icon({
-            iconUrl: '/static/carrier/images/usuario.png',
-            shadowUrl: null,
-
-            iconSize:     [30, 38], // size of the icon
-            shadowSize:   [ 0,  0], // size of the shadow
-            iconAnchor:   [15, 38], // point of the icon which will correspond to marker's location
-            shadowAnchor: [ 0,  0],  // the same for the shadow
-            popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-        });
-        var user_marker = L.marker([user_lat, user_lon], {icon: user_icon}).addTo(modal_map);
-
-        // var user_marker = L.circle([user_lat, user_lon], {
-        //     color: 'red',
-        //     fillColor: '#f03',
-        //     fillOpacity: 0.5,
-        //     radius: 15
-        // }).addTo(modal_map);
+        user_marker = L.marker(user_lat_lng, {icon: user_icon}).addTo(modal_map);
 
 
-        // console.log(gtfs_options);
-        // if (gtfs_options != null) {
-        //
-        // } else {
-        //     // destroy map
-        //     // modal_map.
-        //     $('#modal-map-content-bottom').html('<p> No se puede cargar el mapa.</p>');
-        // }
-        //
+    } else {
+        // update values
+        bus_stop_marker.setLatLng(bus_stop_lat_lng);
+        user_marker.setLatLng(user_lat_lng);
+
+        //modal_map.fitBounds(map_bounding_box);
     }
-
-    //$('#modal-body').html('<img src="' + imageName + '" alt="No se puede cargar la imagen" style="display:block; width: auto; max-width: 100%; height: auto;"/>');
-
-
-    //
 }
 
 function openModal(imageName) {
