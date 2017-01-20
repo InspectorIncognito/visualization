@@ -1,7 +1,7 @@
 
 
 var spinner = new Spinner(spinner_options)
-    .spin(document.getElementById('main-content-panel'));
+    .spin(document.getElementById('right_col_page_content'));
 
 $(function () {
     $('#date_init').datetimepicker({
@@ -70,7 +70,8 @@ function init() {
                                     'onclick="openMapModal(' +
                                         row.userLatitude + ',' + row.userLongitude + ',' +
                                         row.latitude + ',' + row.longitude +
-                                    ')">' +
+                                    ')"' +
+                                'style="margin-bottom: 0; margin-right: 0">' +
                                 '<i class="fa fa-map-marker"></i>' +
                                 '</a>';
                     } catch (err) {
@@ -91,7 +92,7 @@ function init() {
                                     'type="button" ' +
                                     'class="btn btn-default" ' +
                                     'onclick="openModal(\'' + row.imageName + '\')"' +
-                                '>' +
+                                'style="margin-bottom: 0; margin-right: 0">' +
                                 ' Ver Imagen ' +
                                 '</button>';
                     }
@@ -115,7 +116,19 @@ function init() {
 
 var modal_map = null;
 function openMapModal(user_lat, user_lon, bus_stop_lat, bus_stop_lon) {
-    $('#modal-map-content-top').html('<p>' + user_lat + ", " + user_lon + ", "  + bus_stop_lat + ", " + bus_stop_lon+ '</p>');
+
+    var user_lat_lng = L.latLng(user_lat, user_lon);
+    var bus_stop_lat_lng = L.latLng(bus_stop_lat, bus_stop_lon);
+
+    $('#modal-map-distance-info').text(Number(user_lat_lng.distanceTo(bus_stop_lat_lng)).toFixed(1));
+    // $('#modal-map-content-bottom').html('');
+
+    // modal table data
+    $('#modal-bus-stop-lat').text(bus_stop_lat);
+    $('#modal-bus-stop-lon').text(bus_stop_lon);
+    $('#modal-user-lat').text(user_lat);
+    $('#modal-user-lon').text(user_lon);
+
 
     // make sure the map recomputes the modal size, otherwise some tiles
     // will not be shown
@@ -127,29 +140,51 @@ function openMapModal(user_lat, user_lon, bus_stop_lat, bus_stop_lon) {
     // create map on request
     if (modal_map == null) {
 
-         var userLatLng = L.latLng(user_lat, user_lon);
-         var busStopLatLng = L.latLng(bus_stop_lat, bus_stop_lon);
-         var boundingBox = L.latLngBounds(userLatLng, busStopLatLng);
+        var boundingBox = L.latLngBounds(user_lat_lng, bus_stop_lat_lng);
 
-         modal_map = L.map('modal-map-leaflet').setView(boundingBox.getCenter(), 18);
+        modal_map = L.map('modal-map-leaflet').setView(boundingBox.getCenter(), 18);
 
-         function loadDefaultMapboxTiles(options) {
+        function loadDefaultMapboxTiles(options) {
             L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}?access_token={accessToken}', {
                 attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, Imagery © <a href="http://mapbox.com">Mapbox</a>',
                 maxZoom: 18,
                 accessToken: options.token
             }).addTo(modal_map);
-         }
-         loadGTFSOptions(loadDefaultMapboxTiles, null);
+        }
+        loadGTFSOptions(loadDefaultMapboxTiles, null);
 
-         var bus_stop_marker = L.marker([bus_stop_lat, bus_stop_lon]).addTo(modal_map);
+        // bus stop marker
+        var bus_stop_icon = L.icon({
+            iconUrl: '/static/carrier/images/drawable-xhdpi/paradero.png',
+            shadowUrl: null,
 
-         var user_marker = L.circle([user_lat, user_lon], {
-            color: 'red',
-            fillColor: '#f03',
-            fillOpacity: 0.5,
-            radius: 15
-        }).addTo(modal_map);
+            iconSize:     [32, 48], // size of the icon
+            shadowSize:   [ 0,  0], // size of the shadow
+            iconAnchor:   [16, 48], // point of the icon which will correspond to marker's location
+            shadowAnchor: [ 0,  0],  // the same for the shadow
+            popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+        });
+        var bus_stop_marker = L.marker([bus_stop_lat, bus_stop_lon], {icon: bus_stop_icon}).addTo(modal_map);
+
+        // user marker
+        var user_icon = L.icon({
+            iconUrl: '/static/carrier/images/drawable-xhdpi/usuario.png',
+            shadowUrl: null,
+
+            iconSize:     [30, 38], // size of the icon
+            shadowSize:   [ 0,  0], // size of the shadow
+            iconAnchor:   [15, 38], // point of the icon which will correspond to marker's location
+            shadowAnchor: [ 0,  0],  // the same for the shadow
+            popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+        });
+        var user_marker = L.marker([user_lat, user_lon], {icon: user_icon}).addTo(modal_map);
+
+        // var user_marker = L.circle([user_lat, user_lon], {
+        //     color: 'red',
+        //     fillColor: '#f03',
+        //     fillOpacity: 0.5,
+        //     radius: 15
+        // }).addTo(modal_map);
 
 
         // console.log(gtfs_options);
