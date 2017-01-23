@@ -61,25 +61,25 @@ $(document).ready(function () {
                 extend: 'copy',
                 text: 'Copiar',
                 exportOptions: {
-                    columns: [ 0, 4, 3, 2 ]
+                    columns: [ 0, 2, 4, 3 ]
                 }
             }),
             $.extend(true, {}, exportButtonCommon, {
                 extend: 'csv',
                 filename: exportFileName,
                 exportOptions: {
-                    columns: [ 1, 4, 3, 2 ]
+                    columns: [ 1, 2, 4, 3 ]
                 }
             }),
             $.extend(true, {}, exportButtonCommon, {
                 extend: 'excel',
                 filename: exportFileName,
                 exportOptions: {
-                    columns: [ 1, 4, 3, 2 ]
+                    columns: [ 1, 2, 4, 3 ]
                 }
             })
         ],
-        order: [[4, 'desc']],
+        order: [[2, 'desc']],
         ajax: 'http://' + location.host + '/carriers/getPhysicalTable/?name=all',
         columns: [
             {
@@ -96,9 +96,13 @@ $(document).ready(function () {
                 data: null,
                 defaultContent: ""
             },
+            {
+                title: "Fecha",
+                data: 'timeCreation',
+                width: "20%"
+            },
             {title: "Evento Reportado", data: 'type'},
             {title: "Patente", data: 'plate'},
-            {title: "Fecha", data: 'timeCreation'},
             {
                 title: "Arreglar",
                 class: "text-center",
