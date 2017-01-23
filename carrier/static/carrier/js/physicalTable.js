@@ -45,8 +45,9 @@ var id;
 var text;
 var table;
 
-
-var exportFileName = "EventosDeBuses";
+var date = moment();
+var dateString = date.format("YYYY-MM-DD");
+var exportFileName = "EventosDeBuses_" + dateString;
 
 var modal_data = null;
 $(document).ready(function () {

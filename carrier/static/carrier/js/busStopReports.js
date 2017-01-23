@@ -19,7 +19,10 @@ $(function () {
 
 var table;
 var url = 'http://' + location.host + '/carriers/getBusStopReports/';
-var exportFileName = "ReportesLibresDeParaderos";
+
+var date = moment();
+var dateString = date.format("YYYY-MM-DD");
+var exportFileName = "ReportesLibresDeParaderos_" + dateString;
 
 function init() {
     var date_init = $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD");
