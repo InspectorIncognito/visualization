@@ -1,32 +1,35 @@
 var name;
-var headerids = {}
+var headerids = {};
 function createheaders() {
     var Dataurl = "http://" + location.host + "/carriers/getPhysicalHeaders/";
     $.getJSON(Dataurl)
         .done(function (data) {
             var n = 0;
             var total = 0;
-            $("#headers ul").html("");
+
+            var header_selector = $("#headers ul");
+            header_selector.html("");
             $.each(data, function (key, number) {
                 n++;
                 total += number;
-                headerids[key]="header"+n
-                $("#headers ul").append('<li id="' + headerids[key] + '" role="presentation"><a href="#" data-toggle="tab" onclick="changeUrl(\'' + key + '\')">' +
-                    key + ' (<span id="number">' + number + '</span>)');
+                headerids[key] = "header" + n;
+                header_selector.append(
+                    '<li id="' + headerids[key] + '" role="presentation">' +
+                        '<a href="#" data-toggle="tab" onclick="changeUrl(\'' + key + '\')">' +
+                            key + ' (<span id="number">' + number + '</span>)');
             });
-            $("#headers ul").prepend('<li id="all" role="presentation" class="active"><a href="#" data-toggle="tab" onclick="changeUrl(\'all\')">Total (<span id="number">' + total + '</span>)');
+            header_selector.prepend(
+                '<li id="all" role="presentation" class="active">' +
+                    '<a href="#" data-toggle="tab" onclick="changeUrl(\'all\')">' +
+                        'Total (<span id="number">' + total + '</span>)');
 
-
-            console.log(name)
-
-
+            // console.log(name);
         });
 }
 function updateheaders() {
     var Dataurl = "http://" + location.host + "/carriers/getPhysicalHeaders/";
     $.getJSON(Dataurl)
         .done(function (data) {
-
             var total = 0;
             $.each(data, function (key, number) {
                 total += number;
@@ -42,39 +45,49 @@ var id;
 var text;
 var table;
 
+var modal_data = null;
 $(document).ready(function () {
     createheaders();
     $.fn.dataTable.moment('DD-MM-YYYY HH:mm:ss');
-    table = $('#example').DataTable({
+    table = $("#bus-events-table").DataTable({
         scrollX: true,
         pageLength: 15,
         dom: 'Bfrtip',
         order: [[2, 'desc']],
         ajax: 'http://' + location.host + '/carriers/getPhysicalTable/?name=all',
         columns: [
-            {title: "Reporte", data: 'type'},
+            {title: "Evento Reportado", data: 'type'},
             {title: "Patente", data: 'plate'},
             {title: "Fecha", data: 'timeCreation'},
             {
                 title: "Arreglar",
-                data: null,
-                "defaultContent": "<button type='button' class='btn-xs btn-primary' id='si'>Arreglar</button>"
-            },
+                class: "text-center",
+                render: function (data, type, row) {
+                    modal_data = row;
+                    return '<button ' +
+                                'type="button" ' +
+                                'class="btn-xs btn-primary" ' +
+                                'onclick="openEventModal()" ' +
+                                'style="margin-bottom: 0; margin-right: 0">' +
+                                ' Arreglar ' +
+                            '</button>';
+                }
+            }
         ],
         language: {
             "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json"
         }
     });
-
-    $('#example tbody').on('click', 'button', function () {
-        var data = table.row($(this).parents('tr')).data();
-        id = data.id;
-        console.log(data)
-        $('#confirmationtext').html('Reporte: ' + data.type + '<br>Patente: ' + data.plate)
-        $("#myModal").modal()
-    });
-
 });
+
+function openEventModal() {
+    if (modal_data) {
+        $("#modal-physical-event").text(modal_data.type);
+        $("#modal-physical-plate").text(modal_data.plate);
+        $("#modal-event-confirmation").modal()
+    }
+}
+
 function fix() {
     var url = "http://" + location.host + "/carriers/updatePhysical/";
     $.getJSON(url, {"id": id})
@@ -83,15 +96,15 @@ function fix() {
                 table.ajax.reload();
                 updateheaders();
             }
-            else {
-                console.log("Un error ocurrió");
-            }
+            // else {
+            //     console.log("Un error ocurrió");
+            // }
         });
 }
 setInterval(function () {
-    updateheaders();
+    pdateheaders();
     table.ajax.reload();
-}, 3000);
+}, 300000);
 
 function changeUrl(key) {
     table.ajax.url('http://' + location.host + '/carriers/getPhysicalTable/?name=' + key).load();

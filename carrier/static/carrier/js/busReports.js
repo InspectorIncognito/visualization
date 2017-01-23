@@ -60,12 +60,12 @@ function init() {
             {
                 title: "Patente",
                 data: 'registrationPlate',
-                class: "text-center",
+                class: "text-center"
             },
             {
                 title: "Servicio",
                 data: 'service',
-                class: "text-center",
+                class: "text-center"
             },
             {
                 title: "Dirección",
