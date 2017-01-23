@@ -6,10 +6,10 @@ var exportFileName = "EventosDeConductores_" + dateString;
 
 $(document).ready(function () {
     $.fn.dataTable.moment( 'DD-MM-YYYY HH:mm:ss' );
-    table = $('#example').dataTable({
+    table = $('#driver-events-table').dataTable({
         scrollX: true,
         pageLength: 15,
-        order: [[1, "desc"]],
+        order: [[0, "desc"]],
         dom: 'Bfrtip',
         buttons: [
             {
@@ -27,12 +27,35 @@ $(document).ready(function () {
         ],
         ajax: 'http://' + location.host + '/carriers/getDriversTable/',
         columns: [
-            {title: "Reporte", data: 'type'},
             {title: "Fecha", data: 'timeCreation'},
-            {title: "Patente", data: 'plate'},
-            {title: "Servicio", data: 'service'},
-            {title: "Dirección", data: 'direction'},
-            {title: "Comuna", data: 'commune'},
+            {title: "Mensaje", data: 'type'},
+            {
+                title: "Patente",
+                data: 'plate',
+                class: "text-center"
+
+            },
+            {
+                title: "Servicio",
+                data: 'service',
+                class: "text-center"
+            },
+            {
+                title: "Dirección",
+                data: 'direction',
+                render: function (data, type, row) {
+                    if (data == 'I') {
+                        return "IDA";
+                    } else if (data == 'R') {
+                        return "REGRESO";
+                    }
+                    return data;
+                }
+            },
+            {
+                title: "Comuna",
+                data: 'commune'
+            },
             {title: "Paradero más cercano 1", data: 'busStop1'},
             {title: "Paradero más cercano 2", data: 'busStop2'}
         ],
@@ -46,7 +69,7 @@ $(document).ready(function () {
                 }
             }
         }
-    });
+    }).on("init.dt", function () { spinner.stop(); });
 });
 
 setInterval(function () {

@@ -211,7 +211,7 @@ def getDriversTable(request):
     # today_end = datetime.combine(tomorrow, time())
     # query = query.filter(timeCreation__gte=today_start, timeCreation__lte=today_end)
     data = {
-        'data': [report.getDictionary() for report in query]
+        'data': [item.getDictionary() for item in query]
     }
     return JsonResponse(data, safe=False)
 
