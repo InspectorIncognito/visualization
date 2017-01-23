@@ -45,6 +45,9 @@ var id;
 var text;
 var table;
 
+
+var exportFileName = "EventosDeBuses";
+
 var modal_data = null;
 $(document).ready(function () {
     createheaders();
@@ -53,9 +56,46 @@ $(document).ready(function () {
         scrollX: true,
         pageLength: 15,
         dom: 'Bfrtip',
-        order: [[2, 'desc']],
+        buttons: [
+            $.extend(true, {}, exportButtonCommon, {
+                extend: 'copy',
+                text: 'Copiar',
+                exportOptions: {
+                    columns: [ 0, 4, 3, 2 ]
+                }
+            }),
+            $.extend(true, {}, exportButtonCommon, {
+                extend: 'csv',
+                filename: exportFileName,
+                exportOptions: {
+                    columns: [ 1, 4, 3, 2 ]
+                }
+            }),
+            $.extend(true, {}, exportButtonCommon, {
+                extend: 'excel',
+                filename: exportFileName,
+                exportOptions: {
+                    columns: [ 1, 4, 3, 2 ]
+                }
+            })
+        ],
+        order: [[4, 'desc']],
         ajax: 'http://' + location.host + '/carriers/getPhysicalTable/?name=all',
         columns: [
+            {
+                // copy
+                title: "¿Arreglado?",
+                visible: false,
+                data: null,
+                defaultContent: "[ ]"
+            },
+            {
+                // for csv and excel
+                title: "¿Arreglado?",
+                visible: false,
+                data: null,
+                defaultContent: ""
+            },
             {title: "Evento Reportado", data: 'type'},
             {title: "Patente", data: 'plate'},
             {title: "Fecha", data: 'timeCreation'},
@@ -75,9 +115,16 @@ $(document).ready(function () {
             }
         ],
         language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json"
+            "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json",
+            buttons: {
+                copyTitle: 'Copiar al portapapeles',
+                copySuccess: {
+                    _: 'Copiadas %d filas',
+                    1: 'Copiada 1 fila'
+                }
+            }
         }
-    });
+    }).on("init.dt", function () { spinner.stop(); });
 });
 
 function openEventModal() {
