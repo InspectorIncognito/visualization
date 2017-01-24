@@ -108,11 +108,13 @@ $(document).ready(function () {
                 title: "Arreglar",
                 class: "text-center",
                 render: function (data, type, row) {
-                    modal_data = row;
                     return '<button ' +
                                 'type="button" ' +
                                 'class="btn-xs btn-primary" ' +
-                                'onclick="openEventModal()" ' +
+                                'onclick="openEventModal(' +
+                                '\'' + row.type + '\', ' +
+                                '\'' + row.plate + '\'' +
+                                ')" ' +
                                 'style="margin-bottom: 0; margin-right: 0">' +
                                 ' Arreglar ' +
                             '</button>';
@@ -132,12 +134,10 @@ $(document).ready(function () {
     }).on("init.dt", function () { spinner.stop(); });
 });
 
-function openEventModal() {
-    if (modal_data) {
-        $("#modal-physical-event").text(modal_data.type);
-        $("#modal-physical-plate").text(modal_data.plate);
-        $("#modal-event-confirmation").modal()
-    }
+function openEventModal(type, plate) {
+    $("#modal-physical-event").text(type);
+    $("#modal-physical-plate").text(plate);
+    $("#modal-event-confirmation").modal()
 }
 
 function fix() {
