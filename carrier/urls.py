@@ -62,6 +62,9 @@ urlpatterns = [
     # User
     # --------------------
 
+    # bus stop views map
+    url(r'^busStopViewsMap/$', views.busStopViewsMap, name='busStopViewsMap'),
+    url(r'^getUsersPositions/$', views.getUsersPositions, name='getUsersPositions'),
 
     # Tools
     # --------------------
@@ -93,16 +96,6 @@ urlpatterns = [
     #       ...
     # ]}
     url(r'^getActiveUsers/$', views.getActiveUsers, name='getActiveUsers'),
-
-
-
-    # http://localhost/carriers/getUsersPositions/?date_init=2016-10-24T00:00:00&date_end=2017-01-25T00:00:00&_=1485262643655
-    # {
-    #   "9142b237-074c-4282-aaea-c586447087ac": [
-    #       {"lat": -33.4382809, "timeStamp": "2016-10-26T22:17:45.363Z", "lon": -70.5732056},
-    #       {"lat": -33.4391086, "timeStamp": "2016-10-26T22:18:22.036Z", "lon": -70.5726174},
-    #       ...
-    url(r'^getUsersPositions/$', views.getUsersPositions, name='getUsersPositions'),
 
 
     # http://localhost/carriers/getUsersActivities/?date_init=2016-10-24T00:00:00&date_end=2017-01-25T00:00:00&_=1485262643655

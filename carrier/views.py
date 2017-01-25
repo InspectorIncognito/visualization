@@ -482,6 +482,10 @@ def busStopMap(request):
     template = loader.get_template('busStopMap.html')
     return HttpResponse(template.render(request=request))
 
+@login_required
+def busStopViewsMap(request):
+    template = loader.get_template('busStopViewsMap.html')
+    return HttpResponse(template.render(request=request))
 
 # ----------------------------------------------------------------------------------------------------------------------
 # USERS
@@ -688,20 +692,33 @@ def getUsersPositions(request):
         pytz.timezone('America/Santiago').localize(date_init)
         pytz.timezone('America/Santiago').localize(date_end)
 
+        devices = DevicePositionInTime.objects.filter(
+            timeStamp__range=[date_init, date_end]
+        ).order_by('userId', 'timeStamp').values()
+
         response = {}
-
-        devices = DevicePositionInTime.objects.filter(timeStamp__range=[date_init, date_end]).order_by('userId',
-                                                                                                       'timeStamp').values()
-
         for device in devices:
-            if str(device['userId']) in response:
-                response[str(device['userId'])].append(
-                    {'lat': device['latitud'], 'lon': device['longitud'], 'timeStamp': device['timeStamp']})
+            device_id = str(device['userId'])
+
+            # already exists: save the last one
+            if device_id in response:
+                response[device_id]['last'] = {
+                    'lat': device['latitud'],
+                    'lon': device['longitud'],
+                    'timeStamp': device['timeStamp']
+                }
             else:
-                response[str(device['userId'])] = [
-                    {'lat': device['latitud'], 'lon': device['longitud'], 'timeStamp': device['timeStamp']}]
+                # new device
+                response[device_id] = {
+                    'first': {
+                        'lat': device['latitud'],
+                        'lon': device['longitud'],
+                        'timeStamp': device['timeStamp']
+                    }
+                }
 
         return JsonResponse(response, safe=False)
+
 
 @user_passes_test(is_transapp)
 def getUsersTravelMap(request):
