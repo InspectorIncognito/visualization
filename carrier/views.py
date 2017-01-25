@@ -459,18 +459,28 @@ def getBusStopInfo(request):
                 response[str(bscheck['busStop'])] = {'busStopCheckCount': bscheck['num_checks']}
 
         for resp in response:
+
             if 'eventCount' not in response[resp]:
                 response[resp].update({'eventCount': 0})
+
             if 'confirmCount' not in response[resp]:
                 response[resp].update({'confirmCount': 0})
+
             if 'declineCount' not in response[resp]:
                 response[resp].update({'declineCount': 0})
+
             if 'busStopCheckCount' not in response[resp]:
                 response[resp].update({'busStopCheckCount': 0})
 
             response[resp]['confirmCount'] = response[resp]['confirmCount'] - response[resp]['eventCount']
 
         return JsonResponse(response, safe=False)
+
+
+@login_required
+def busStopMap(request):
+    template = loader.get_template('busStopMap.html')
+    return HttpResponse(template.render(request=request))
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -669,6 +679,66 @@ def getActiveUsers(request):
         return JsonResponse(data, safe=False)
 
 
+@user_passes_test(is_transapp)
+def getUsersPositions(request):
+    if request.method == 'GET':
+        date_init = datetime.strptime(request.GET.get('date_init'), "%Y-%m-%dT%H:%M:%S")
+        date_end = datetime.strptime(request.GET.get('date_end'), "%Y-%m-%dT%H:%M:%S")
+
+        pytz.timezone('America/Santiago').localize(date_init)
+        pytz.timezone('America/Santiago').localize(date_end)
+
+        response = {}
+
+        devices = DevicePositionInTime.objects.filter(timeStamp__range=[date_init, date_end]).order_by('userId',
+                                                                                                       'timeStamp').values()
+
+        for device in devices:
+            if str(device['userId']) in response:
+                response[str(device['userId'])].append(
+                    {'lat': device['latitud'], 'lon': device['longitud'], 'timeStamp': device['timeStamp']})
+            else:
+                response[str(device['userId'])] = [
+                    {'lat': device['latitud'], 'lon': device['longitud'], 'timeStamp': device['timeStamp']}]
+
+        return JsonResponse(response, safe=False)
+
+@user_passes_test(is_transapp)
+def getUsersTravelMap(request):
+    if request.method == 'GET':
+        date_init = datetime.strptime(request.GET.get('date_init'), "%Y-%m-%dT%H:%M:%S")
+        date_end = datetime.strptime(request.GET.get('date_end'), "%Y-%m-%dT%H:%M:%S")
+
+        pytz.timezone('America/Santiago').localize(date_init)
+        pytz.timezone('America/Santiago').localize(date_end)
+
+        response = {}
+
+        tokenposes = PoseInTrajectoryOfToken.objects.filter(timeStamp__range=[date_init, date_end]).order_by(
+            'token_id',
+            'timeStamp'). \
+            annotate(service=ExpressionWrapper(F('token__busassignment__service'), output_field=CharField())). \
+            values('latitud', 'longitud', 'timeStamp', 'token_id', 'service')
+
+        for tokenpose in tokenposes:
+            if str(tokenpose['token_id']) not in response:
+                response[str(tokenpose['token_id'])] = {'service': tokenpose['service'],
+                                                        'origin': {'latitude': tokenpose['latitud'],
+                                                                   'longitude': tokenpose['longitud'],
+                                                                   'timeStamp': tokenpose['timeStamp']}}
+
+        tokenposes = PoseInTrajectoryOfToken.objects.filter(token_id__in=response).order_by('token_id',
+                                                                                            '-timeStamp')
+
+        for resp in response:
+            response[resp].update({'destination': {'latitude': tokenposes.filter(token_id=resp).first().latitud,
+                                                   'longitude': tokenposes.filter(token_id=resp).first().longitud,
+                                                   'timeStamp': tokenposes.filter(
+                                                       token_id=resp).first().timeStamp}})
+
+        return JsonResponse(response, safe=False)
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # TOOLS
 # ----------------------------------------------------------------------------------------------------------------------
@@ -705,60 +775,3 @@ def getFullTable(request):
         }
         return JsonResponse(data, safe=False)
 
-
-@user_passes_test(is_transapp)
-def getUsersPositions(request):
-    if request.method == 'GET':
-        date_init = datetime.strptime(request.GET.get('date_init'), "%Y-%m-%dT%H:%M:%S")
-        date_end = datetime.strptime(request.GET.get('date_end'), "%Y-%m-%dT%H:%M:%S")
-
-        pytz.timezone('America/Santiago').localize(date_init)
-        pytz.timezone('America/Santiago').localize(date_end)
-
-        response = {}
-
-        devices = DevicePositionInTime.objects.filter(timeStamp__range=[date_init, date_end]).order_by('userId',
-                                                                                                       'timeStamp').values()
-
-        for device in devices:
-            if str(device['userId']) in response:
-                response[str(device['userId'])].append(
-                    {'lat': device['latitud'], 'lon': device['longitud'], 'timeStamp': device['timeStamp']})
-            else:
-                response[str(device['userId'])] = [
-                    {'lat': device['latitud'], 'lon': device['longitud'], 'timeStamp': device['timeStamp']}]
-
-        return JsonResponse(response, safe=False)
-
-
-@user_passes_test(is_transapp)
-def getUsersTravelMap(request):
-    if request.method == 'GET':
-        date_init = datetime.strptime(request.GET.get('date_init'), "%Y-%m-%dT%H:%M:%S")
-        date_end = datetime.strptime(request.GET.get('date_end'), "%Y-%m-%dT%H:%M:%S")
-
-        pytz.timezone('America/Santiago').localize(date_init)
-        pytz.timezone('America/Santiago').localize(date_end)
-
-        response = {}
-
-        tokenposes = PoseInTrajectoryOfToken.objects.filter(timeStamp__range=[date_init, date_end]).order_by('token_id',
-                                                                                                             'timeStamp'). \
-            annotate(service=ExpressionWrapper(F('token__busassignment__service'), output_field=CharField())). \
-            values('latitud', 'longitud', 'timeStamp', 'token_id', 'service')
-
-        for tokenpose in tokenposes:
-            if str(tokenpose['token_id']) not in response:
-                response[str(tokenpose['token_id'])] = {'service': tokenpose['service'],
-                                                        'origin': {'latitude': tokenpose['latitud'],
-                                                                   'longitude': tokenpose['longitud'],
-                                                                   'timeStamp': tokenpose['timeStamp']}}
-
-        tokenposes = PoseInTrajectoryOfToken.objects.filter(token_id__in=response).order_by('token_id', '-timeStamp')
-
-        for resp in response:
-            response[resp].update({'destination': {'latitude': tokenposes.filter(token_id=resp).first().latitud,
-                                                   'longitude': tokenposes.filter(token_id=resp).first().longitud,
-                                                   'timeStamp': tokenposes.filter(token_id=resp).first().timeStamp}})
-
-        return JsonResponse(response, safe=False)

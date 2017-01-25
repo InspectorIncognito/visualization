@@ -50,8 +50,14 @@ urlpatterns = [
 
     # BusStop
     # --------------------
+
+    # reports
     url(r'^busStopReports/$', views.busStopReports, name='busStopReports'),
     url(r'^getBusStopReports/$', views.getBusStopReports, name='getBusStopReports'),
+
+    # bus stop events map
+    url(r'^busStopMap/$', views.busStopMap, name='busStopMap'),
+    url(r'^getBusStopInfo/$', views.getBusStopInfo, name='getBusStopInfo'),
 
     # User
     # --------------------
@@ -109,13 +115,4 @@ urlpatterns = [
     #       ...
     #  ...
     url(r'^getUsersActivities/$', views.getUsersActivities, name='getUsersActivities'),
-
-    # usage: BusStop ???
-    # http://localhost/carriers/getBusStopInfo/?date_init=2016-10-24T00:00:00&date_end=2017-01-25T00:00:00&_=1485262643655
-    # {
-    #  "PH84": {"confirmCount": 0, "declineCount": 0, "busStopCheckCount": 1, "eventCount": 1},
-    #  "PH86": {"confirmCount": 0, "declineCount": 0, "busStopCheckCount": 22, "eventCount": 0},
-    #  ...
-    # }
-    url(r'^getBusStopInfo/$', views.getBusStopInfo, name='getBusStopInfo'),
 ]
