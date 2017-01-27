@@ -482,14 +482,21 @@ def busStopMap(request):
     template = loader.get_template('busStopMap.html')
     return HttpResponse(template.render(request=request))
 
+
+# ----------------------------------------------------------------------------------------------------------------------
+# USERS
+# ----------------------------------------------------------------------------------------------------------------------
+
 @login_required
 def busStopViewsMap(request):
     template = loader.get_template('busStopViewsMap.html')
     return HttpResponse(template.render(request=request))
 
-# ----------------------------------------------------------------------------------------------------------------------
-# USERS
-# ----------------------------------------------------------------------------------------------------------------------
+
+@login_required
+def usersTravelMap(request):
+    template = loader.get_template('usersTravelMap.html')
+    return HttpResponse(template.render(request=request))
 
 
 @user_passes_test(is_transapp)

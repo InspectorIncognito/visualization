@@ -1,0 +1,134 @@
+{% extends 'visualization/dashboard.html' %}
+{% load staticfiles %}
+{% block title %}
+    <title>Mapa de Viajes de Usuarios - TranSapp</title>
+{% endblock title %}
+
+{% block topimports %}
+
+    <!-- Select2 -->
+    <link href="{% static 'components/gentelella/vendors/select2/dist/css/select2.min.css' %}" rel="stylesheet">
+
+    <!-- toggle button -->
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.css"/>
+
+    <style>
+        .info_div {
+            padding: 6px 8px;
+            font: 14px/16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        .info_div h4 {
+            margin: 0 0 5px;
+            color: #777;
+            font-weight: bold;
+        }
+    </style>
+
+{% endblock topimports %}
+
+{% block toptiles %}
+{% endblock toptiles %}
+
+{% block maincontent %}
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_title">
+                <h2 style="margin-top: 24px;">Mapa de Viajes de Usuarios</h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div class="dashboard-widget-content">
+                    <div class="container">
+                        <div class="form">
+                            <div class="row form-inline">
+                                <div class='col-sm-4 col-xs-12'>
+                                    <div class="form-group">
+                                        <label for="date_init">Fecha Inicio:</label>
+                                        <input type='text' class="form-control"
+                                               id="date_init"/>
+                                    </div>
+                                </div>
+                                <div class='col-sm-4 col-xs-12'>
+                                    <div class="form-group">
+                                        <label for="date_end">Fecha Fin:</label>
+                                        <input type='text' class="form-control"
+                                               id="date_end"/>
+                                    </div>
+                                </div>
+                                <div class='col-sm-4 col-xs-12'>
+                                    <div class="form-group">
+                                        <div class="checkbox">
+                                            <input
+                                                    id="toggle-button"
+                                                    data-toggle="toggle"
+                                                    data-size="normal"
+                                                    type="checkbox"
+                                                    data-on="Origen de viajes"
+                                                    data-off="Destino de viajes"
+                                                    data-onstyle="warning"
+                                                    data-offstyle="success"
+                                                    data-width=" 200px"
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class='col-sm-12 col-xs-12'>
+                                    <div class="form-group" style="margin-top: 20px;">
+                                        <label for="date_end">Mostrar viajes:</label>
+                                        <label class="checkbox checkbox-inline">
+                                            <input type="checkbox" id="checkbox-distance-0"> Menores a 100 metros
+                                        </label>
+                                        <label class="checkbox checkbox-inline">
+                                            <input type="checkbox" id="checkbox-distance-1"> Menores a 1 km
+                                        </label>
+                                        <label class="checkbox checkbox-inline">
+                                            <input type="checkbox" id="checkbox-distance-2"> Entre 1 y 5 km
+                                        </label>
+                                        <label class="checkbox checkbox-inline">
+                                            <input type="checkbox" id="checkbox-distance-3"> Mayores a 10 km
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="container">
+                        <div id="map_id" style="margin-top: 20px; height: 570px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock maincontent %}
+
+{% block bottomimports %}
+    <!-- bootstrap-datetimepicker -->
+    <script src="{% static 'components/gentelella/vendors/moment/min/moment.min.js' %}"></script>
+    <script src="{% static 'components/gentelella/vendors/moment/locale/es.js' %}"></script>
+    <script src="{% static 'components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js' %}"></script>
+
+    <!-- bootstrap button -->
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+
+    <!-- Select2 -->
+    <script src="{% static 'components/gentelella/vendors/select2/dist/js/select2.full.min.js' %}"></script>
+
+    <!-- Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.js"></script>
+
+    <!-- TranSapp baseline -->
+    <script src="{% static 'carrier/js/baseline.js' %}"></script>
+
+    <!-- This view -->
+    <script src="{% static 'carrier/js/usersTravelMap.js' %}"></script>
+
+{% endblock bottomimports %}

@@ -66,21 +66,14 @@ urlpatterns = [
     url(r'^busStopViewsMap/$', views.busStopViewsMap, name='busStopViewsMap'),
     url(r'^getUsersPositions/$', views.getUsersPositions, name='getUsersPositions'),
 
+    url(r'^usersTravelMap/$', views.usersTravelMap, name='usersTravelMap'),
+    url(r'^getUsersTravelMap/$', views.getUsersTravelMap, name='getUsersTravelMap'),
+
     # Tools
     # --------------------
     url(r'^fullTable/$', views.fullTable, name='fullTable'),
     url(r'^getFullTable/$', views.getFullTable, name='getFullTable'),
 
-
-    # http://localhost/carriers/getUsersTravelMap/?date_init=2016-10-24T00:00:00&date_end=2017-01-25T00:00:00&_=1485262643655
-    # {
-    #   "3e4b1eda90e01f977577c4dbcad03091c76c33942b1217a7e7bbf6d2483e568a19f121a86562b5ac5e9da7ae8399da776e889c0f0b6a6961cc8ce61757e90f99": {
-    #       "origin": {"latitude": -33.4459671, "timeStamp": "2016-12-14T12:22:13Z", "longitude": -70.6605514},
-    #       "destination": {"latitude": -33.4461054, "timeStamp": "2016-12-14T13:21:14Z", "longitude": -70.6615643},
-    #       "service": "418"
-    #   },
-    #   ...
-    url(r'^getUsersTravelMap/$', views.getUsersTravelMap, name='getUsersTravelMap'),
 
 
     # http://localhost/carriers/getActiveUsers/?date=2016-10-24
