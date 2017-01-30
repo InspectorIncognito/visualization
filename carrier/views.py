@@ -488,6 +488,12 @@ def busStopMap(request):
 # ----------------------------------------------------------------------------------------------------------------------
 
 @login_required
+def userActivities(request):
+    template = loader.get_template('userActivities.html')
+    return HttpResponse(template.render(request=request))
+
+
+@login_required
 def busStopViewsMap(request):
     template = loader.get_template('busStopViewsMap.html')
     return HttpResponse(template.render(request=request))
@@ -508,7 +514,7 @@ def getUsersActivities(request):
         pytz.timezone('America/Santiago').localize(date_init)
         pytz.timezone('America/Santiago').localize(date_end)
         # ADD TIMEZONE
-        response = {}
+
         # Per user id get:
         # devicePositionInTime count
         devices = DevicePositionInTime.objects.filter(timeStamp__range=[date_init, date_end])
@@ -544,100 +550,108 @@ def getUsersActivities(request):
         bschecks = NearByBusesLog.objects.filter(timeStamp__range=[date_init, date_end])
         bschecks = bschecks.values('userId').annotate(num_checks=Count('timeStamp'))
 
+        tmp_response = {}
         for device in devices:
-            response[str(device['userId'])] = {'devicePositionInTimeCount': device['num_positions']}
+            tmp_response[str(device['userId'])] = {'devicePositionInTimeCount': device['num_positions']}
 
         for busevent in busevents:
-            if str(busevent['userId']) in response:
-                response[str(busevent['userId'])].update({'busEventCreationCount': busevent['num_events']})
+            if str(busevent['userId']) in tmp_response:
+                tmp_response[str(busevent['userId'])].update({'busEventCreationCount': busevent['num_events']})
             else:
-                response[str(busevent['userId'])] = {'busEventCreationCount': busevent['num_events']}
+                tmp_response[str(busevent['userId'])] = {'busEventCreationCount': busevent['num_events']}
 
         for stopsevent in stopsevents:
-            if str(stopsevent['userId']) in response:
-                response[str(stopsevent['userId'])].update({'busStopEventCreationCount': stopsevent['num_events']})
+            if str(stopsevent['userId']) in tmp_response:
+                tmp_response[str(stopsevent['userId'])].update({'busStopEventCreationCount': stopsevent['num_events']})
             else:
-                response[str(stopsevent['userId'])] = {'busStopEventCreationCount': stopsevent['num_events']}
+                tmp_response[str(stopsevent['userId'])] = {'busStopEventCreationCount': stopsevent['num_events']}
 
         for confirmbus in confirmsbus:
-            if str(confirmbus['userId']) in response:
-                response[str(confirmbus['userId'])].update({'confirmBusCount': confirmbus['num_confirms']})
+            if str(confirmbus['userId']) in tmp_response:
+                tmp_response[str(confirmbus['userId'])].update({'confirmBusCount': confirmbus['num_confirms']})
             else:
-                response[str(confirmbus['userId'])] = {'confirmBusCount': confirmbus['num_confirms']}
+                tmp_response[str(confirmbus['userId'])] = {'confirmBusCount': confirmbus['num_confirms']}
 
         for declinebus in declinesbus:
-            if str(declinebus['userId']) in response:
-                response[str(declinebus['userId'])].update({'declineBusCount': declinebus['num_declines']})
+            if str(declinebus['userId']) in tmp_response:
+                tmp_response[str(declinebus['userId'])].update({'declineBusCount': declinebus['num_declines']})
             else:
-                response[str(declinebus['userId'])] = {'declineBusCount': declinebus['num_declines']}
+                tmp_response[str(declinebus['userId'])] = {'declineBusCount': declinebus['num_declines']}
 
         for confirmstop in confirmsstop:
-            if str(confirmstop['userId']) in response:
-                response[str(confirmstop['userId'])].update({'confirmBusStopCount': confirmstop['num_confirms']})
+            if str(confirmstop['userId']) in tmp_response:
+                tmp_response[str(confirmstop['userId'])].update({'confirmBusStopCount': confirmstop['num_confirms']})
             else:
-                response[str(confirmstop['userId'])] = {'confirmBusStopCount': confirmstop['num_confirms']}
+                tmp_response[str(confirmstop['userId'])] = {'confirmBusStopCount': confirmstop['num_confirms']}
 
         for declinestop in declinesstop:
-            if str(declinestop['userId']) in response:
-                response[str(declinestop['userId'])].update({'declineBusStopCount': declinestop['num_declines']})
+            if str(declinestop['userId']) in tmp_response:
+                tmp_response[str(declinestop['userId'])].update({'declineBusStopCount': declinestop['num_declines']})
             else:
-                response[str(declinestop['userId'])] = {'declineBusStopCount': declinestop['num_declines']}
+                tmp_response[str(declinestop['userId'])] = {'declineBusStopCount': declinestop['num_declines']}
 
         for token in tokens:
-            if str(token['userId']) in response:
-                response[str(token['userId'])].update({'tokenCount': token['num_tokens']})
+            if str(token['userId']) in tmp_response:
+                tmp_response[str(token['userId'])].update({'tokenCount': token['num_tokens']})
             else:
-                response[str(token['userId'])] = {'tokenCount': token['num_tokens']}
+                tmp_response[str(token['userId'])] = {'tokenCount': token['num_tokens']}
 
         for report in reports:
-            if str(report['userId']) in response:
-                response[str(report['userId'])].update({'reportCount': report['num_reports']})
+            if str(report['userId']) in tmp_response:
+                tmp_response[str(report['userId'])].update({'reportCount': report['num_reports']})
             else:
-                response[str(report['userId'])] = {'reportCount': report['num_reports']}
+                tmp_response[str(report['userId'])] = {'reportCount': report['num_reports']}
 
         for bscheck in bschecks:
-            if str(bscheck['userId']) in response:
-                response[str(bscheck['userId'])].update({'busStopCheckCount': bscheck['num_checks']})
+            if str(bscheck['userId']) in tmp_response:
+                tmp_response[str(bscheck['userId'])].update({'busStopCheckCount': bscheck['num_checks']})
             else:
-                response[str(bscheck['userId'])] = {'busStopCheckCount': bscheck['num_checks']}
+                tmp_response[str(bscheck['userId'])] = {'busStopCheckCount': bscheck['num_checks']}
 
-        for resp in response:
-            if 'devicePositionInTimeCount' not in response[resp]:
-                response[resp].update({'devicePositionInTimeCount': 0})
+        for device_id in tmp_response:
+            if 'devicePositionInTimeCount' not in tmp_response[device_id]:
+                tmp_response[device_id].update({'devicePositionInTimeCount': 0})
 
-            if 'busEventCreationCount' not in response[resp]:
-                response[resp].update({'busEventCreationCount': 0})
+            if 'busEventCreationCount' not in tmp_response[device_id]:
+                tmp_response[device_id].update({'busEventCreationCount': 0})
 
-            if 'busStopEventCreationCount' not in response[resp]:
-                response[resp].update({'busStopEventCreationCount': 0})
+            if 'busStopEventCreationCount' not in tmp_response[device_id]:
+                tmp_response[device_id].update({'busStopEventCreationCount': 0})
 
-            if 'confirmBusCount' not in response[resp]:
-                response[resp].update({'confirmBusCount': 0})
+            if 'confirmBusCount' not in tmp_response[device_id]:
+                tmp_response[device_id].update({'confirmBusCount': 0})
 
-            if 'declineBusCount' not in response[resp]:
-                response[resp].update({'declineBusCount': 0})
+            if 'declineBusCount' not in tmp_response[device_id]:
+                tmp_response[device_id].update({'declineBusCount': 0})
 
-            if 'tokenCount' not in response[resp]:
-                response[resp].update({'tokenCount': 0})
+            if 'tokenCount' not in tmp_response[device_id]:
+                tmp_response[device_id].update({'tokenCount': 0})
 
-            if 'reportCount' not in response[resp]:
-                response[resp].update({'reportCount': 0})
+            if 'reportCount' not in tmp_response[device_id]:
+                tmp_response[device_id].update({'reportCount': 0})
 
-            if 'busStopCheckCount' not in response[resp]:
-                response[resp].update({'busStopCheckCount': 0})
+            if 'busStopCheckCount' not in tmp_response[device_id]:
+                tmp_response[device_id].update({'busStopCheckCount': 0})
 
-            if 'confirmBusStopCount' not in response[resp]:
-                response[resp].update({'confirmBusStopCount': 0})
+            if 'confirmBusStopCount' not in tmp_response[device_id]:
+                tmp_response[device_id].update({'confirmBusStopCount': 0})
 
-            if 'declineBusStopCount' not in response[resp]:
-                response[resp].update({'declineBusStopCount': 0})
+            if 'declineBusStopCount' not in tmp_response[device_id]:
+                tmp_response[device_id].update({'declineBusStopCount': 0})
 
-            response[resp]['confirmBusCount'] = response[resp]['confirmBusCount'] - response[resp][
+            tmp_response[device_id]['confirmBusCount'] = tmp_response[device_id]['confirmBusCount'] - tmp_response[device_id][
                 'busEventCreationCount']
-            response[resp]['confirmBusStopCount'] = response[resp]['confirmBusStopCount'] - response[resp][
+            tmp_response[device_id]['confirmBusStopCount'] = tmp_response[device_id]['confirmBusStopCount'] - tmp_response[device_id][
                 'busStopEventCreationCount']
 
-        return JsonResponse(response, safe=False)
+        # as array
+        response = []
+        for device_id in tmp_response:
+            info = tmp_response[device_id]
+            info["device_id"] = device_id
+            response.append(info)
+
+        return JsonResponse({"data": response}, safe=False)
 
 
 @user_passes_test(is_transapp)

@@ -62,10 +62,15 @@ urlpatterns = [
     # User
     # --------------------
 
+    # user activities
+    url(r'^userActivities/$', views.userActivities, name='userActivities'),
+    url(r'^getUsersActivities/$', views.getUsersActivities, name='getUsersActivities'),
+
     # bus stop views map
     url(r'^busStopViewsMap/$', views.busStopViewsMap, name='busStopViewsMap'),
     url(r'^getUsersPositions/$', views.getUsersPositions, name='getUsersPositions'),
 
+    # user travels
     url(r'^usersTravelMap/$', views.usersTravelMap, name='usersTravelMap'),
     url(r'^getUsersTravelMap/$', views.getUsersTravelMap, name='getUsersTravelMap'),
 
@@ -73,7 +78,6 @@ urlpatterns = [
     # --------------------
     url(r'^fullTable/$', views.fullTable, name='fullTable'),
     url(r'^getFullTable/$', views.getFullTable, name='getFullTable'),
-
 
 
     # http://localhost/carriers/getActiveUsers/?date=2016-10-24
@@ -89,16 +93,4 @@ urlpatterns = [
     #       ...
     # ]}
     url(r'^getActiveUsers/$', views.getActiveUsers, name='getActiveUsers'),
-
-
-    # http://localhost/carriers/getUsersActivities/?date_init=2016-10-24T00:00:00&date_end=2017-01-25T00:00:00&_=1485262643655
-    # {
-    #   "9142b237-074c-4282-aaea-c586447087ac": {
-    #       "confirmBusCount": 0, "reportCount": 0, "declineBusStopCount": 0,
-    #       "devicePositionInTimeCount": 45, "confirmBusStopCount": 0, "declineBusCount": 0,
-    #       "busStopCheckCount": 54, "busEventCreationCount": 0, "tokenCount": 0, "busStopEventCreationCount": 0},
-    #  "d4c4fe99-ee24-4d30-be2a-a4e032d0474b": {
-    #       ...
-    #  ...
-    url(r'^getUsersActivities/$', views.getUsersActivities, name='getUsersActivities'),
 ]
