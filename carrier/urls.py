@@ -66,6 +66,9 @@ urlpatterns = [
     url(r'^userActivities/$', views.userActivities, name='userActivities'),
     url(r'^getUsersActivities/$', views.getUsersActivities, name='getUsersActivities'),
 
+    url(r'^activeUsers/$', views.activeUsers, name='activeUsers'),
+    url(r'^getActiveUsers/$', views.getActiveUsers, name='getActiveUsers'),
+
     # bus stop views map
     url(r'^busStopViewsMap/$', views.busStopViewsMap, name='busStopViewsMap'),
     url(r'^getUsersPositions/$', views.getUsersPositions, name='getUsersPositions'),
@@ -79,18 +82,4 @@ urlpatterns = [
     url(r'^fullTable/$', views.fullTable, name='fullTable'),
     url(r'^getFullTable/$', views.getFullTable, name='getFullTable'),
 
-
-    # http://localhost/carriers/getActiveUsers/?date=2016-10-24
-    # {
-    #   "half_hours": [
-    #       {
-    #           "half_hour": "2016-10-24 00:00:00-03:00 2016-10-25 00:29:59-03:00",
-    #           "active_events": 1419,
-    #           "active_users": 2,
-    #           "reporting_users": 0,
-    #           "reports": 0
-    #       },
-    #       ...
-    # ]}
-    url(r'^getActiveUsers/$', views.getActiveUsers, name='getActiveUsers'),
 ]

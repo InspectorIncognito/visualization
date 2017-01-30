@@ -494,6 +494,12 @@ def userActivities(request):
 
 
 @login_required
+def activeUsers(request):
+    template = loader.get_template('activeUsers.html')
+    return HttpResponse(template.render(request=request))
+
+
+@login_required
 def busStopViewsMap(request):
     template = loader.get_template('busStopViewsMap.html')
     return HttpResponse(template.render(request=request))
