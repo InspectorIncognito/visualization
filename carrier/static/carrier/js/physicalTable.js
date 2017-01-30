@@ -116,7 +116,7 @@ $(document).ready(function () {
                                 '\'' + row.plate + '\'' +
                                 ')" ' +
                                 'style="margin-bottom: 0; margin-right: 0">' +
-                                ' Arreglar ' +
+                                ' Arreglado ' +
                             '</button>';
                 }
             }
