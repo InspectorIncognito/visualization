@@ -146,8 +146,7 @@ function resetCurData() {
 }
 
 function loadData() {
-    runSpinner();
-
+    
     var now = moment();
     var elapsed_seconds = now.diff(cur_data_timestamp)/(1000);
     if (elapsed_seconds > 30*60) {
@@ -163,12 +162,12 @@ function loadData() {
                 cur_data = data;
                 cur_data_timestamp = moment();
                 redrawData();
-                stopSpinner();
+                spinner.stop();
             });
     } else {
         console.log("... using already loaded data from " + elapsed_seconds + " seconds ago.");
         redrawData();
-        stopSpinner();
+        spinner.stop();
     }
 }
 
@@ -184,7 +183,7 @@ function loadData() {
 
 
 var origin_icon = L.icon({
-    iconUrl: '/static/carrier/images/drawable-mdpi/circulo_inicio.png',
+    iconUrl: '/static/carrier/images/circulo_inicio.png',
     shadowUrl: null,
 
     iconSize:     [22, 22], // size of the icon
@@ -195,7 +194,7 @@ var origin_icon = L.icon({
 });
 
 var dest_icon = L.icon({
-    iconUrl: '/static/carrier/images/drawable-mdpi/circulo_fin.png',
+    iconUrl: '/static/carrier/images/circulo_fin.png',
     shadowUrl: null,
 
     iconSize:     [22, 22], // size of the icon
