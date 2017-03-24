@@ -50,7 +50,8 @@ with open(os.path.join(os.path.dirname(__file__), 'keys/email_config.json')) as 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [u'104.236.183.105', u'127.0.0.1', u'localhost']
+ALLOWED_HOSTS = [u'198.199.103.136', 'transappweb.cl', 'www.transappweb.cl']
+#ALLOWED_HOSTS = [u'127.0.0.1', u'localhost']
 
 # Application definition
 
@@ -126,6 +127,25 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(os.path.dirname(__file__), 'logs/file.log'),
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
