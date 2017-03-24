@@ -1,6 +1,5 @@
-====================================================
-Installation
-====================================================
+# Installation
+
 
 This repository mantains the code for deploying the TranSapp visualization server on a linux machine
 
