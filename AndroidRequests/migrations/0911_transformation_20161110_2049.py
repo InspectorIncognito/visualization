@@ -8,7 +8,7 @@ import django.contrib.gis.db.models.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('AndroidRequests', '0021_nearest_busstops'),
+        ('AndroidRequests', '0910_transformation_nearest_busstops'),
     ]
 
     operations = [

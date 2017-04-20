@@ -39,7 +39,7 @@ def fill_tables(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('AndroidRequests', '0026_auto_20161216_2025'),
+        ('AndroidRequests', '0915_transformation_20161216_2025'),
     ]
 
     operations = [

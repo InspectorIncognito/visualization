@@ -7,7 +7,7 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('AndroidRequests', '0015_eventforbusv2_half_hour_period'),
+        ('AndroidRequests', '0904_transformation_eventforbusv2_half_hour_period'),
     ]
 
     operations = [

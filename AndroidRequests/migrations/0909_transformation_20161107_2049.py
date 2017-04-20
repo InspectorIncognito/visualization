@@ -63,7 +63,7 @@ def fill_tables(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('AndroidRequests', '0019_zonification'),
+        ('AndroidRequests', '0908_transformation_zonification'),
     ]
 
     operations = [

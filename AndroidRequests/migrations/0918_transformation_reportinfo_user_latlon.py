@@ -33,7 +33,7 @@ def fill_tables(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('AndroidRequests', '0028_reportinfo_foreign_busstop'),
+        ('AndroidRequests', '0917_transformation_reportinfo_foreign_busstop'),
     ]
 
     operations = [
