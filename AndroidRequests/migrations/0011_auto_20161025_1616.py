@@ -41,7 +41,7 @@ def fill_tables(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('AndroidRequests', '0017_auto_20161123_1457'),
+        ('AndroidRequests', '0029_score_20170330_1443'),
     ]
 
     operations = [
