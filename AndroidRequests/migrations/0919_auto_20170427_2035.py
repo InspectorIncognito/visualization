@@ -13,10 +13,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='token',
-            name='id',
-        ),
         migrations.AlterField(
             model_name='eventforbusstop',
             name='zonification',
@@ -29,26 +25,16 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name='reportinfo',
-            name='stopCode',
-            field=models.CharField(max_length=6, null=True, verbose_name=b'StopCode'),
-        ),
-        migrations.AlterField(
-            model_name='reportinfo',
             name='zonification',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='AndroidRequests.ZonificationTransantiago', verbose_name=b'zonification'),
         ),
         migrations.AlterField(
-            model_name='servicesbybusstop',
-            name='code',
-            field=models.CharField(max_length=6),
+            model_name='reportinfo',
+            name='stopCode',
+            field=models.CharField(max_length=6, null=True, verbose_name=b'StopCode'),
         ),
-        migrations.AlterField(
-            model_name='token',
-            name='token',
-            field=models.CharField(max_length=128, primary_key=True, serialize=False, verbose_name=b'Token'),
-        ),
-        migrations.AlterUniqueTogether(
-            name='busassignment',
-            unique_together=set([]),
-        ),
+        #migrations.AlterUniqueTogether(
+        #    name='busassignment',
+        #    unique_together=set(['uuid', 'service']),
+        #),
     ]
