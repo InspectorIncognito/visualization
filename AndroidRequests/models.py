@@ -50,12 +50,10 @@ class ReportInfo(models.Model):
 
         res["busStopCode"] = "No Info."
         res["busStopName"] = "No Info."
-        if self.busStop:
-            busstop = self.busStop.getDictionary()
-            code = busstop["codeBusStop"]
-            name = busstop["nameBusStop"]
-            res["busStopCode"] = code
-            res["busStopName"] = name.replace(code + "-", "", 1)
+        if self.stopCode is not None:
+            busStopName = BusStop.objects.filter(code=self.stopCode).order_by('-gtfs__timeCreation').first().name
+            res["busStopCode"] = self.stopCode
+            res["busStopName"] = busStopName.replace(self.stopCode + "-", "", 1)
 
         report = self.report.getDictionary()
         res["imageName"] = report["imageName"]
@@ -275,8 +273,8 @@ class EventForBusv2(EventRegistration):
         dictionary['service'] = self.busassignment.service if self.busassignment else "No info."
         dictionary['plate'] = self.busassignment.uuid.registrationPlate if self.busassignment else "No info."
         dictionary['type'] = self.event.name.capitalize()
-        dictionary['busStop1'] = self.busStop1.name if self.busStop1 else "No info."
-        dictionary['busStop2'] = self.busStop2.name if self.busStop2 else "No info."
+        dictionary['busStop1'] = self.busStop1#.name if self.busStop1 else "No info."
+        dictionary['busStop2'] = self.busStop2#.name if self.busStop2 else "No info."
         dictionary['fixed'] = "Si" if self.fixed else "No"
         dictionary['id'] = self.id
         dictionary['category'] = self.event.category.capitalize()
@@ -300,7 +298,7 @@ class ServicesByBusStop(models.Model):
     """This model helps to determine the direction of the bus service I or R.
     All of this is tied to the bus stop code and the service provided by it.
     It's useful to have the direction of the service to be able to determine position of the bus."""
-    code = models.CharField(max_length=6, null=False,
+    code = models.CharField(max_length=11, null=False,
                             blank=False)  # EX: 506I or 506R, R and I indicate "Ida" and "Retorno"
     """ Service code where the last character indicates the direction of this """
     busStop = models.ForeignKey('BusStop', verbose_name='the busStop')
@@ -394,8 +392,8 @@ class Busassignment(models.Model):
     """ Unique ID to primarily identify Buses created without registrationPlate """
     events = models.ManyToManyField(Event, verbose_name='the event', through=EventForBusv2)
 
-    # class Meta:
-    #    unique_together = ('registrationPlate', 'service')
+    class Meta:
+        unique_together = ('uuid', 'service')
 
     def getDirection(self, pBusStop, pDistance):
         """Given a bus stop and the distance from the bus to the bus stop, return the address to which point the bus."""
@@ -568,7 +566,7 @@ class ServiceStopDistance(models.Model):
 
 class Token(models.Model):
     """This table has all the tokens that have been used ever."""
-    token = models.CharField('Token', max_length=128, primary_key=True)
+    token = models.CharField('Token', max_length=128)
     '''Identifier for an incognito trip'''
     busassignment = models.ForeignKey(Busassignment, verbose_name='Bus')
     '''Bus that is making the trip'''

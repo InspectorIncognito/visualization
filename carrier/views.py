@@ -32,7 +32,7 @@ def is_transapp(user):
 
 @login_required
 def index(request):
-    template = loader.get_template('carrier/test.html')
+    template = loader.get_template('test.html')
     return HttpResponse(template.render(request=request))
 
 
@@ -370,7 +370,7 @@ def getBusMapParameters(request):
     busassignment = Busassignment.objects.filter(service__in=services).exclude(
         uuid__registrationPlate__icontains="No Info.").select_related('uuid').distinct('uuid__registrationPlate')
     plates = [ba.uuid.registrationPlate for ba in busassignment]
-    zones = zonificationTransantiago.objects.distinct("comuna")
+    zones = ZonificationTransantiago.objects.distinct("comuna")
     comunas = [zone.comuna for zone in zones]
     events = Event.objects.filter(eventType="bus").exclude(category="estado físico")
     categories = events.distinct("category")
@@ -404,7 +404,7 @@ def getBusStopReports(request):
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
         query = ReportInfo.objects.filter(reportType='busStop', report__timeStamp__range=[date_init, date_end])
-        query = query.exclude(busStop__isnull=True)
+        query = query.exclude(stopCode__isnull=True)
         data = {
             'data': [report_info.getDictionary() for report_info in query]
         }
@@ -423,35 +423,35 @@ def getBusStopInfo(request):
         response = {}
         # events
         stopsevents = EventForBusStop.objects.filter(timeCreation__range=[date_init, date_end])
-        stopsevents = stopsevents.values('busStop_id').annotate(num_events=Count('id'))
+        stopsevents = stopsevents.values('stopCode').annotate(num_events=Count('id'))
         # confirms
         confirmsstop = StadisticDataFromRegistrationBusStop.objects.filter(timeStamp__range=[date_init, date_end],
                                                                            confirmDecline='confirm') \
-            .annotate(busStop=ExpressionWrapper(F('reportOfEvent__busStop'), output_field=CharField()))
-        confirmsstop = confirmsstop.values('busStop').annotate(num_confirms=Count('id'))
+            .annotate(stopCode=ExpressionWrapper(F('reportOfEvent__stopCode'), output_field=CharField()))
+        confirmsstop = confirmsstop.values('stopCode').annotate(num_confirms=Count('id'))
         # declines
         declinesstop = StadisticDataFromRegistrationBusStop.objects.filter(timeStamp__range=[date_init, date_end],
                                                                            confirmDecline='decline') \
-            .annotate(busStop=ExpressionWrapper(F('reportOfEvent__busStop'), output_field=CharField()))
-        declinesstop = declinesstop.values('busStop').annotate(num_declines=Count('id'))
+            .annotate(stopCode=ExpressionWrapper(F('reportOfEvent__stopCode'), output_field=CharField()))
+        declinesstop = declinesstop.values('stopCode').annotate(num_declines=Count('id'))
         # touch
         bschecks = NearByBusesLog.objects.filter(timeStamp__range=[date_init, date_end])
         bschecks = bschecks.values('busStop').annotate(num_checks=Count('timeStamp'))
 
         for stopevent in stopsevents:
-            response[str(stopevent['busStop_id'])] = {'eventCount': stopevent['num_events']}
+            response[str(stopevent['stopCode'])] = {'eventCount': stopevent['num_events']}
 
         for confirmstop in confirmsstop:
-            if str(confirmstop['busStop']) in response:
-                response[str(confirmstop['busStop'])].update({'confirmCount': confirmstop['num_confirms']})
+            if str(confirmstop['stopCode']) in response:
+                response[str(confirmstop['stopCode'])].update({'confirmCount': confirmstop['num_confirms']})
             else:
-                response[str(confirmstop['busStop'])] = {'confirmCount': confirmstop['num_confirms']}
+                response[str(confirmstop['stopCode'])] = {'confirmCount': confirmstop['num_confirms']}
 
         for declinestop in declinesstop:
-            if str(declinestop['busStop']) in response:
-                response[str(declinestop['busStop'])].update({'declineCount': declinestop['num_declines']})
+            if str(declinestop['stopCode']) in response:
+                response[str(declinestop['stopCode'])].update({'declineCount': declinestop['num_declines']})
             else:
-                response[str(declinestop['busStop'])] = {'declineCount': declinestop['num_declines']}
+                response[str(declinestop['stopCode'])] = {'declineCount': declinestop['num_declines']}
 
         for bscheck in bschecks:
             if str(bscheck['busStop']) in response:
@@ -525,95 +525,95 @@ def getUsersActivities(request):
         # Per user id get:
         # devicePositionInTime count
         devices = DevicePositionInTime.objects.filter(timeStamp__range=[date_init, date_end])
-        devices = devices.values('userId').annotate(num_positions=Count('id'))
+        devices = devices.values('phoneId').annotate(num_positions=Count('id'))
         # bus and busstops events -> eventFor*
         busevents = EventForBusv2.objects.filter(timeCreation__range=[date_init, date_end])
-        busevents = busevents.values('userId').annotate(num_events=Count('id'))
+        busevents = busevents.values('phoneId').annotate(num_events=Count('id'))
         stopsevents = EventForBusStop.objects.filter(timeCreation__range=[date_init, date_end])
-        stopsevents = stopsevents.values('userId').annotate(num_events=Count('id'))
+        stopsevents = stopsevents.values('phoneId').annotate(num_events=Count('id'))
         # confirms and declines fro bus and busstops events -> statistic*
         # TODO: if the timeStamp is the first of the event, is the creation of the event and must not be counted
         confirmsbus = StadisticDataFromRegistrationBus.objects.filter(timeStamp__range=[date_init, date_end],
                                                                       confirmDecline='confirm')
-        confirmsbus = confirmsbus.values('userId').annotate(num_confirms=Count('id'))
+        confirmsbus = confirmsbus.values('phoneId').annotate(num_confirms=Count('id'))
         declinesbus = StadisticDataFromRegistrationBus.objects.filter(timeStamp__range=[date_init, date_end],
                                                                       confirmDecline='decline')
-        declinesbus = declinesbus.values('userId').annotate(num_declines=Count('id'))
+        declinesbus = declinesbus.values('phoneId').annotate(num_declines=Count('id'))
 
         confirmsstop = StadisticDataFromRegistrationBusStop.objects.filter(timeStamp__range=[date_init, date_end],
                                                                            confirmDecline='confirm')
-        confirmsstop = confirmsstop.values('userId').annotate(num_confirms=Count('id'))
+        confirmsstop = confirmsstop.values('phoneId').annotate(num_confirms=Count('id'))
         declinesstop = StadisticDataFromRegistrationBusStop.objects.filter(timeStamp__range=[date_init, date_end],
                                                                            confirmDecline='decline')
-        declinesstop = declinesstop.values('userId').annotate(num_declines=Count('id'))
+        declinesstop = declinesstop.values('phoneId').annotate(num_declines=Count('id'))
         # tokens
         tokens = PoseInTrajectoryOfToken.objects.filter(timeStamp__range=[date_init, date_end]).values('token_id')
-        tokens = Token.objects.filter(token__in=tokens)
-        tokens = tokens.values('userId').annotate(num_tokens=Count('token'))
+        tokens = Token.objects.filter(pk__in=tokens)
+        tokens = tokens.values('phoneId').annotate(num_tokens=Count('token'))
         # reports
         reports = Report.objects.filter(timeStamp__range=[date_init, date_end])
-        reports = reports.values('userId').annotate(num_reports=Count('id'))
+        reports = reports.values('phoneId').annotate(num_reports=Count('id'))
         # busstops checkeds -> nearbyBusesLog
         bschecks = NearByBusesLog.objects.filter(timeStamp__range=[date_init, date_end])
-        bschecks = bschecks.values('userId').annotate(num_checks=Count('timeStamp'))
+        bschecks = bschecks.values('phoneId').annotate(num_checks=Count('timeStamp'))
 
         tmp_response = {}
         for device in devices:
-            tmp_response[str(device['userId'])] = {'devicePositionInTimeCount': device['num_positions']}
+            tmp_response[str(device['phoneId'])] = {'devicePositionInTimeCount': device['num_positions']}
 
         for busevent in busevents:
-            if str(busevent['userId']) in tmp_response:
-                tmp_response[str(busevent['userId'])].update({'busEventCreationCount': busevent['num_events']})
+            if str(busevent['phoneId']) in tmp_response:
+                tmp_response[str(busevent['phoneId'])].update({'busEventCreationCount': busevent['num_events']})
             else:
-                tmp_response[str(busevent['userId'])] = {'busEventCreationCount': busevent['num_events']}
+                tmp_response[str(busevent['phoneId'])] = {'busEventCreationCount': busevent['num_events']}
 
         for stopsevent in stopsevents:
-            if str(stopsevent['userId']) in tmp_response:
-                tmp_response[str(stopsevent['userId'])].update({'busStopEventCreationCount': stopsevent['num_events']})
+            if str(stopsevent['phoneId']) in tmp_response:
+                tmp_response[str(stopsevent['phoneId'])].update({'busStopEventCreationCount': stopsevent['num_events']})
             else:
-                tmp_response[str(stopsevent['userId'])] = {'busStopEventCreationCount': stopsevent['num_events']}
+                tmp_response[str(stopsevent['phoneId'])] = {'busStopEventCreationCount': stopsevent['num_events']}
 
         for confirmbus in confirmsbus:
-            if str(confirmbus['userId']) in tmp_response:
-                tmp_response[str(confirmbus['userId'])].update({'confirmBusCount': confirmbus['num_confirms']})
+            if str(confirmbus['phoneId']) in tmp_response:
+                tmp_response[str(confirmbus['phoneId'])].update({'confirmBusCount': confirmbus['num_confirms']})
             else:
-                tmp_response[str(confirmbus['userId'])] = {'confirmBusCount': confirmbus['num_confirms']}
+                tmp_response[str(confirmbus['phoneId'])] = {'confirmBusCount': confirmbus['num_confirms']}
 
         for declinebus in declinesbus:
-            if str(declinebus['userId']) in tmp_response:
-                tmp_response[str(declinebus['userId'])].update({'declineBusCount': declinebus['num_declines']})
+            if str(declinebus['phoneId']) in tmp_response:
+                tmp_response[str(declinebus['phoneId'])].update({'declineBusCount': declinebus['num_declines']})
             else:
-                tmp_response[str(declinebus['userId'])] = {'declineBusCount': declinebus['num_declines']}
+                tmp_response[str(declinebus['phoneId'])] = {'declineBusCount': declinebus['num_declines']}
 
         for confirmstop in confirmsstop:
-            if str(confirmstop['userId']) in tmp_response:
-                tmp_response[str(confirmstop['userId'])].update({'confirmBusStopCount': confirmstop['num_confirms']})
+            if str(confirmstop['phoneId']) in tmp_response:
+                tmp_response[str(confirmstop['phoneId'])].update({'confirmBusStopCount': confirmstop['num_confirms']})
             else:
-                tmp_response[str(confirmstop['userId'])] = {'confirmBusStopCount': confirmstop['num_confirms']}
+                tmp_response[str(confirmstop['phoneId'])] = {'confirmBusStopCount': confirmstop['num_confirms']}
 
         for declinestop in declinesstop:
-            if str(declinestop['userId']) in tmp_response:
-                tmp_response[str(declinestop['userId'])].update({'declineBusStopCount': declinestop['num_declines']})
+            if str(declinestop['phoneId']) in tmp_response:
+                tmp_response[str(declinestop['phoneId'])].update({'declineBusStopCount': declinestop['num_declines']})
             else:
-                tmp_response[str(declinestop['userId'])] = {'declineBusStopCount': declinestop['num_declines']}
+                tmp_response[str(declinestop['phoneId'])] = {'declineBusStopCount': declinestop['num_declines']}
 
         for token in tokens:
-            if str(token['userId']) in tmp_response:
-                tmp_response[str(token['userId'])].update({'tokenCount': token['num_tokens']})
+            if str(token['phoneId']) in tmp_response:
+                tmp_response[str(token['phoneId'])].update({'tokenCount': token['num_tokens']})
             else:
-                tmp_response[str(token['userId'])] = {'tokenCount': token['num_tokens']}
+                tmp_response[str(token['phoneId'])] = {'tokenCount': token['num_tokens']}
 
         for report in reports:
-            if str(report['userId']) in tmp_response:
-                tmp_response[str(report['userId'])].update({'reportCount': report['num_reports']})
+            if str(report['phoneId']) in tmp_response:
+                tmp_response[str(report['phoneId'])].update({'reportCount': report['num_reports']})
             else:
-                tmp_response[str(report['userId'])] = {'reportCount': report['num_reports']}
+                tmp_response[str(report['phoneId'])] = {'reportCount': report['num_reports']}
 
         for bscheck in bschecks:
-            if str(bscheck['userId']) in tmp_response:
-                tmp_response[str(bscheck['userId'])].update({'busStopCheckCount': bscheck['num_checks']})
+            if str(bscheck['phoneId']) in tmp_response:
+                tmp_response[str(bscheck['phoneId'])].update({'busStopCheckCount': bscheck['num_checks']})
             else:
-                tmp_response[str(bscheck['userId'])] = {'busStopCheckCount': bscheck['num_checks']}
+                tmp_response[str(bscheck['phoneId'])] = {'busStopCheckCount': bscheck['num_checks']}
 
         for device_id in tmp_response:
             if 'devicePositionInTimeCount' not in tmp_response[device_id]:
@@ -701,9 +701,9 @@ def getActiveUsers(request):
             data["half_hours"].append({
                 "half_hour": str(date_start + timedelta(minutes=30 * (x - 1))) + " " + str(
                     date_finish + timedelta(minutes=30 * (x))),
-                "active_users": len(list(set([position.userId for position in period_positions]))),
+                "active_users": len(list(set([position.phoneId for position in period_positions]))),
                 "reporting_users": len(list(set(
-                    [event.userId for event in period_bus_stop_events] + [event.userId for event in
+                    [event.phoneId for event in period_bus_stop_events] + [event.phoneId for event in
                                                                           period_bus_events]))),
                 "reports": len(period_bus_stop_events) + len(period_bus_events),
                 "active_events": len(bus_active_events) + len(bus_stop_active_events)
@@ -722,25 +722,25 @@ def getUsersPositions(request):
 
         devices = DevicePositionInTime.objects.filter(
             timeStamp__range=[date_init, date_end]
-        ).order_by('userId', 'timeStamp').values()
+        ).order_by('phoneId', 'timeStamp').values()
 
         response = {}
         for device in devices:
-            device_id = str(device['userId'])
+            device_id = str(device['phoneId'])
 
             # already exists: save the last one
             if device_id in response:
                 response[device_id]['last'] = {
-                    'lat': device['latitud'],
-                    'lon': device['longitud'],
+                    'lat': device['latitude'],
+                    'lon': device['longitude'],
                     'timeStamp': device['timeStamp']
                 }
             else:
                 # new device
                 response[device_id] = {
                     'first': {
-                        'lat': device['latitud'],
-                        'lon': device['longitud'],
+                        'lat': device['latitude'],
+                        'lon': device['longitude'],
                         'timeStamp': device['timeStamp']
                     }
                 }
@@ -758,29 +758,29 @@ def getUsersTravelMap(request):
         pytz.timezone('America/Santiago').localize(date_end)
 
         response = {}
-
+        
         tokenposes = PoseInTrajectoryOfToken.objects.filter(timeStamp__range=[date_init, date_end]).order_by(
             'token_id',
             'timeStamp'). \
             annotate(service=ExpressionWrapper(F('token__busassignment__service'), output_field=CharField())). \
-            values('latitud', 'longitud', 'timeStamp', 'token_id', 'service')
-
+            values('latitude', 'longitude', 'timeStamp', 'token_id', 'service')
+        
         for tokenpose in tokenposes:
             if str(tokenpose['token_id']) not in response:
                 response[str(tokenpose['token_id'])] = {'service': tokenpose['service'],
-                                                        'origin': {'latitude': tokenpose['latitud'],
-                                                                   'longitude': tokenpose['longitud'],
+                                                        'origin': {'latitude': tokenpose['latitude'],
+                                                                   'longitude': tokenpose['longitude'],
                                                                    'timeStamp': tokenpose['timeStamp']}}
-
+        
         tokenposes = PoseInTrajectoryOfToken.objects.filter(token_id__in=response).order_by('token_id',
                                                                                             '-timeStamp')
 
         for resp in response:
-            response[resp].update({'destination': {'latitude': tokenposes.filter(token_id=resp).first().latitud,
-                                                   'longitude': tokenposes.filter(token_id=resp).first().longitud,
+            response[resp].update({'destination': {'latitude': tokenposes.filter(token_id=resp).first().latitude,
+                                                   'longitude': tokenposes.filter(token_id=resp).first().longitude,
                                                    'timeStamp': tokenposes.filter(
                                                        token_id=resp).first().timeStamp}})
-
+        
         return JsonResponse(response, safe=False)
 
 
