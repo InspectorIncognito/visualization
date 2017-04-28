@@ -56,7 +56,7 @@ ALLOWED_HOSTS = [u'198.199.103.136', 'transappweb.cl', 'www.transappweb.cl']
 # Application definition
 
 INSTALLED_APPS = [
-    'visualization',
+    'login',
     'carrier.apps.CarrierConfig',
     'AndroidRequests.apps.AndroidRequestsConfig',
     'django.contrib.admin',
