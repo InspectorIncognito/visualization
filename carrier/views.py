@@ -2,16 +2,17 @@
 
 from django.http import HttpResponse
 from django.template import loader
-from AndroidRequests.models import *
 from django.http import JsonResponse
 from django.db.models import Q, Count
-from datetime import datetime, date, timedelta
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models import CharField, ExpressionWrapper, F
+
+from datetime import datetime, date, timedelta
+from pytz import timezone
 import json
 import pytz
-from django.db.models import CharField, ExpressionWrapper, F
-from pytz import timezone
 
+from AndroidRequests.models import *
 
 def filter(request):
     user = request.user.getUser()
@@ -31,7 +32,7 @@ def is_transapp(user):
 
 @login_required
 def index(request):
-    template = loader.get_template('test.html')
+    template = loader.get_template('carrier/test.html')
     return HttpResponse(template.render(request=request))
 
 
@@ -67,7 +68,7 @@ def getCount(request):
 
 @login_required
 def drivers(request):
-    template = loader.get_template('drivers.html')
+    template = loader.get_template('carrier/drivers.html')
     services = Service.objects.filter(filter(request))
     context = {
         'services': services,
@@ -129,7 +130,7 @@ def getDriversReport(request):
 
 @login_required
 def driversTable(request):
-    template = loader.get_template('driversTable.html')
+    template = loader.get_template('carrier/driversTable.html')
     return HttpResponse(template.render(request=request))
 
 
@@ -158,7 +159,7 @@ def getDriversTable(request):
 
 @login_required
 def busReports(request):
-    template = loader.get_template('busReports.html')
+    template = loader.get_template('carrier/busReports.html')
     return HttpResponse(template.render(request=request))
 
 
@@ -179,7 +180,7 @@ def getBusReports(request):
 
 @login_required
 def physical(request):
-    template = loader.get_template('physical.html')
+    template = loader.get_template('carrier/physical.html')
     services = Service.objects.filter(filter(request))
     context = {
         'services': services
@@ -215,7 +216,7 @@ def getPhysicalHeaders(request):
 
 @login_required
 def physicalTable(request):
-    template = loader.get_template('physicalTable.html')
+    template = loader.get_template('carrier/physicalTable.html')
     return HttpResponse(template.render(request=request))
 
 
@@ -321,7 +322,7 @@ def updatePhysical(request):
 
 @login_required
 def busMap(request):
-    template = loader.get_template('busMap.html')
+    template = loader.get_template('carrier/busMap.html')
     return HttpResponse(template.render(request=request))
 
 
@@ -393,7 +394,7 @@ def getBusMapParameters(request):
 
 @login_required
 def busStopReports(request):
-    template = loader.get_template('busStopReports.html')
+    template = loader.get_template('carrier/busStopReports.html')
     return HttpResponse(template.render(request=request))
 
 
@@ -479,7 +480,7 @@ def getBusStopInfo(request):
 
 @login_required
 def busStopMap(request):
-    template = loader.get_template('busStopMap.html')
+    template = loader.get_template('carrier/busStopMap.html')
     return HttpResponse(template.render(request=request))
 
 
@@ -489,25 +490,25 @@ def busStopMap(request):
 
 @login_required
 def userActivities(request):
-    template = loader.get_template('userActivities.html')
+    template = loader.get_template('carrier/userActivities.html')
     return HttpResponse(template.render(request=request))
 
 
 @login_required
 def activeUsers(request):
-    template = loader.get_template('activeUsers.html')
+    template = loader.get_template('carrier/activeUsers.html')
     return HttpResponse(template.render(request=request))
 
 
 @login_required
 def busStopViewsMap(request):
-    template = loader.get_template('busStopViewsMap.html')
+    template = loader.get_template('carrier/busStopViewsMap.html')
     return HttpResponse(template.render(request=request))
 
 
 @login_required
 def usersTravelMap(request):
-    template = loader.get_template('usersTravelMap.html')
+    template = loader.get_template('carrier/usersTravelMap.html')
     return HttpResponse(template.render(request=request))
 
 
@@ -790,7 +791,7 @@ def getUsersTravelMap(request):
 
 @login_required
 def fullTable(request):
-    template = loader.get_template('fullTable.html')
+    template = loader.get_template('carrier/fullTable.html')
     events = Event.objects.filter(eventType="bus").distinct("category")
     types = [event.category.capitalize() for event in events]
     context = {
