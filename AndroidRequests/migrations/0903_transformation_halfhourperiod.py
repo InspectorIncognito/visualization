@@ -71,5 +71,4 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.RunPython(fill_tables, reverse_code=migrations.RunPython.noop),
-
     ]

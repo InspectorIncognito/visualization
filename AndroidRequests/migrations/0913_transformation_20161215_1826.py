@@ -13,37 +13,23 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name='bus',
-            name='service',
-            field=models.CharField(max_length=5),
-        ),
-        migrations.AlterField(
             model_name='busassignment',
             name='service',
-            field=models.CharField(max_length=5),
-        ),
-        migrations.AlterField(
-            model_name='service',
-            name='service',
-            field=models.CharField(max_length=5, primary_key=True, serialize=False, verbose_name=b'Service'),
+            field=models.CharField(max_length=11),
         ),
         migrations.AlterField(
             model_name='servicelocation',
             name='service',
-            field=models.CharField(max_length=6, verbose_name=b'Service Code'),
+            field=models.CharField(max_length=11, verbose_name=b'Service Code'),
         ),
         migrations.AlterField(
             model_name='servicesbybusstop',
             name='code',
-            field=models.CharField(max_length=6),
+            field=models.CharField(max_length=11),
         ),
         migrations.AlterField(
             model_name='servicestopdistance',
             name='service',
-            field=models.CharField(max_length=6, verbose_name=b'Service Code'),
-        ),
-        migrations.AlterUniqueTogether(
-            name='busassignment',
-            unique_together=set([]),
+            field=models.CharField(max_length=11, verbose_name=b'Service Code'),
         ),
     ]

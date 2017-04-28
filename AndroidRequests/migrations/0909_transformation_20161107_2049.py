@@ -20,11 +20,11 @@ def fill_tables(apps, schema_editor):
     #     st.longitud = aux
     #     st.save()
 
-    print("ZONIFICACION DE EVENTS FOR BUS")
+    print("ASSIGN ZONE TO EVENTS FOR BUS")
     for ev in eventsforbusv2.objects.all():
         statistic_data = statisticsfrombus.objects.filter(reportOfEvent = ev).order_by('-timeStamp')[0]
-        ev_lat = statistic_data.latitud
-        ev_long = statistic_data.longitud
+        ev_lat = statistic_data.latitude
+        ev_long = statistic_data.longitude
         pnt = Point(ev_long, ev_lat)
         zon = None
         try:
@@ -34,11 +34,11 @@ def fill_tables(apps, schema_editor):
         ev.zonification = zon
         ev.save()
     
-    print("ZONIFICACION DE EVENTS FOR BUS STOP")
+    print("ASSIGN ZONE TO EVENTS FOR BUS STOP")
     for ev in eventsforbusstop.objects.all():
         statistic_data = statisticsfrombusstop.objects.filter(reportOfEvent = ev).order_by('-timeStamp')[0]
-        ev_lat = statistic_data.latitud
-        ev_long = statistic_data.longitud
+        ev_lat = statistic_data.latitude
+        ev_long = statistic_data.longitude
         pnt = Point(ev_long, ev_lat)
         zon = None
         try:
@@ -51,7 +51,7 @@ def fill_tables(apps, schema_editor):
     print("ZONIFICACION DE REPORT INFO")
     for ev in reportsinfo.objects.all():
 
-        pnt = Point(ev.longitud, ev.latitud)
+        pnt = Point(ev.longitude, ev.latitude)
         zon = None
         try:
             zon = zonification.objects.filter(geom__intersects = pnt)[0]

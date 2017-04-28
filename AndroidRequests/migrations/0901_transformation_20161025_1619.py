@@ -11,13 +11,11 @@ def fill_tables(apps, schema_editor):
     timeperiods = apps.get_model('AndroidRequests', 'TimePeriod')
     
     for ev in eventsforbusv2.objects.all():
-        # time_to_match = ev.timeCreation
-        # print(time_to_match)
         time = ev.timeCreation.time().replace(microsecond=0)
         timeperiod = None
         if ev.timeCreation.strftime("%A") == 'Saturday':
             timeperiod = timeperiods.objects.get(
-                day_type = 'Sabado',
+                day_type = 'Sábado',
                 initial_time__lte = time ,
                 end_time__gte = time
             )
@@ -35,17 +33,15 @@ def fill_tables(apps, schema_editor):
                 end_time__gte = time
             )
 
-        ev.time_period = timeperiod
+        ev.timePeriod = timeperiod
         ev.save()
 
     for ev in eventsforbusstop.objects.all():
-        # time_to_match = ev.timeCreation
-        # print(time_to_match)
         time = ev.timeCreation.time().replace(microsecond=0)
         timeperiod = None
         if ev.timeCreation.strftime("%A") == 'Saturday':
             timeperiod = timeperiods.objects.get(
-                day_type = 'Sabado',
+                day_type = 'Sábado',
                 initial_time__lte = time ,
                 end_time__gte = time
             )
@@ -63,7 +59,7 @@ def fill_tables(apps, schema_editor):
                 end_time__gte = time
             )
 
-        ev.time_period = timeperiod
+        ev.timePeriod = timeperiod
         ev.save()
 
 class Migration(migrations.Migration):
@@ -75,7 +71,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='eventforbusv2',
-            name='time_period',
+            name='timePeriod',
             field=models.ForeignKey(verbose_name=b'Time Period',
                                     to='AndroidRequests.TimePeriod',
                                     null = True),
@@ -83,7 +79,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='eventforbusstop',
-            name='time_period',
+            name='timePeriod',
             field=models.ForeignKey(verbose_name=b'Time Period',
                                     to='AndroidRequests.TimePeriod',
                                     null = True),
@@ -93,22 +89,17 @@ class Migration(migrations.Migration):
 
         migrations.AlterField(
             model_name='eventforbusv2',
-            name='time_period',
+            name='timePeriod',
             field=models.ForeignKey(verbose_name=b'Time Period',
                                     to='AndroidRequests.TimePeriod',
                                     null = False),
         ),
         migrations.AlterField(
             model_name='eventforbusstop',
-            name='time_period',
+            name='timePeriod',
             field=models.ForeignKey(verbose_name=b'Time Period',
                                     to='AndroidRequests.TimePeriod',
                                     null = False),
-        ),
-        migrations.AddField(
-            model_name='eventforbus',
-            name='fixed',
-            field=models.BooleanField(default=False, verbose_name=b'Fixed'),
         ),
         migrations.AddField(
             model_name='eventforbusstop',

@@ -17,14 +17,4 @@ class Migration(migrations.Migration):
             name='point',
             field=django.contrib.gis.db.models.fields.PointField(srid=32140, verbose_name=b'The point'),
         ),
-        migrations.AlterField(
-            model_name='eventforbusv2',
-            name='busStop1',
-            field=models.ForeignKey(related_name='busStop1', verbose_name=b'Bus Stop1', to='AndroidRequests.BusStop'),
-        ),
-        migrations.AlterField(
-            model_name='eventforbusv2',
-            name='busStop2',
-            field=models.ForeignKey(related_name='busStop2', verbose_name=b'Bus Stop2', to='AndroidRequests.BusStop'),
-        ),
     ]

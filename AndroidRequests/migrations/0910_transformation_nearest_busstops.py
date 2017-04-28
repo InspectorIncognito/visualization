@@ -17,12 +17,14 @@ def fill_tables(apps, schema_editor):
     busstops = apps.get_model('AndroidRequests', 'BusStop')
     statisticsfrombus = apps.get_model('AndroidRequests', 'StadisticDataFromRegistrationBus')
     zonification = apps.get_model('AndroidRequests', 'zonificationTransantiago')
+
     sys.stdout.write("\nBusStop iteration\nTotal rows: "+str(busstops.objects.all().count())+"\n")
     sys.stdout.write("\r Rows modified: 0")
     sys.stdout.flush()
+
     counter = 0
     for busstop in busstops.objects.all():
-        busstop.point = Point(busstop.longitud, busstop.latitud)
+        busstop.point = Point(busstop.longitude, busstop.latitude)
         #print("creando point")
         busstop.save()
         counter = counter + 1
@@ -39,14 +41,14 @@ def fill_tables(apps, schema_editor):
     for ev in eventsforbusv2.objects.all():
         nearest = []
         statistic_data = statisticsfrombus.objects.filter(reportOfEvent = ev).order_by('-timeStamp')[0]
-        ev_lat = statistic_data.latitud
-        ev_long = statistic_data.longitud
+        ev_lat = statistic_data.latitude
+        ev_long = statistic_data.longitude
         evpoint = Point(ev_long, ev_lat)
         for busstop in busstopsdict:
             busstop["distance"] = busstop['point'].distance(evpoint)
         nearest = sorted(busstopsdict, key = lambda busstop: busstop['distance'])
-        ev.busStop1 = busstops.objects.get(code = nearest[0]['code'])
-        ev.busStop2 = busstops.objects.get(code = nearest[1]['code'])
+        ev.busStop1 = nearest[0]['code']
+        ev.busStop2 = nearest[1]['code']
         ev.save()
         counter = counter +1
         if counter%100==0:
@@ -79,14 +81,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='eventforbusv2',
             name='busStop1',
-            field=models.ForeignKey(related_name='busStop1', verbose_name=b'Bus Stop1', to='AndroidRequests.BusStop', null=True),
-            preserve_default=False,
+            field=models.CharField(max_length=6, verbose_name=b'Bus Stop1', null=True),
         ),
         migrations.AddField(
             model_name='eventforbusv2',
             name='busStop2',
-            field=models.ForeignKey(related_name='busStop2', verbose_name=b'Bus Stop2', to='AndroidRequests.BusStop', null=True),
-            preserve_default=False,
+            field=models.CharField(max_length=6, verbose_name=b'Bus Stop2', null=True),
         ),
         migrations.AddField(
             model_name='busstop',
@@ -95,5 +95,4 @@ class Migration(migrations.Migration):
             preserve_default=False,
         ),
         migrations.RunPython(fill_tables, reverse_code=migrations.RunPython.noop),
-        
     ]

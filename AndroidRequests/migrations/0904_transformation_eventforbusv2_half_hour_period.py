@@ -2,8 +2,6 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import datetime
-from django.utils.timezone import utc
 
 def fill_tables(apps, schema_editor):
     eventsforbusv2 = apps.get_model('AndroidRequests', 'EventForBusv2')
@@ -13,13 +11,13 @@ def fill_tables(apps, schema_editor):
     for ev in eventsforbusv2.objects.all():
         time = ev.timeCreation.time().replace(microsecond=0)
         hhperiod = hhperiods.objects.get(initial_time__lte = time , end_time__gte = time)
-        ev.half_hour_period = hhperiod
+        ev.halfHourPeriod = hhperiod
         ev.save()
 
     for ev in eventsforbusstop.objects.all():
         time = ev.timeCreation.time().replace(microsecond=0)
         hhperiod = hhperiods.objects.get(initial_time__lte = time , end_time__gte = time)
-        ev.half_hour_period = hhperiod
+        ev.halfHourPeriod = hhperiod
         ev.save()
 
 class Migration(migrations.Migration):
@@ -31,13 +29,13 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='eventforbusv2',
-            name='half_hour_period',
+            name='halfHourPeriod',
             field=models.ForeignKey(verbose_name=b'Half Hour Period', to='AndroidRequests.HalfHourPeriod', null=True),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='eventforbusstop',
-            name='half_hour_period',
+            name='halfHourPeriod',
             field=models.ForeignKey(verbose_name=b'Half Hour Period', to='AndroidRequests.HalfHourPeriod', null=True),
             preserve_default=False,
         ),
@@ -45,12 +43,12 @@ class Migration(migrations.Migration):
 
         migrations.AlterField(
             model_name='eventforbusv2',
-            name='half_hour_period',
+            name='halfHourPeriod',
             field=models.ForeignKey(verbose_name=b'Half Hour Period', to='AndroidRequests.HalfHourPeriod', null=False),
         ),
         migrations.AlterField(
             model_name='eventforbusstop',
-            name='half_hour_period',
+            name='halfHourPeriod',
             field=models.ForeignKey(verbose_name=b'Half Hour Period', to='AndroidRequests.HalfHourPeriod', null=False),
         ),
     ]

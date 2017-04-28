@@ -12,7 +12,7 @@ def fill_tables(apps, schema_editor):
 
     for ev in evs.objects.all():
         direction = None
-        pose = tokentrajectory.objects.filter(timeStamp__lte = ev.timeStamp, token__userId=ev.userId).order_by('-timeStamp').first()
+        pose = tokentrajectory.objects.filter(timeStamp__lte = ev.timeStamp, token__phoneId=ev.phoneId).order_by('-timeStamp').first()
         try:
             direction = pose.token.direction
         except:
@@ -22,7 +22,7 @@ def fill_tables(apps, schema_editor):
 
     for report in reports.objects.filter(reportType='bus'):
         direction = None
-        pose = tokentrajectory.objects.filter(timeStamp__lte = report.report.timeStamp, token__userId=report.report.userId).order_by('-timeStamp').first()
+        pose = tokentrajectory.objects.filter(timeStamp__lte = report.report.timeStamp, token__phoneId=report.report.phoneId).order_by('-timeStamp').first()
         try:
             direction = pose.token.direction
         except:

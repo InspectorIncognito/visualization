@@ -1,6 +1,6 @@
 import os
 from django.contrib.gis.utils import LayerMapping
-from .models import zonificationTransantiago
+from .models import ZonificationTransantiago
 
 world_mapping =  {
     'id' : 'id',
@@ -21,7 +21,7 @@ world_shp = os.path.abspath(
 
 def run(verbose=True):
     lm = LayerMapping(
-        zonificationTransantiago, world_shp, world_mapping,
+        ZonificationTransantiago, world_shp, world_mapping,
         transform=False, encoding='utf-8',
     )
     lm.save(strict=True, verbose=verbose)

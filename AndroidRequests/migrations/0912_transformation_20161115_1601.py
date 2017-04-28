@@ -20,48 +20,33 @@ class Migration(migrations.Migration):
             field=django.contrib.gis.db.models.fields.PointField(null=True, srid=32140, verbose_name=b'The point'),
         ),
         migrations.AlterField(
-            model_name='eventforbus',
-            name='fixed',
-            field=models.NullBooleanField(default=False, verbose_name=b'Fixed'),
-        ),
-        migrations.AlterField(
             model_name='eventforbusstop',
             name='fixed',
             field=models.NullBooleanField(default=False, verbose_name=b'Fixed'),
         ),
         migrations.AlterField(
             model_name='eventforbusstop',
-            name='half_hour_period',
+            name='halfHourPeriod',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='AndroidRequests.HalfHourPeriod', verbose_name=b'Half Hour Period'),
         ),
         migrations.AlterField(
             model_name='eventforbusstop',
-            name='time_period',
+            name='timePeriod',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='AndroidRequests.TimePeriod', verbose_name=b'Time Period'),
         ),
         migrations.AlterField(
             model_name='eventforbusv2',
-            name='busStop1',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='busStop1', to='AndroidRequests.BusStop', verbose_name=b'Bus Stop1'),
-        ),
-        migrations.AlterField(
-            model_name='eventforbusv2',
-            name='busStop2',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='busStop2', to='AndroidRequests.BusStop', verbose_name=b'Bus Stop2'),
-        ),
-        migrations.AlterField(
-            model_name='eventforbusv2',
             name='fixed',
             field=models.NullBooleanField(default=False, verbose_name=b'Fixed'),
         ),
         migrations.AlterField(
             model_name='eventforbusv2',
-            name='half_hour_period',
+            name='halfHourPeriod',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='AndroidRequests.HalfHourPeriod', verbose_name=b'Half Hour Period'),
         ),
         migrations.AlterField(
             model_name='eventforbusv2',
-            name='time_period',
+            name='timePeriod',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='AndroidRequests.TimePeriod', verbose_name=b'Time Period'),
         ),
         migrations.AlterField(

@@ -12,29 +12,12 @@ def fill_tables(apps, schema_editor):
     reportsinfo = apps.get_model('AndroidRequests', 'ReportInfo')
     busesstops = apps.get_model('AndroidRequests', 'BusStop')
 
-    for ev in eventsforbusv2.objects.all():
-        ev.transformed = True
-        ev.save()
-
-    for ev in eventsforbusstop.objects.all():
-        ev.transformed = True
-        ev.save()
-
-    for ev in busv2.objects.all():
-        ev.transformed = True
-        ev.save()
-
-    for ev in reports.objects.all():
-        ev.transformed = True
-        ev.save()
-
-    for ev in reportsinfo.objects.all():
-        ev.transformed = True
-        ev.save()
-
-    for ev in busesstops.objects.all():
-        ev.transformed = True
-        ev.save()
+    eventsforbusv2.objects.all().update(transformed=True)
+    eventsforbusstop.objects.all().update(transformed=True)
+    busv2.objects.all().update(transformed=True)
+    reports.objects.all().update(transformed=True)
+    reportsinfo.objects.all().update(transformed=True)
+    busesstops.objects.all().update(transformed=True)
 
 class Migration(migrations.Migration):
 
