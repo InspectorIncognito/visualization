@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 import os
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "visualization.settings")
@@ -11,7 +12,7 @@ import sys
 django.setup()
 from AndroidRequests.models import EventForBusv2, EventForBusStop, TimePeriod, \
     Busv2, HalfHourPeriod, Report, ReportInfo, StadisticDataFromRegistrationBus, \
-    StadisticDataFromRegistrationBusStop, BusStop, zonificationTransantiago, PoseInTrajectoryOfToken
+    StadisticDataFromRegistrationBusStop, BusStop, ZonificationTransantiago, PoseInTrajectoryOfToken
 from django.contrib.gis.geos import Point
 from django.db.models import Q
 from datetime import datetime, time, date, timedelta
@@ -253,7 +254,7 @@ def add_county(timestamp, minutes_to_filter):
             evLat = statistic_data.latitude
             evLong = statistic_data.longitude
             pnt = Point(evLong, evLat)
-            zon = zonificationTransantiago.objects.filter(geom__intersects=pnt)[0]
+            zon = ZonificationTransantiago.objects.filter(geom__intersects=pnt)[0]
             ev.zonification = zon
             ev.save()
             counter += 1
@@ -276,7 +277,7 @@ def add_county(timestamp, minutes_to_filter):
             evLat = statistic_data.latitude
             evLong = statistic_data.longitude
             pnt = Point(evLong, evLat)
-            zon = zonificationTransantiago.objects.filter(geom__intersects=pnt)[0]
+            zon = ZonificationTransantiago.objects.filter(geom__intersects=pnt)[0]
             ev.zonification = zon
             ev.save()
             counter += 1
@@ -294,7 +295,7 @@ def add_county(timestamp, minutes_to_filter):
         pnt = Point(ev.longitude, ev.latitude)
         zon = None
         try:
-            zon = zonificationTransantiago.objects.filter(geom__intersects=pnt)[0]
+            zon = ZonificationTransantiago.objects.filter(geom__intersects=pnt)[0]
             counter += 1
         except:
             pass
