@@ -65,7 +65,7 @@ def add_time_periods(timestamp, minutes_to_filter):
         creationTime = ev.timeCreation.time().replace(microsecond=0)
         if ev.timeCreation.strftime("%A") == 'Saturday':
             timePeriod = TimePeriod.objects.get(
-                day_type='Sabado',
+                day_type='Sábado',
                 initial_time__lte=creationTime,
                 end_time__gte=creationTime
             )
