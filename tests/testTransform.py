@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.utils import timezone
 from datetime import datetime, date
 
-from AndroidRequests.models import EventForBusStop, EventForBusv2
+from AndroidRequests.models import EventForBusStop, EventForBusv2, Busv2
 
 import transform as t
 
@@ -72,5 +72,38 @@ class AddTimePeriodsTestCase(TestCase):
 
         for report in EventForBusStop.objects.all():
             self.assertIsNotNone(report.timePeriod)
+
+class ValidatePlateTestCase(TestCase):
+    """ evalute transform functions """
+
+    def setUp(self):
+        ''' '''
+        self.test = TestHelper(self)
+
+        self.gtfs = self.test.createGTFS('v1.0');
+
+        self.phoneId = '067e6162-3b6f-4ae2-a171-2470b63dff00'
+
+    def test_checkPlateWithGoodFormat(self):
+        '''  '''
+        licencePlate = 'AAAA11'
+        bus = self.test.createBus(self.phoneId, licencePlate)
+
+        t.validate_plates()
+
+        formattedLicencePlate = 'AA AA 11'
+        newLicencePlate = Busv2.objects.first().registrationPlate
+        self.assertEqual(newLicencePlate, formattedLicencePlate)
+
+    def test_checkPlateWithDummyPlate(self):
+        '''  '''
+        licencePlate = 'dummylPt'
+        bus = self.test.createBus(self.phoneId, licencePlate)
+
+        t.validate_plates()
+
+        formattedLicencePlate = u'No Info.'
+        newLicencePlate = Busv2.objects.first().registrationPlate
+        self.assertEqual(newLicencePlate, formattedLicencePlate)
 
 

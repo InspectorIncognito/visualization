@@ -110,8 +110,7 @@ def validate_plates():
             counter += 1
             bus.transformed = True
             bus.save()
-        else:
-            pass
+
     sys.stdout.write("\n Bus rows modified: " + str(counter) + "\n")
     sys.stdout.flush()
 
