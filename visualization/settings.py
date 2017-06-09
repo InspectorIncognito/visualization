@@ -56,6 +56,7 @@ ALLOWED_HOSTS = [u'198.199.103.136', 'transappweb.cl', 'www.transappweb.cl']
 
 INSTALLED_APPS = [
     'login',
+    'bowerapp',
     'carrier.apps.CarrierConfig',
     'AndroidRequests.apps.AndroidRequestsConfig',
     'django.contrib.admin',
