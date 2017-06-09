@@ -790,8 +790,8 @@ def getUsersTravelMap(request):
 
 
 @login_required
-def fullTable(request):
-    template = loader.get_template('carrier/fullTable.html')
+def fullTableBus(request):
+    template = loader.get_template('carrier/fullTableBus.html')
     events = Event.objects.filter(eventType="bus").distinct("category")
     types = [event.category.capitalize() for event in events]
     context = {
@@ -801,7 +801,7 @@ def fullTable(request):
 
 
 @login_required
-def getFullTable(request):
+def getFullTableBus(request):
     if request.method == 'GET':
         query = EventForBusv2.objects.filter(
             busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
@@ -818,5 +818,35 @@ def getFullTable(request):
         data = {
             'data': [report.getDictionary() for report in query]
         }
+        return JsonResponse(data, safe=False)
+
+@login_required
+def fullTableStop(request):
+    template = loader.get_template('carrier/fullTableStop.html')
+    events = Event.objects.filter(eventType="busStop").distinct("category")
+    types = [event.category.capitalize() for event in events]
+    context = {
+        'types': types,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+@login_required
+def getFullTableStop(request):
+    if request.method == 'GET':
+        query = EventForBusStop.objects.all()
+        date_init = request.GET.get('date_init')
+        date_end = request.GET.get('date_end')
+        types = request.GET.get('types')
+        query = query.filter(timeCreation__range=[date_init, date_end])
+        if types:
+            types = json.loads(types)
+            typeFilter = reduce(lambda x, y: x | y, [Q(event__category__icontains=type) for type in types])
+            query = query.filter(typeFilter)
+
+        data = {
+            'data': [report.getDictionary() for report in query]
+        }
+        
         return JsonResponse(data, safe=False)
 

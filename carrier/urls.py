@@ -79,7 +79,10 @@ urlpatterns = [
 
     # Tools
     # --------------------
-    url(r'^fullTable/$', views.fullTable, name='fullTable'),
-    url(r'^getFullTable/$', views.getFullTable, name='getFullTable'),
+    url(r'^fullTableBus/$', views.fullTableBus, name='fullTableBus'),
+    url(r'^getFullTableBus/$', views.getFullTableBus, name='getFullTableBus'),
+
+    url(r'^fullTableStop/$', views.fullTableStop, name='fullTableStop'),
+    url(r'^getFullTableStop/$', views.getFullTableStop, name='getFullTableStop'),
 
 ]

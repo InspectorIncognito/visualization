@@ -219,8 +219,8 @@ class EventRegistration(models.Model):
         stamp = timezone.localtime(self.timeStamp, pytz.timezone('Chile/Continental'))
         dictionary['timeCreation'] = creation.strftime("%d-%m-%Y %H:%M:%S")
         dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
-        eventDictionay = self.event.getDictionary()
-        dictionary.update(eventDictionay)
+        eventDictionary = self.event.getDictionary()
+        dictionary.update(eventDictionary)
 
         return dictionary
 
@@ -240,6 +240,23 @@ class EventForBusStop(EventRegistration):
     transformed = models.NullBooleanField(default=False, verbose_name=b'Transformed')
     '''Indicates if the current row was transformed '''
 
+    def getDictionary(self):
+        """A dictionary with the event information"""
+        dictionary = super(EventForBusStop, self).getDictionary()
+        dictionary['type'] = self.event.name.capitalize()
+        dictionary['id'] = self.id
+        dictionary['category'] = self.event.category.capitalize()
+        dictionary['stopCode'] = self.stopCode
+        dictionary['fixed'] = "Si" if self.fixed else "No"
+        dictionary['category'] = self.event.category.capitalize()
+        dictionary['zone777'] = self.zonification.zona if self.zonification else "No info."
+        dictionary['commune'] = self.zonification.comuna if self.zonification else "No info."
+        dictionary['typeOfDay'] = self.timePeriod.day_type if self.timePeriod else "No info."
+        dictionary['periodHour'] = self.halfHourPeriod.name if self.halfHourPeriod else "No info."
+        dictionary['periodTransantiago'] = self.timePeriod.name if self.timePeriod else "No info."
+        dictionary['additionalInfo'] = self.aditionalInfo if self.aditionalInfo else "No info."
+
+        return dictionary
 
 class EventForBusv2(EventRegistration):
     """This model stores the reported events for the Bus"""
@@ -285,6 +302,7 @@ class EventForBusv2(EventRegistration):
         dictionary['periodTransantiago'] = self.timePeriod.name if self.timePeriod else "No info."
 
         dictionary['direction'] = self.direction if self.direction else "No info."
+
         return dictionary
 
 

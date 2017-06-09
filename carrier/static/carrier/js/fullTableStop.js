@@ -30,7 +30,7 @@ $(document).ready(function () {
 
 var table;
 var fileName = "Todos los reportes";
-var url = 'http://' + location.host + '/carriers/getFullTable/';
+var url = 'http://' + location.host + '/carriers/getFullTableStop/';
 
 function init() {
     var date_init = $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD");
@@ -60,12 +60,9 @@ function init() {
             {title: "Falsos", data: 'eventDecline'},
             {title: "Tipo de día", data: 'typeOfDay'},
             {title: "Período media hora", data: 'periodHour'},
-            {title: "Servicio", data: 'service'},
-            {title: "Dirección", data: 'direction'},
-            {title: "Patente", data: 'plate'},
+            {title: "Info adicional", data: 'additionalInfo'},
+            {title: "Código parada", data: 'stopCode'},
             {title: "Comuna", data: 'commune'},
-            {title: "Paradero más cercano 1", data: 'busStop1'},
-            {title: "Paradero más cercano 2", data: 'busStop2'},
             {title: "Zona 777-lugar", data: 'zone777'},
             {title: "Período Transantiago", data: 'periodTransantiago'},
         ],
