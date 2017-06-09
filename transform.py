@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
-import os
+from __future__ import print_function
 
+import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "visualization.settings")
 
 # your imports, e.g. Django models
@@ -10,14 +11,19 @@ import json
 import sys
 
 django.setup()
+
 from AndroidRequests.models import EventForBusv2, EventForBusStop, TimePeriod, \
     Busv2, HalfHourPeriod, Report, ReportInfo, StadisticDataFromRegistrationBus, \
-    StadisticDataFromRegistrationBusStop, BusStop, ZonificationTransantiago, PoseInTrajectoryOfToken
+    StadisticDataFromRegistrationBusStop, BusStop, ZonificationTransantiago, \
+    PoseInTrajectoryOfToken
 from django.contrib.gis.geos import Point
 from django.db.models import Q
 from datetime import datetime, time, date, timedelta
 from pytz import timezone
 
+
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
 
 def add_time_periods(timestamp, minutes_to_filter):
     counter = 0
@@ -158,6 +164,7 @@ def add_report_info(timestamp, minutes_to_filter):
         try:
             report_json = json.loads(report1.reportInfo)
         except ValueError:
+            eprint("ERROR: to load  json reportInfo: {}".format(report1.reportInfo))
             continue
 
         # user location fields
@@ -170,6 +177,7 @@ def add_report_info(timestamp, minutes_to_filter):
                 try:
                     userLatitude = float(strLat[2:])
                 except:
+                    eprint("ERROR: problem with latitude format: {}".format(strLat))
                     pass
 
             if 'longitude' in userLoation:
@@ -177,6 +185,7 @@ def add_report_info(timestamp, minutes_to_filter):
                 try:
                     userLongitude = float(strLon[2:])
                 except:
+                    eprint("ERROR: problem with longitude format: {}".format(strLon))
                     pass
 
         # bus and bus stop fields
@@ -233,7 +242,7 @@ def add_report_info(timestamp, minutes_to_filter):
                 report=report1,
             )
             counter += 1
-
+        
         report1.transformed = True
         report1.save()
 

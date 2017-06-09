@@ -7,7 +7,7 @@ import json
 import datetime as dt
 
 # views
-from AndroidRequests.models import Busv2, Busassignment, Event, EventForBusv2, GTFS, BusStop, EventForBusStop
+from AndroidRequests.models import Busv2, Busassignment, Event, EventForBusv2, GTFS, BusStop, EventForBusStop, Report
 
 
 class TestHelper():
@@ -77,6 +77,17 @@ class TestHelper():
             eventDecline=eventDecline)
         return report
 
+    def createReport(self, phoneId, message, reportInfo={}, 
+            timeStamp=timezone.now(), imageName='', transformed=False):
+        """ """
+        report = Report.objects.create(
+            phoneId=phoneId,
+            message=message,
+            reportInfo=reportInfo,
+            imageName=imageName,
+            timeStamp=timeStamp,
+            transformed=transformed)
+        return report
 
     # ===================================================================== 
 
