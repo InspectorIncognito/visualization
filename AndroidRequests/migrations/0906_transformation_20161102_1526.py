@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.core.exceptions import ValidationError
 from django.db import models, migrations
 import json
+
 
 #Loads the JSON info in the reports into the ReportInfo table
 
@@ -11,7 +13,7 @@ def fill_table(apps, schema_editor):
     reports = apps.get_model('AndroidRequests', 'Report')
     buses = apps.get_model('AndroidRequests', 'Busv2')
     for report1 in reports.objects.all():
-        print(report1.pk)
+
         try:
             reportJson = json.loads(report1.reportInfo)
             if 'bus' in reportJson:
@@ -22,9 +24,13 @@ def fill_table(apps, schema_editor):
                 busUUIDn = None
                 try:
                     busUUIDn = reportJson['bus']['machineId']
+                    if busUUIDn == "" and buses.objects.filter(registrationPlate = plate).count() == 1:
+                        busUUIDn = buses.objects.filter(registrationPlate = plate).values_list("uuid", flat=True)[0]
+                    else:
+                        continue
                 except:
                     if reportJson['bus']['licensePlate'].upper() != "DUMMYLPT":
-                        busUUIDn = buses.objects.get(registrationPlate = plate).uuid
+                        busUUIDn = buses.objects.filter(registrationPlate = plate).values_list("uuid", flat=True)[0]
                 if reportJson['bus']['licensePlate'].upper() == "DUMMYLPT":
                     plate = reportJson['bus']['licensePlate'] = 'No Info.'
                 if len(reportJson['bus']['service']) > 5:
@@ -54,9 +60,8 @@ def fill_table(apps, schema_editor):
                     longitude = reportJson['busStop']['longitude'],
                     report = report1)
 
-        except ValueError as e:
-            print str(e)
-            pass
+        except (ValueError, ValidationError) as e:
+            print("Error: {}".format(str(e)))
     
 
 class Migration(migrations.Migration):
