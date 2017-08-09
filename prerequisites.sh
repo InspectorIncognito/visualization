@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 
 #####################################################################
 # REQUIREMENTS
@@ -29,6 +30,7 @@ sudo apt-get install --yes openssh-server
 pip install django-crontab
 pip install psycopg2
 pip install pytz
+pip install coverage
 # install apache
 sudo apt-get install --yes apache2 libapache2-mod-wsgi
 
