@@ -1,0 +1,27 @@
+{% extends 'admin/base_site.html' %}
+{% load staticfiles panel %}
+{% block title %}Visualizador Transapp{% endblock title %}
+
+{% block css %}
+    <!-- C3 -->
+    <link href="{% static 'components/c3/c3.min.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="col-md-6 col-sm-6 col-xs-12">
+        {% panel "fa-area-chart" "Resumen" "<div id='resumen'></div>" %}
+    </div>
+    <div class="col-md-6 col-sm-6 col-xs-12">
+        {% panel "fa-area-chart" "Resumen" "<div id='detalle'></div>" "detailtext"%}
+    </div>
+{% endblock %}
+
+{% block extrajs %}
+    <!-- C3 -->
+    <script src="{% static 'components/c3/c3.min.js' %}"></script>
+    <script src="{% static 'components/d3/d3.min.js' %}"></script>
+
+    <script src="{% static 'carrier/js/test.js' %}"></script>
+{% endblock %}
+
+
