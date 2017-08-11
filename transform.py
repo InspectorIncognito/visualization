@@ -1,23 +1,22 @@
 # -*- coding: UTF-8 -*-
-import os
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "visualization.settings")
-
-# your imports, e.g. Django models
-import django
-import re
-import json
-import sys
-
-django.setup()
 from AndroidRequests.models import EventForBusv2, EventForBusStop, TimePeriod, \
     Busv2, HalfHourPeriod, Report, ReportInfo, StadisticDataFromRegistrationBus, \
     StadisticDataFromRegistrationBusStop, BusStop, ZonificationTransantiago, PoseInTrajectoryOfToken
 from django.contrib.gis.geos import Point
 from django.db.models import Q
 from datetime import datetime, time, date, timedelta
-from pytz import timezone
+from django.utils import timezone
 
+# your imports, e.g. Django models
+import django
+import re
+import json
+import sys
+import os
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "visualization.settings")
+
+django.setup()
 
 def add_time_periods(timestamp, minutes_to_filter):
     counter = 0
@@ -118,30 +117,30 @@ def validate_plates():
 def add_half_hour_periods(timestamp, minutes_to_filter):
     
     counter = 0
-    for ev in EventForBusv2.objects.filter(
+    for event in EventForBusv2.objects.filter(
             Q(transformed=False) | Q(transformed__isnull=True),
             timeStamp__gt=timestamp - timedelta(minutes=minutes_to_filter)):
 
-        creationTime = ev.timeCreation.time().replace(microsecond=0)
-        hhperiod = HalfHourPeriod.objects.get(
-            initial_time__lte=creationTime, end_time__gte=creationTime)
-        ev.halfHourPeriod = hhperiod
-        ev.save()
+        creationTime = timezone.localtime(event.timeCreation).time().replace(microsecond=0)
+        hhperiod = HalfHourPeriod.objects.get(initial_time__lte=creationTime,
+                                              end_time__gte=creationTime)
+        event.halfHourPeriod = hhperiod
+        event.save()
         counter += 1
 
     sys.stdout.write("\n EventForBus rows modified: "+str(counter) + "\n")
     sys.stdout.flush()
     counter = 0
 
-    for ev in EventForBusStop.objects.filter(
+    for event in EventForBusStop.objects.filter(
             Q(transformed=False) | Q(transformed__isnull=True),
             timeStamp__gt=timestamp - timedelta(minutes=minutes_to_filter)):
 
-        creationTime = ev.timeCreation.time().replace(microsecond=0)
-        hhperiod = HalfHourPeriod.objects.get(
-            initial_time__lte=creationTime, end_time__gte=creationTime)
-        ev.halfHourPeriod = hhperiod
-        ev.save()
+        creationTime = timezone.localtime(event.timeCreation).time().replace(microsecond=0)
+        hhperiod = HalfHourPeriod.objects.get(initial_time__lte=creationTime,
+                                              end_time__gte=creationTime)
+        event.halfHourPeriod = hhperiod
+        event.save()
         counter += 1
 
     sys.stdout.write("\n EventForBusStop rows modified: "+ str(counter) + "\n")
@@ -149,7 +148,9 @@ def add_half_hour_periods(timestamp, minutes_to_filter):
 
 
 def add_report_info(timestamp, minutes_to_filter):
+    """
 
+    """
     counter = 0
     for report1 in Report.objects.filter(
             Q(transformed=False) | Q(transformed__isnull=True),
@@ -158,22 +159,22 @@ def add_report_info(timestamp, minutes_to_filter):
         try:
             report_json = json.loads(report1.reportInfo)
         except ValueError:
-            continue
+            report_json = {}
 
         # user location fields
         userLatitude = None
         userLongitude = None
         if 'locationUser' in report_json:
-            userLoation = report_json['locationUser']
-            if 'latitude' in userLoation:
-                strLat = userLoation['latitude']
+            userLocation = report_json['locationUser']
+            if 'latitude' in userLocation:
+                strLat = userLocation['latitude']
                 try:
                     userLatitude = float(strLat[2:])
                 except:
                     pass
 
-            if 'longitude' in userLoation:
-                strLon = userLoation['longitude']
+            if 'longitude' in userLocation:
+                strLon = userLocation['longitude']
                 try:
                     userLongitude = float(strLon[2:])
                 except:
@@ -197,8 +198,8 @@ def add_report_info(timestamp, minutes_to_filter):
             if len(report_json['bus']['service']) > 5:
                 report_json['bus']['service'] = 'JAVA'
 
-            report_info = ReportInfo.objects.create(
-                reportType='bus',
+            ReportInfo.objects.create(
+                reportType=ReportInfo.BUS,
                 busUUID=busUUID,
                 service=report_json['bus']['service'],
                 registrationPlate=plate,
@@ -211,9 +212,9 @@ def add_report_info(timestamp, minutes_to_filter):
             counter += 1
 
         elif 'bus_stop' in report_json:
-            report_info = ReportInfo.objects.create(
-                reportType='busStop',
-                busStop_id=report_json['bus_stop']['id'],
+            ReportInfo.objects.create(
+                reportType=ReportInfo.STOP,
+                stopCode=report_json['bus_stop']['id'],
                 latitude=report_json['bus_stop']['latitude'],
                 longitude=report_json['bus_stop']['longitude'],
                 userLatitude=userLatitude,
@@ -223,9 +224,9 @@ def add_report_info(timestamp, minutes_to_filter):
             counter += 1
 
         elif 'busStop' in report_json:
-            report_info = ReportInfo.objects.create(
-                reportType='busStop',
-                busStop_id=report_json['busStop']['id'],
+            ReportInfo.objects.create(
+                reportType=ReportInfo.STOP,
+                stopCode=report_json['busStop']['id'],
                 latitude=report_json['busStop']['latitude'],
                 longitude=report_json['busStop']['longitude'],
                 userLatitude=userLatitude,
@@ -291,7 +292,7 @@ def add_county(timestamp, minutes_to_filter):
 
     for ev in ReportInfo.objects.filter(
             Q(transformed=False) | Q(transformed__isnull=True)):
-        pnt = Point(ev.longitude, ev.latitude)
+        pnt = Point(ev.userLongitude, ev.userLatitude)
         zon = None
         try:
             zon = ZonificationTransantiago.objects.filter(geom__intersects=pnt)[0]
@@ -425,9 +426,7 @@ if __name__ == '__main__':
     dt = datetime.combine(ddate, dtime)
     # print(dt)
 
-    tz = timezone('Chile/Continental')
-
-    dttz = tz.localize(dt)
+    dttz = timezone.localtime(dt)
     print(dttz)
     
     add_time_periods(dttz, arg_minutes_to_filter)
