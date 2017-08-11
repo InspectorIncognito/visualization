@@ -13,9 +13,11 @@ import logging
 
 class ReportInfo(models.Model):
     """ Table for the report info data in Report """
+    BUS = "bus"
+    STOP = "busStop"
     REPORT_TYPE = (
-        ('bus', 'An event for the bus.'),
-        ('busStop', 'An event for the busStop.'))
+        (BUS, 'An event for the bus.'),
+        (STOP, 'An event for the busStop.'))
     reportType = models.CharField('Event Type', max_length=7, choices=REPORT_TYPE)
     """ Represents the element to which the report refers """
     busUUID = models.UUIDField(null=True)
@@ -33,11 +35,11 @@ class ReportInfo(models.Model):
     report = models.ForeignKey('Report', verbose_name='The Report')
     """ Link to the report """
     zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null=True)
-    '''Indicates the zonification for the event'''
+    """Indicates the zonification for the event"""
     transformed = models.NullBooleanField(default=False, verbose_name=b'Transformed')
-    '''Indicates if the current row was transformed '''
+    """Indicates if the current row was transformed """
     direction = models.CharField(max_length=1, null=True)
-    ''' route direction that the bus was doing. It can be 'R' or 'I' '''
+    """ route direction that the bus was doing. It can be 'R' or 'I' """
     userLatitude = models.FloatField(null=True)
     """ the latitude of user who reported this """
     userLongitude = models.FloatField(null=True)
@@ -196,6 +198,8 @@ class EventRegistration(models.Model):
     """ Specific date time when the server received the event registration """
     timeCreation = models.DateTimeField('Creation Time')  # the date and time when it was first reported
     """ Specific date time when the server received for the first time the event registration """
+    expireTime = models.DateTimeField(null=True)
+    """ Specific date time when event expired """
     event = models.ForeignKey(Event, verbose_name='The event information')
     eventConfirm = models.IntegerField('Confirmations', default=1)
     """ Amount of confirmations for this event """
@@ -205,6 +209,12 @@ class EventRegistration(models.Model):
     """ To identify the AndroidRequests owner """
     fixed = models.NullBooleanField('Fixed', default=False)
     """ To know if the event is 'fixed' and stop showing it"""
+    broken = models.BooleanField(default=False)
+    """ to indicate that event expired by some brokenType """
+    # list  of criterion of broken type
+    PERCENTAGE_BETWEEN_POSITIVE_AND_NEGATIVE = 'percentage'
+    brokenType = models.CharField(max_length=50, default=None, null=True)
+    """ indicate why event is broken """
 
     class Meta:
         abstract = True
@@ -228,17 +238,17 @@ class EventRegistration(models.Model):
 class EventForBusStop(EventRegistration):
     """This model stores the reported events for the busStop"""
     stopCode = models.CharField(max_length=6, db_index=True, verbose_name='Stop Code')
-    '''Indicates the bus stop to which the event refers'''
+    """Indicates the bus stop to which the event refers"""
     aditionalInfo = models.CharField('Additional Information', max_length=140, default='nothing')
-    ''' Saves additional information required by the event '''
+    """ Saves additional information required by the event """
     timePeriod = models.ForeignKey('TimePeriod', verbose_name=b'Time Period', null=True)
-    '''Indicates the Transantiago Time Period of the event'''
+    """Indicates the Transantiago Time Period of the event"""
     halfHourPeriod = models.ForeignKey('HalfHourPeriod', verbose_name=b'Half Hour Period', null=True)
-    '''Indicates the half hour time period of the event'''
+    """Indicates the half hour time period of the event"""
     zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null=True)
-    '''Indicates the zonification for the event'''
+    """Indicates the zonification for the event"""
     transformed = models.NullBooleanField(default=False, verbose_name=b'Transformed')
-    '''Indicates if the current row was transformed '''
+    """Indicates if the current row was transformed """
 
     def getDictionary(self):
         """A dictionary with the event information"""
@@ -261,21 +271,21 @@ class EventForBusStop(EventRegistration):
 class EventForBusv2(EventRegistration):
     """This model stores the reported events for the Bus"""
     busassignment = models.ForeignKey('Busassignment', verbose_name='the bus')
-    '''Indicates the bus to which the event refers'''
+    """Indicates the bus to which the event refers"""
     timePeriod = models.ForeignKey('TimePeriod', verbose_name=b'Time Period', null=True)
-    '''Indicates the Transantiago Time Period of the event'''
+    """Indicates the Transantiago Time Period of the event"""
     halfHourPeriod = models.ForeignKey('HalfHourPeriod', verbose_name=b'Half Hour Period', null=True)
-    '''Indicates the half hour time period of the event'''
+    """Indicates the half hour time period of the event"""
     zonification = models.ForeignKey('zonificationTransantiago', verbose_name='zonification', null=True)
-    '''Indicates the zonification for the event'''
+    """Indicates the zonification for the event"""
     busStop1 = models.CharField(max_length=6, verbose_name='Bus Stop1', null=True)
-    '''Indicates the 1 nearest bus stop'''
+    """Indicates the 1 nearest bus stop"""
     busStop2 = models.CharField(max_length=6, verbose_name='Bus Stop2', null=True)
-    '''Indicates the 2 nearest bus stop'''
+    """Indicates the 2 nearest bus stop"""
     transformed = models.NullBooleanField(default=False, verbose_name=b'Transformed')
-    '''Indicates if the current row was transformed '''
+    """Indicates if the current row was transformed """
     direction = models.CharField(max_length=1, null=True)
-    ''' route direction that the bus was doing. It can be 'R' or 'I' '''
+    """ route direction that the bus was doing. It can be 'R' or 'I' """
 
     def getDictionary(self):
         """A dictionary with the event information"""
@@ -339,7 +349,7 @@ class BusStop(Location):
     gtfs = models.ForeignKey('GTFS', verbose_name='gtfs version')
     """ gtfs version """
     transformed = models.NullBooleanField(default=False, verbose_name=b'Transformed')
-    '''Indicates if the current row was transformed '''
+    """Indicates if the current row was transformed """
     point = models.PointField(srid=32140, verbose_name='The point', null=True)
 
     class Meta:
@@ -395,7 +405,7 @@ class Busv2(models.Model):
     """ Unique ID to primarily identify Buses created without registrationPlate """
     # events = models.ManyToManyField(Event,  verbose_name='the event' ,through=EventForBus)
     transformed = models.NullBooleanField(default=False, verbose_name=b'Transformed')
-    '''Indicates if the current row was transformed '''
+    """Indicates if the current row was transformed """
 
 
 class Busassignment(models.Model):
@@ -585,13 +595,13 @@ class ServiceStopDistance(models.Model):
 class Token(models.Model):
     """This table has all the tokens that have been used ever."""
     token = models.CharField('Token', max_length=128)
-    '''Identifier for an incognito trip'''
+    """Identifier for an incognito trip"""
     busassignment = models.ForeignKey(Busassignment, verbose_name='Bus')
-    '''Bus that is making the trip'''
+    """Bus that is making the trip"""
     direction = models.CharField(max_length=1, null=True)
-    ''' route direction that the bus is doing. It can be 'R' or 'I' '''
+    """ route direction that the bus is doing. It can be 'R' or 'I' """
     color = models.CharField("Icon's color", max_length=7, default='#00a0f0')
-    '''Color to paint the travel icon'''
+    """Color to paint the travel icon"""
     phoneId = models.UUIDField()
     """ To identify the data owner """
     timeCreation = models.DateTimeField('Time Creation', null=True, blank=False)
@@ -632,7 +642,7 @@ class Report(models.Model):
     phoneId = models.UUIDField()
     """ To identify the AndroidRequests owner """
     transformed = models.NullBooleanField(default=False, verbose_name=b'Transformed')
-    '''Indicates if the current row was transformed '''
+    """Indicates if the current row was transformed """
 
     def getDictionary(self):
         """Returns a dictionary with the event information"""
@@ -720,27 +730,27 @@ zonificationtransantiago_mapping = {
 ##
 
 class Level(models.Model):
-    ''' user level '''
+    """ user level """
     name = models.CharField(max_length=50, null=False, blank=False)
-    ''' level name '''
+    """ level name """
     minScore = models.FloatField(default=0, null=False)
-    ''' minimun score to keep the level '''
+    """ minimun score to keep the level """
     maxScore = models.FloatField(default=0, null=False)
-    ''' maximum score to keep the level '''
+    """ maximum score to keep the level """
     position = models.IntegerField(null=False, unique=True)
-    ''' to order levels 1,2,3,... '''
+    """ to order levels 1,2,3,... """
 
 
 class TranSappUser(models.Model):
-    ''' user logged with social network (Facebook, google) '''
+    """ user logged with social network (Facebook, google) """
     userId = models.CharField(max_length=128, null=False, blank=False)
-    ''' user id given by social network(FacebookUserId or ) '''
+    """ user id given by social network(FacebookUserId or ) """
     name = models.CharField(max_length=50, null=False, blank=False)
-    ''' user name '''
+    """ user name """
     email = models.EmailField(null=False, blank=False)
-    ''' user email'''
+    """ user email"""
     phoneId = models.UUIDField(null=False)
-    ''' phone id used to log in '''
+    """ phone id used to log in """
     FACEBOOK = 'FACEBOOK'
     GOOGLE = 'GOOGLE'
     ACCOUNT_TYPES=(
@@ -748,32 +758,32 @@ class TranSappUser(models.Model):
         (GOOGLE, 'Google')
     )
     accountType = models.CharField(max_length=10, choices=ACCOUNT_TYPES, null=False)
-    ''' type of toke id (it says where tokenID comes from) '''
+    """ type of toke id (it says where tokenID comes from) """
     globalScore = models.FloatField(default=0, null=False)
-    ''' global score generated by user interactions '''
+    """ global score generated by user interactions """
     level = models.ForeignKey(Level, null=False)
-    ''' level based on score '''
+    """ level based on score """
     sessionToken = models.UUIDField(null=False)
-    ''' uuid generated each time the user log in '''
+    """ uuid generated each time the user log in """
 
 
 class ScoreEvent(models.Model):
-    ''' score given by action '''
+    """ score given by action """
     code = models.CharField(max_length=10, null=False, blank=False, unique=True)
-    ''' event code '''
+    """ event code """
     score = models.FloatField(default=0, null=False)
-    ''' score given to user when he does the action associated to code '''
+    """ score given to user when he does the action associated to code """
 
 
 class ScoreHistory(models.Model):
-    ''' history of events give score'''
+    """ history of events give score"""
     tranSappUser = models.ForeignKey(TranSappUser)
-    ''' user '''
+    """ user """
     scoreEvent = models.ForeignKey(ScoreEvent)
-    ''' event that generates the score '''
+    """ event that generates the score """
     timeCreation = models.DateTimeField(null=False)
-    ''' time when event was generated '''
+    """ time when event was generated """
     score = models.FloatField(default=0, null=False)
-    ''' winned score '''
+    """ winned score """
     meta = models.CharField(max_length=10000, null=True)
-    ''' addional data to score '''
+    """ addional data to score """
