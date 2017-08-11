@@ -1,11 +1,12 @@
 from django.http import HttpResponse
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.shortcuts import redirect
-from accounts.models import LoginForm
+from .models import LoginForm
 from carrier.views import index as cindex
 from django.template import loader
 
 def login(request):
+    """ check if user is logged in system """
     form = LoginForm(request.POST or None)
     if request.user.is_authenticated():
         return redirect(cindex)
