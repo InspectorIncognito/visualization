@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 
-# Create your tests here.
+import json
+
 
 class URLStatusTestCase(TestCase):
     """ """
@@ -12,15 +13,15 @@ class URLStatusTestCase(TestCase):
         ''
     ]
 
-    def makeGetRequest(self, url, params = {}):
+    def makeGetRequest(self, url, params={}):
 
         c = Client()
         response = c.get(url, params)
         self.assertEqual(response.status_code, 200)
-        
+
         return response
 
-    def makePostRequest(self, url, params = {}):
+    def makePostRequest(self, url, params={}):
 
         c = Client()
         response = c.post(url, params)
@@ -30,11 +31,11 @@ class URLStatusTestCase(TestCase):
 
     def printJson(self, jsonResponse):
 
-        print json.dumps(jsonResponse, 
-                sort_keys=True, 
-                indent=4, 
-                separators=(',', ': '))
- 
+        print(json.dumps(jsonResponse,
+                         sort_keys=True,
+                         indent=4,
+                         separators=(',', ': ')))
+
     def setUp(self):
         ''' '''
         pass
@@ -48,4 +49,3 @@ class URLStatusTestCase(TestCase):
         '''  '''
         for url in self.POST_URLS:
             self.makePostRequest(url, {})
-        
