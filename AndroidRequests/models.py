@@ -115,6 +115,8 @@ class DevicePositionInTime(Location):
 
 
 class Event(models.Model):
+    BUS = "bus"
+    STOP = "Stop"
     """Here are all the events, it's configuration and information."""
     id = models.CharField('Identifier', max_length=8, primary_key=True)
     """ string code that identifies the event """
@@ -131,8 +133,8 @@ class Event(models.Model):
         ('i', 'the event was taken inside the bus'),  # this is an I for inside
         ('o', 'the event was taken from a bustop'),)  # this is an O for outside
     REPORT_TYPE = (
-        ('bus', 'An event for the bus.'),
-        ('busStop', 'An event for the busStop.'))
+        (BUS, 'An event for the bus.'),
+        (STOP, 'An event for the busStop.'))
     origin = models.CharField('Origin', max_length=1, choices=REPORT_ORIGIN, default='o')
     """ Represents the place from where the event was reported """
     eventType = models.CharField('Event Type', max_length=7, choices=REPORT_TYPE)
