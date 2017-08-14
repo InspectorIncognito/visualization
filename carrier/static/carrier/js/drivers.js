@@ -449,7 +449,6 @@ function myFunction(refresh) {
                 //LICENSE_PLATE_SELECT.find("option").remove().val("");
                 //LICENSE_PLATE_SELECT.val(null).trigger("change");
 
-
                 // order by license plates with reports
                 var top = [];
                 var bottom = [];
@@ -473,8 +472,9 @@ function myFunction(refresh) {
                         text: value
                     }));
                 });
-                bottom.sort();
                 /*
+                bottom.sort();
+
                 $.each(bottom, function (index, value) {
                     LICENSE_PLATE_SELECT.append($("<option>", {
                         value: value,
