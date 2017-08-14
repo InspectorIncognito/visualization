@@ -15,9 +15,13 @@ def panel(title_icon, title, body, title_id="", show_collapse=False):
     if not show_collapse:
         collapse = ""
 
+    html_title = u"""<span id="{1}">{2}</span>"""
+    if title_id == "":
+        html_title = u"{2}"
+
     header = u"""
         <div class="x_title">
-          <h2><i class="fa {0}"></i> <span id="{1}">{2}</span></h2>
+          <h2><i class="fa {0}"></i> """ + html_title + """</h2>
           """ + collapse + u"""
           <div class="clearfix"></div>
         </div>
