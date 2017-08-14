@@ -8,9 +8,6 @@ $(function () {
     var optionDateRangePicker = {
         startDate: moment().subtract(29, "days"),
         endDate: moment(),
-        dateLimit: {
-            days: 60
-        },
         alwaysShowCalendars: true,
         showCustomRangeLabel: false,
         showDropdowns: false,
@@ -244,9 +241,15 @@ function updatechart() {
                 types.forEach(function(val, i){
                     cols.push([types[i]].concat(chartdata[el]["periodtype"][i]));
                 });
-                makeChart(cols, chartdata[el]["periods"], null, undefined, null, [], "category", null);
-                break;
 
+                // add region to separate day type
+                otherOpts = {
+                    regions: [
+                        {axis: 'x', start: 12, end: 20}
+                    ]
+                };
+                makeChart(cols, chartdata[el]["periods"], null, undefined, null, [], "category", null, otherOpts);
+                break;
 
             case "plate":
                 if (chartdata["plate"] === null) {
@@ -378,7 +381,7 @@ function updatechart() {
     }
 }
 
-function makeChart(columns, categories, height, x, xFormat, groups, type, tickFormat) {
+function makeChart(columns, categories, height, x, xFormat, groups, type, tickFormat, otherOpts) {
     var opts = {
         size: {
             height: height
@@ -407,6 +410,7 @@ function makeChart(columns, categories, height, x, xFormat, groups, type, tickFo
             }
         }
     };
+    opts = Object.assign({}, opts, otherOpts || {});
     chart = c3.generate(opts);
 }
 
@@ -442,7 +446,7 @@ function myFunction(refresh) {
             console.log(data);
 
             if (refresh) {
-                LICENSE_PLATE_SELECT.find("option").remove().val("");
+                //LICENSE_PLATE_SELECT.find("option").remove().val("");
                 //LICENSE_PLATE_SELECT.val(null).trigger("change");
 
 
@@ -483,7 +487,6 @@ function myFunction(refresh) {
             reloadchart();
             resp = data.reports;
             types = data.types;
-            console.log(types);
             authorityPeriods = data.authorityPeriods;
             updatechart();
         }).always(function(){
