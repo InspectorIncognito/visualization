@@ -170,16 +170,19 @@ def busReports(request):
 @login_required
 def getBusReports(request):
     if request.method == 'GET':
-        services = Service.objects.filter(filter(request))
+        services = Service.objects.filter(filter(request)).values_list("service", flat=True)
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
-        query = ReportInfo.objects.filter(reportType='bus', report__timeStamp__range=[date_init, date_end])
-        query = query.filter(service__in=[service.service for service in services])
+
+        date_init = parse_datetime(date_init)
+        date_end = parse_datetime(date_end)
+
+        query = ReportInfo.objects.filter(reportType=ReportInfo.BUS, report__timeStamp__range=[date_init, date_end])
+        query = query.filter(service__in=services)
         data = {
             'data': [q.getDictionary() for q in query]
         }
         return JsonResponse(data, safe=False)
-
 
 
 @login_required
