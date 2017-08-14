@@ -1,52 +1,57 @@
-
 var table;
 var date = moment();
 var dateString = date.format("YYYY-MM-DD");
 var exportFileName = "EventosDeConductores_" + dateString;
 
 $(document).ready(function () {
-    $.fn.dataTable.moment( 'DD-MM-YYYY HH:mm:ss' );
-    table = $('#driver-events-table').dataTable({
+
+    var target = document.getElementsByClassName("x_content")[0];
+    var spinner = new Spinner(spinnerOpt).spin(target);
+    // activate spinner
+    spinner.spin(target);
+
+    $.fn.dataTable.moment("DD-MM-YYYY HH:mm:ss");
+    table = $("#driver-events-table").dataTable({
         scrollX: true,
         pageLength: 15,
         order: [[0, "desc"]],
-        dom: 'Bfrtip',
+        dom: "Bfrtip",
         buttons: [
             {
-                extend: 'copy',
-                text: 'Copiar'
+                extend: "copy",
+                text: "Copiar"
             },
             {
-                extend: 'csv',
+                extend: "csv",
                 filename: exportFileName
             },
             {
-                extend: 'excel',
+                extend: "excel",
                 filename: exportFileName
             }
         ],
-        ajax: 'http://' + location.host + '/carriers/getDriversTable/',
+        ajax: "/carriers/getDriversTable/",
         columns: [
-            {title: "Fecha", data: 'timeCreation'},
-            {title: "Mensaje", data: 'type'},
+            {title: "Fecha", data: "timeCreation"},
+            {title: "Mensaje", data: "type"},
             {
                 title: "Patente",
-                data: 'plate',
+                data: "plate",
                 class: "text-center"
 
             },
             {
                 title: "Servicio",
-                data: 'service',
+                data: "service",
                 class: "text-center"
             },
             {
                 title: "Dirección",
-                data: 'direction',
+                data: "direction",
                 render: function (data, type, row) {
-                    if (data == 'I') {
+                    if (data == "I") {
                         return "IDA";
-                    } else if (data == 'R') {
+                    } else if (data == "R") {
                         return "REGRESO";
                     }
                     return data;
@@ -54,24 +59,26 @@ $(document).ready(function () {
             },
             {
                 title: "Comuna",
-                data: 'commune'
+                data: "commune"
             },
-            {title: "Paradero más cercano 1", data: 'busStop1'},
-            {title: "Paradero más cercano 2", data: 'busStop2'}
+            {title: "Paradero más cercano 1", data: "busStop1"},
+            {title: "Paradero más cercano 2", data: "busStop2"}
         ],
         language: {
             "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json",
             buttons: {
-                copyTitle: 'Copiar al portapapeles',
+                copyTitle: "Copiar al portapapeles",
                 copySuccess: {
-                    _: 'Copiadas %d filas',
-                    1: 'Copiada 1 fila'
+                    _: "Copiadas %d filas",
+                    1: "Copiada 1 fila"
                 }
             }
         }
-    }).on("init.dt", function () { spinner.stop(); });
+    }).on("init.dt", function () {
+        spinner.stop();
+    });
 });
-
+/*
 setInterval(function () {
     table.api().ajax.reload();
-}, 300000);
+}, 300000);*/

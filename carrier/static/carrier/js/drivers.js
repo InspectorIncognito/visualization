@@ -414,16 +414,11 @@ function makeChart(columns, categories, height, x, xFormat, groups, type, tickFo
     chart = c3.generate(opts);
 }
 
-var spinnerOpt = {
-    scale: 4,
-    color: "#169F85",
-    top: "80px"
-};
 var target = document.getElementById("filters");
 var spinner = new Spinner(spinnerOpt).spin(target);
 
 function myFunction(refresh) {
-    const URL = "http://" + location.host + "/carriers/getDriversData/";
+    const URL = "/carriers/getDriversData/";
 
     var data = {
         date_init: DATE_RANGE_INPUT.data("daterangepicker").startDate.format(),
