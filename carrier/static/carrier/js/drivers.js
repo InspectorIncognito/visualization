@@ -162,9 +162,9 @@ function updatechart() {
                         "daytypes": [],
                         "daytypetype": types.map(function(){ return []; })
                     };
-                    resp.forEach(function(val, i){
-                        var type = val["type"];
-                        var daytype = val["typeOfDay"];
+                    resp.forEach(function(val){
+                        var type = val.type;
+                        var daytype = val.typeOfDay;
                         if (chartdata["daytype"]["daytypes"].indexOf(daytype) === -1) {
                             chartdata["daytype"]["daytypes"].push(daytype);
                             types.forEach(function(_, j){
@@ -172,7 +172,7 @@ function updatechart() {
                             });
                         }
                         var p = chartdata["daytype"]["daytypes"].indexOf(daytype);
-                        chartdata["daytype"]["daytypetype"][type][p] += resp[i]["eventConfirm"];
+                        chartdata["daytype"]["daytypetype"][type][p] += val.eventConfirm;
                     });
                 }
                 types.forEach(function(val, i){
@@ -187,17 +187,17 @@ function updatechart() {
                         "halfhours": [],
                         "halfhourtype": types.map(function(){ return []; })
                     };
-                    resp.forEach(function(val, i){
-                        var type = val["type"];
-                        var halfhour = val["periodHour"];
+                    resp.forEach(function(val){
+                        var type = val.type;
+                        var halfhour = val.periodHour;
                         if (chartdata["halfhour"]["halfhours"].indexOf(halfhour) === -1) {
                             chartdata["halfhour"]["halfhours"].push(halfhour);
-                            for (var j = 0; j < types.length; j++) {
+                            types.forEach(function(_, j){
                                 chartdata["halfhour"]["halfhourtype"][j].push(0);
-                            }
+                            });
                         }
                         var p = chartdata["halfhour"]["halfhours"].indexOf(halfhour);
-                        chartdata["halfhour"]["halfhourtype"][type][p] += resp[i]["eventConfirm"];
+                        chartdata["halfhour"]["halfhourtype"][type][p] += val.eventConfirm;
                     });
                 }
                 types.forEach(function(val, i){
