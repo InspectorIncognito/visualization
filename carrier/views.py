@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*
-
+from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
 from django.http import JsonResponse
 from django.db.models import Q, Count
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import CharField, ExpressionWrapper, F
+from django.utils.dateparse import parse_datetime
+
+from collections import defaultdict
 
 from datetime import datetime, date, timedelta
-from pytz import timezone
+
 import json
-import pytz
 
 from AndroidRequests.models import *
 
@@ -32,31 +34,29 @@ def is_transapp(user):
 
 @login_required
 def index(request):
-    template = loader.get_template('test.html')
+    template = loader.get_template('index.html')
     return HttpResponse(template.render(request=request))
 
 
 @login_required
 def getCount(request):
-    events = Event.objects.filter(eventType="bus").distinct("category")
-    types = [event.category for event in events]
-    datatype = {}
-    query = EventForBusv2.objects.filter(
-        busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
-    query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
-    for type in types:
-        datatype[type] = query.filter(event__category=type).count()
-    groups = {}
-    for type in types:
+    categories = Event.objects.filter(eventType=Event.BUS).values_list("category", flat=True).distinct()
+    routeList = Service.objects.filter(filter(request)).values_list("service", flat=True)
+    query = EventForBusv2.objects.filter(busassignment__service__in=routeList).\
+        exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
 
-        events = Event.objects.filter(eventType="bus", category=type)
-        names = [event.name for event in events]
-        groups[type] = {}
+    queries = {}
+    for category in categories:
+        queries[category] = query.filter(event__category=category).count()
+
+    groups = defaultdict(dict)
+    for category in categories:
+        names = Event.objects.filter(eventType=Event.BUS, category=category).values_list("name", flat=True)
         for name in names:
-            groups[type][name] = query.filter(event__category=type, event__name=name).count()
+            groups[category][name] = query.filter(event__category=category, event__name=name).count()
 
     data = {
-        'datatype': datatype,
+        'datatype': queries,
         'groups': groups,
     }
     return JsonResponse(data, safe=False)
@@ -68,62 +68,66 @@ def getCount(request):
 
 @login_required
 def drivers(request):
-    template = loader.get_template('carrier/drivers.html')
-    services = Service.objects.filter(filter(request))
+    template = "carrier/drivers.html"
+    services = Service.objects.filter(filter(request)).values_list("service", flat=True)
     context = {
         'services': services,
     }
-    return HttpResponse(template.render(context, request))
+    return render(request, template, context)
 
 
 @login_required
 def getDriversReport(request):
     if request.method == 'GET':
-        events = Event.objects.filter(category="conductor")
-        events = [event.name.capitalize() for event in events]
-        pos = range(0, len(events))
-        event_to_pos = {name: pos for name, pos in zip(events, pos)}
+        eventNameList = Event.objects.filter(category="conductor").values_list("name", flat=True)
+        eventNameList = map(lambda x: x.capitalize(), eventNameList)
+        event_to_pos = {name: index for index, name in enumerate(eventNameList)}
 
         def change(dict):
             dict["type"] = event_to_pos[dict["type"]]
             return dict
 
+        # params of requests
         date_init = request.GET.get('date_init')
         date_end = request.GET.get('date_end')
-        plates = request.GET.get('plate')
-        serv = request.GET.get('service')
-        services = [service.service for service in Service.objects.filter(filter(request))]
-        query = EventForBusv2.objects.filter(
-            busassignment__service__in=services)
-        query = query.filter(event__category="conductor")
-        query = query.filter(timeCreation__range=[date_init, date_end])
-        query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
-        busassignment = Busassignment.objects.filter(service__in=services).exclude(
-            uuid__registrationPlate__icontains="No Info.").select_related('uuid')
-        if serv:
-            serv = json.loads(serv)
-            serviceFilter = reduce(lambda x, y: x | y, [Q(busassignment__service=ser) for ser in serv])
-            query = query.filter(serviceFilter)
-            busassignment = busassignment.filter(service__in=serv)
+        licensePlates = request.GET.get('licensePlates')
+        routes = request.GET.get('routes')
 
-        busassignment = busassignment.distinct("uuid__registrationPlate")
+        date_init = parse_datetime(date_init)
+        date_end = parse_datetime(date_end)
+
+        query = EventForBusv2.objects.filter(event__category="conductor", timeCreation__range=[date_init, date_end]).\
+            exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
+
+        busassignment = Busassignment.objects.select_related('uuid').\
+            exclude(uuid__registrationPlate__icontains="No Info.").distinct("uuid__registrationPlate")
+
+        if routes:
+            routes = json.loads(routes)
+            query = query.filter(busassignment__service__in=routes)
+            busassignment = busassignment.filter(service__in=routes)
+        else:
+            routeList = Service.objects.filter(filter(request)).values_list("service", flat=True)
+            query = query.filter(busassignment__service__in=routeList)
+            busassignment = busassignment.filter(service__in=routeList)
+
         allplates = {ba.uuid.registrationPlate: False for ba in busassignment}
-        query2 = query.distinct("busassignment__uuid__registrationPlate").select_related("busassignment__uuid")
+        query2 = query.select_related("busassignment__uuid").distinct("busassignment__uuid__registrationPlate")
         for report in query2:
             plate = report.busassignment.uuid.registrationPlate
             allplates[plate] = True
 
         # print(allplates)
 
-        if plates:
-            plates = json.loads(plates)
-            plateFilter = reduce(lambda x, y: x | y,
-                                 [Q(busassignment__uuid__registrationPlate=plate) for plate in plates])
-            query = query.filter(plateFilter)
+        if licensePlates:
+            licensePlates = json.loads(licensePlates)
+            query = query.filter(busassignment__uuid__registrationPlate__in=licensePlates)
+
         data = {
             "allplates": allplates,
             "reports": [change(report.getDictionary()) for report in query],
-            "types": events
+            "types": eventNameList,
+            "authorityPeriods": list(TimePeriod.objects.values_list("name", flat=True).order_by('id'))
         }
         return JsonResponse(data, safe=False)
 

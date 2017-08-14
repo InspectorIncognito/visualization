@@ -1,184 +1,100 @@
-{% extends 'visualization/dashboard.html' %}
-{% load staticfiles %}
-{% block title %}
-<title>Visualizador TranSapp</title>
-{% endblock title %}
+{% extends "admin/base_site.html" %}
+{% load staticfiles header panel inline_input inline_select columns %}
+{% block title %}Visualizador TranSapp{% endblock title %}
 
-{% block topimports %}
-<!-- Leaflet -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.css"/>
-<!-- Select2 -->
-<link href="{% static 'components/gentelella/vendors/select2/dist/css/select2.min.css' %}" rel="stylesheet">
-<!-- jQuery Script -->
-<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-<!-- C3 -->
-<link href="{% static 'components/c3/c3.min.css' %}" rel="stylesheet">
-<!-- Datetimepicker -->
-<link href="{% static 'components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css' %}"
-      rel="stylesheet">
-{% endblock topimports %}
+{% block css %}
+    <!-- Leaflet -->
+    <link href="{% static "components/leaflet/dist/leaflet.css" %}" rel="stylesheet" />
+    <!-- C3 -->
+    <link href="{% static 'components/c3/c3.min.css' %}" rel="stylesheet">
+    {% with "components/gentelella/vendors/" as gentelella_static %}
+        <!-- Datetimepicker -->
+        <link href="{% static gentelella_static|add:'bootstrap-daterangepicker/daterangepicker.css' %}" rel="stylesheet">
+        <!-- Select2 -->
+        <link href="{% static gentelella_static|add:'select2/dist/css/select2.min.css' %}" rel="stylesheet">
+    {% endwith %}
+{% endblock %}
 
-{% block toptiles %}
-<div id="headers" class="row tile_count">
-</div>
-{% endblock toptiles %}
-
-{% block maincontent %}
+{% block content %}
 <div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
-{#        <div class="x_panel">#}
+        {% header "Reportes de comportamiento del conductor" %}
+
+        <div class='x_panel'>
             <div class="x_title">
-                <h2>Reportes Conducta Conductor</h2>
-{#                <ul class="nav navbar-right panel_toolbox">#}
-{#                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>#}
-{#                    </li>#}
-{#                </ul>#}
+                <h2><i class="fa fa-filter"></i> Filtros</h2>
                 <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
-                <div class="x_panel">
-                    <div class="x_title">
-                        <h2>Filtros</h2>
-                        <ul class="nav navbar-right panel_toolbox">
-                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                            </li>
-                        </ul>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div class="x_content">
-                        <div class="dashboard-widget-content">
-                            <div id="filters" class="container">
-                                <div class="form">
-                                    <div class="row form-inline">
-                                        <div class='col-sm-4 col-xs-12'>
-                                            <div class="form-group">
-                                                <label for="date_init">Fecha Inicio:</label>
-                                                <input type='text' class="form-control"
-                                                       id="date_init"/>
-                                            </div>
-                                        </div>
-                                        <div class='col-sm-4 col-xs-12'>
-                                            <div class="form-group">
-                                                <label for="date_end">Fecha Fin:</label>
-                                                <input type='text' class="form-control"
-                                                       id="date_end"/>
-                                            </div>
-                                        </div>
-                                        <div class='col-sm-4 col-xs-12'>
-                                            <div class="form-group">
-                                                <button class="btn" onclick="updateDate(1)">Hoy</button>
-                                                <button class="btn" onclick="updateDate(2)">Ultimo mes</button>
-                                                <button class="btn" onclick="updateDate(3)">3 Meses</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <!--<div class='col-sm-2'>
-                                            <div class="form-group">
-                                                <label for="hour1">Desde</label>
-                                                <input type='text' onchange="myFunction()"
-                                                       class="form-control" id="hour1"/>
-                                            </div>
-                                        </div>
-                                        <div class='col-sm-2'>
-                                            <div class="form-group">
-                                                <label for="hour2">Hasta</label>
-                                                <input type='text' class="form-control"
-                                                       id="hour2"/>
-                                            </div>
-                                        </div>-->
-                                        <div class='col-sm-4 col-xs-12'>
-                                            <div class="form-group">
-                                                <label for="service">Recorrido(s)</label>
-                                                <select class="select2_multiple form-control"
-                                                        id='service' multiple="multiple">
-                                                    <option>Todos los recorridos</option>
-                                                    {% for service in services %}
-                                                    <option>{{ service.service }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class='col-sm-4 col-xs-12'>
-                                            <div class="form-group">
-                                                <label for="plate">Patente</label>
-                                                <select class="select2_plate form-control"
-                                                        id='plate'  multiple="multiple">
-                                                    <option>Todas las patentes</option>
-                                                    {% for plate in plates %}
-                                                    <option>{{ plate}}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="dashboard-widget-content">
-                    <div class="container">
-                        Agrupar por:
-                        <div id="group" class="btn-toolbar" role="toolbar" data-toggle="buttons">
-                            <div class="btn-group">
-                                <!--<label class="btn btn-default active">
-                                    <input type="radio" name="groups" value="weekday" checked> Dia semana
-                                </label>-->
-                                <!--<label class="btn btn-default ">
-                                    <input type="radio" name="groups" value="plate"> Patente
-                                </label>-->
-                                <!--<label class="btn btn-default ">
-                                    <input type="radio" name="groups" value="service"> Recorrido
-                                </label>-->
-                                <label class="btn btn-default active">
-                                    <input type="radio" name="groups" value="daytype" checked> Tipo de día
-                                </label>
-                                <!--<label class="btn btn-default ">
-                                    <input type="radio" name="groups" value="periodHour"> Periodos media hora
-                                </label>-->
-                                <label class="btn btn-default ">
-                                    <input type="radio" name="groups" value="periodTransantiago"> Periodo Transantiago
-                                </label>
-                            </div>
-                            <div class="btn-group">
-                                <label class="btn btn-default ">
-                                    <input type="radio" name="groups" value="daily"> Dia
-                                </label>
-                                <label class="btn btn-default ">
-                                    <input type="radio" name="groups" value="monthly"> Mes
-                                </label>
-                                <label class="btn btn-default ">
-                                    <input type="radio" name="groups" value="yearly"> Año
-                                </label>
-                            </div>
-                        </div>
-                        <hr>
-                        <div id="chart"></div>
-                    </div>
+             </div>
+            <div id="filters" class="container">
+                <div class="row">
+                    {% inline_input "Rango de días" "dateRange" as input1 %}
+                    {% columns 4 4 12 input1 %}
+
+                    {% inline_select "Recorrido(s)" "routes" services as select_input1 %}
+                    {% columns 4 4 12 select_input1 %}
+
+                    {% inline_select "Patente(s)" "licensePlates" plates as select_input2 %}
+                    {% columns 4 4 12 select_input2 %}
                 </div>
             </div>
-{#        </div>#}
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="ln_solid"></div>
+                <button id="btnUpdateData" class="btn btn-success btn-round">Actualizar datos</button>
+            </div>
+        </div>
+        <div class="container">
+            Agrupar por:
+            <div id="group" class="btn-toolbar" role="toolbar" data-toggle="buttons">
+                <div class="btn-group">
+                    <!--<label class="btn btn-default active">
+                        <input type="radio" name="groups" value="weekday" checked> Dia semana
+                    </label>-->
+                    <!--<label class="btn btn-default ">
+                        <input type="radio" name="groups" value="plate"> Patente
+                    </label>-->
+                    <!--<label class="btn btn-default ">
+                        <input type="radio" name="groups" value="service"> Recorrido
+                    </label>-->
+                    <label class="btn btn-default active">
+                        <input type="radio" name="groups" value="daytype" checked> Tipo de día
+                    </label>
+                    <!--<label class="btn btn-default ">
+                        <input type="radio" name="groups" value="periodHour"> Periodos media hora
+                    </label>-->
+                    <label class="btn btn-default ">
+                        <input type="radio" name="groups" value="periodTransantiago"> Periodo Transantiago
+                    </label>
+                </div>
+                <div class="btn-group">
+                    <label class="btn btn-default "><input type="radio" name="groups" value="daily"> Dia</label>
+                    <label class="btn btn-default "><input type="radio" name="groups" value="monthly"> Mes</label>
+                    <label class="btn btn-default "><input type="radio" name="groups" value="yearly"> Año</label>
+                </div>
+            </div>
+            <hr>
+            <div id="chart"></div>
+        </div>
     </div>
 </div>
-{% endblock maincontent %}
+{% endblock %}
 
-{% block bottomimports %}
+{% block extrajs %}
+    {% with "components/gentelella/vendors/" as gentelella_static %}
+        <!-- bootstrap-datetimepicker -->
+        <script src="{% static gentelella_static|add:'moment/min/moment.min.js' %}"></script>
+        <script src="{% static gentelella_static|add:'moment/locale/es.js' %}"></script>
+        <script src="{% static gentelella_static|add:'bootstrap-daterangepicker/daterangepicker.js' %}"></script>
+        <!-- Select2 -->
+        <script src="{% static gentelella_static|add:'select2/dist/js/select2.full.min.js' %}"></script>
+    {% endwith %}
+    <script src="{% static 'components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js' %}"></script>
+    <!-- C3 -->
+    <script src="{% static 'components/c3/c3.min.js' %}"></script>
+    <script src="{% static 'components/d3/d3.min.js' %}"></script>
+    <!-- spin js -->
+    <script src="{% static 'components/spin.js/spin.min.js' %}"></script>
 
-
-<!-- C3 -->
-<script src="{% static 'components/c3/c3.min.js' %}"></script>
-<script src="{% static 'components/d3/d3.min.js' %}"></script>
-
-<!-- bootstrap-datetimepicker -->
-<script src="{% static 'components/gentelella/vendors/moment/min/moment.min.js' %}"></script>
-<script src="{% static 'components/gentelella/vendors/moment/locale/es.js' %}"></script>
-<script src="{% static 'components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js' %}"></script>
-
-<!-- Select2 -->
-<script src="{% static 'components/gentelella/vendors/select2/dist/js/select2.full.min.js' %}"></script>
-
-<script src="{% static 'carrier/js/drivers.js' %}"></script>
-{% endblock bottomimports %}
+    <script src="{% static 'carrier/js/drivers.js' %}"></script>
+{% endblock %}
 
 
