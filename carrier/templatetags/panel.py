@@ -17,7 +17,7 @@ def panel(title_icon, title, body, title_id="", show_collapse=False):
 
     header = u"""
         <div class="x_title">
-          <h2><i class="fa {}"></i> <span id="{}">{}</span></h2>
+          <h2><i class="fa {0}"></i> <span id="{1}">{2}</span></h2>
           """ + collapse + u"""
           <div class="clearfix"></div>
         </div>
@@ -25,7 +25,7 @@ def panel(title_icon, title, body, title_id="", show_collapse=False):
 
     content = u"""
         <div class="x_content">
-          {}
+          {3}
         </div>"""
     header = header if title != "" else ""
     panel = u"<div class='x_panel'>" + header + content + u"</div>"

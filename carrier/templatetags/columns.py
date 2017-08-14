@@ -8,8 +8,8 @@ register = template.Library()
 def columns(md, sm, xs, body):
 
     content = u"""
-        <div class='col-md-{} col-sm-{} col-xs-{}'>
-        {}
+        <div class='col-md-{0} col-sm-{1} col-xs-{2}'>
+        {3}
         </div>
     """
 

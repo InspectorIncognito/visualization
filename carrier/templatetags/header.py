@@ -9,10 +9,10 @@ def header(title, subtitle="", right=""):
     content = u"""
       <div class="page-title">
         <div class="title_left">
-          <h3>{} <small>{}</small></h3>
+          <h3>{0} <small>{1}</small></h3>
         </div>
         <div class="title_right">
-          {}
+          {2}
         </div>
       </div>
       <div class="clearfix"></div>
