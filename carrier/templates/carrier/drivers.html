@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load staticfiles header panel inline_input inline_select columns %}
+{% load staticfiles header panel inline_input inline_select columns update_button %}
 {% block title %}Visualizador TranSapp{% endblock title %}
 
 {% block css %}
@@ -35,11 +35,10 @@
 
                     {% inline_select "Patente(s) <span class='badge'>*Solo patentes que contienen datos</span>" "licensePlates" plates as select_input2 %}
                     {% columns 4 4 12 select_input2 %}
+
+                    {% update_button "btnUpdateDate" "Actualizar datos" as button %}
+                    {% columns 12 12 12 button %}
                 </div>
-            </div>
-            <div class="col-md-12 col-sm-12 col-xs-12">
-                <div class="ln_solid"></div>
-                <button id="btnUpdateData" class="btn btn-success btn-round">Actualizar datos</button>
             </div>
         </div>
         <div class="container">
@@ -80,7 +79,7 @@
 
 {% block extrajs %}
     {% with "components/gentelella/vendors/" as gentelella_static %}
-        <!-- bootstrap-datetimepicker -->
+        <!-- bootstrap-daterangepicker -->
         <script src="{% static gentelella_static|add:'moment/min/moment.min.js' %}"></script>
         <script src="{% static gentelella_static|add:'moment/locale/es.js' %}"></script>
         <script src="{% static gentelella_static|add:'bootstrap-daterangepicker/daterangepicker.js' %}"></script>
