@@ -102,4 +102,4 @@ node_modules/
 static/components/
 visualization/keys/
 static/*
-bowerapp/static/*
+bowerapp/static/components/*
