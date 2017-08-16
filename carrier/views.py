@@ -192,7 +192,10 @@ def getPhysicalHeaders(request):
     routeList = Service.objects.filter(filter(request)).values_list("service", flat=True)
     headerInfo = EventForBusv2.objects.filter(event__category='estado físico',
                                               busassignment__service__in=routeList).exclude(event__id="evn00225")
-    threeMonthsBefore = timezone.now() - timedelta(days=90)
+
+    now = timezone.now()
+    threeMonthsBefore = now.replace(month=(now.month-3)%12, hour=0, minute=0, second=0, microsecond=0)
+
     headerInfo = headerInfo.filter(timeCreation__gte=threeMonthsBefore).exclude(
         busassignment__uuid__registrationPlate__icontains="No Info.")
     response = {}
@@ -213,20 +216,15 @@ def physicalTable(request):
 
 @login_required
 def getPhysicalTable(request):
-    query = EventForBusv2.objects.filter(
-        busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
-    query = query.filter(event__category="estado físico").exclude(event__id="evn00225")
-    today = date.today()
-    year = today.year
-    if today.month <= 3:
-        last_month = today.month + 12 - 3
-        year = year - 1
-    else:
-        last_month = today.month - 3
+    routeList = Service.objects.filter(filter(request)).values_list("service", flat=True)
+    query = EventForBusv2.objects.filter(busassignment__service__in=routeList, event__category="estado físico").\
+        exclude(event__id="evn00225")
 
+    now = timezone.now()
+    threeMonthsBefore = now.replace(month=(now.month-3)%12, hour=0, minute=0, second=0, microsecond=0)
     #events = Event.objects.filter(eventType="bus", category= "estado físico").exclude(id="evn00225").distinct("name")
 
-    query = query.filter(timeCreation__gte=date(year, last_month, today.day)).exclude(
+    query = query.filter(timeCreation__gte=threeMonthsBefore).exclude(
         busassignment__uuid__registrationPlate__icontains="No Info.")
     query = query.order_by("event__name", "busassignment__uuid__registrationPlate", "-timeStamp").distinct(
         "event__name", "busassignment__uuid__registrationPlate")
