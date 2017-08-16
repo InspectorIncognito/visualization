@@ -1,358 +1,311 @@
-$(function () {
-    $('#date_init').datetimepicker({
-        defaultDate: moment().subtract(3, 'months'),
-        format: 'LL'
-    });
-    $('#date_end').datetimepicker({
-        defaultDate: moment(),
-        format: 'LL'
-    });
-    /*$('#hour1').datetimepicker({
-     defaultDate: moment().set({'hour': 0, 'minute': 0}),
-     format: 'LT'
-     });
-     $('#hour2').datetimepicker({
-     defaultDate: moment().set({'hour': 23, 'minute': 59}),
-     format: 'LT'
-     });*/
+
+$(document).ready(function () {
+    var DATE_RANGE_INPUT = $("#dateRange");
+    var LICENSE_PLATE_SELECT = $("#licensePlates");
+    var UPDATE_BUTTON = $("#btnUpdateData");
+
+    optionDateRangePicker.startDate = moment().subtract(3, "months");
+    DATE_RANGE_INPUT.daterangepicker(optionDateRangePicker);
+
     $("#group :input").change(function () {
         updatechart();
     });
-    $("#filters").on("dp.change", function (e) {
-        myFunction(true);
-    });
-    $('#plate').on("select2:select", function () {
-        if ($(".select2_plate").val()[0] == "Todas las patentes") {
-            $("#plate").select2("val", "");
-        }
-    });
-     $("#plate").change(function () {
-        myFunction(false);
-    });
-    myFunction(true);
-});
-$(document).ready(function () {
-    $(".select2_plate").select2({
+
+    LICENSE_PLATE_SELECT.select2({
         placeholder: "Todas las patentes",
         allowClear: true
     });
-});
-var resp = null;
-var types = 0;
-var chartdata = {
-    'weekday': null,
-    'plate': null,
-    'service': null,
-    'daily': null,
-    'monthly': null,
-    'yearly': null
-};
-var chart;
-function reloadchart() {
-    chartdata = {
-        'weekday': null,
-        'plate': null,
-        'service': null,
-        'daily': null,
-        'monthly': null,
-        'yearly': null
-    };
-}
-function updatechart() {
-    if (resp != null) {
-        switch ($('input:checked', '#group').val()) {
-            case "weekday":
-                if (chartdata['weekday'] == null) {
-                    chartdata['weekday'] = [];
-                    for (i = 0; i < types.length; i++) {
-                        chartdata['weekday'].push([0, 0, 0, 0, 0, 0, 0]);
-                    }
-                    for (i = 0; i < resp.length; i++) {
-                        var type = resp[i]['type'];
-                        var day = (moment(resp[i]['timeCreation'], "DD-MM-YYYY HH:mm:SS").day() + 6) % 7;
-                        chartdata['weekday'][type][day] += resp[i]['eventConfirm'];
-                    }
-                }
-                var cols = [];
-                for (i = 0; i < types.length; i++) {
-                    cols.push([types[i]].concat(chartdata['weekday'][i]));
-                }
-                makechart(cols, ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'], null, null, null, [], 'category', null)
-                break;
 
-            case "plate":
-                if (chartdata['plate'] == null) {
-                    chartdata['plate'] = {
-                        'plates': [],
-                        'platetype': []
-                    }
-                    chartdata['plate']['plates'] = [];
-                    chartdata['plate']['platetype'] = [];
-                    for (i = 0; i < types.length; i++) {
-                        chartdata['plate']['platetype'].push([]);
-                    }
-                    for (i = 0; i < resp.length; i++) {
-                        var type = resp[i]['type'];
-                        var plate = resp[i]['plate'];
-                        if (chartdata['plate']['plates'].indexOf(plate) == -1) {
-                            chartdata['plate']['plates'].push(plate)
-                            for (var j = 0; j < types.length; j++) {
-                                chartdata['plate']['platetype'][j].push(0);
-                            }
-                        }
-                        var p = chartdata['plate']['plates'].indexOf(plate);
-                        chartdata['plate']['platetype'][type][p] += resp[i]['eventConfirm'];
-                    }
-                }
-                var cols = [];
-                for (i = 0; i < types.length; i++) {
-                    cols.push([types[i]].concat(chartdata['plate']['platetype'][i]));
-                }
-                makechart(cols, chartdata['plate']['plates'], null, undefined, null, [], 'category', null);
-                break;
-
-            case "service":
-                if (chartdata['service'] == null) {
-                    var services = [];
-                    var servicetype = [];
-                    for (i = 0; i < types.length; i++) {
-                        servicetype.push([]);
-                    }
-                    for (i = 0; i < resp.length; i++) {
-                        var type = resp[i]['type'];
-                        var service = resp[i]['service'];
-                        if (services.indexOf(service) == -1) {
-                            services.push(service)
-                            for (var j = 0; j < types.length; j++) {
-                                servicetype[j].push(0);
-                            }
-                        }
-                        var p = services.indexOf(service);
-                        servicetype[type][p] += resp[i]['eventConfirm'];
-                    }
-                }
-                var cols = [];
-                for (i = 0; i < types.length; i++) {
-                    cols.push([types[i]].concat(servicetype[i]));
-                }
-                makechart(cols, services, null, undefined, null, [], 'category', null);
-                break;
-
-            case "daily":
-                if (chartdata['daily'] == null) {
-                    var days = [];
-                    var daystype = [];
-                    for (i = 0; i < types.length; i++) {
-                        daystype.push([]);
-                    }
-                    for (i = 0; i < resp.length; i++) {
-                        var type = resp[i]['type'];
-                        var day = moment(resp[i]['timeCreation'], "DD-MM-YYYY HH:mm:SS").format("DD-MM-YYYY")
-
-                        if (days.indexOf(day) == -1) {
-                            days.push(day)
-                            for (var j = 0; j < types.length; j++) {
-                                daystype[j].push(0);
-                            }
-                        }
-                        var p = days.indexOf(day);
-                        daystype[type][p] += resp[i]['eventConfirm'];
-                    }
-                }
-                var cols = days;
-                cols.unshift("x");
-                cols = [cols];
-                for (i = 0; i < types.length; i++) {
-                    cols.push([types[i]].concat(daystype[i]));
-                }
-                makechart(cols, null, null, 'x', '%d-%m-%Y', [types], 'timeseries', '%d-%m-%Y')
-                break;
-            case "monthly":
-                if (chartdata['monthly'] == null) {
-                    var months = [];
-                    var monthstype = [];
-                    for (i = 0; i < types.length; i++) {
-                        monthstype.push([]);
-                    }
-                    for (i = 0; i < resp.length; i++) {
-                        var type = resp[i]['type'];
-                        var month = moment(resp[i]['timeCreation'], "DD-MM-YYYY HH:mm:SS").format("MM-YYYY")
-
-                        if (months.indexOf(month) == -1) {
-                            months.push(month)
-                            for (var j = 0; j < types.length; j++) {
-                                monthstype[j].push(0);
-                            }
-                        }
-                        var p = months.indexOf(month);
-                        monthstype[type][p] += resp[i]['eventConfirm'];
-                    }
-                }
-                var cols = months;
-                cols.unshift("x");
-                cols = [cols];
-                for (i = 0; i < types.length; i++) {
-                    cols.push([types[i]].concat(monthstype[i]));
-                }
-                makechart(cols, null, null, 'x', '%m-%Y', [types], 'timeseries', '%m-%Y')
-                break;
-            case "yearly":
-                if (chartdata['yearly'] == null) {
-                    var years = [];
-                    var yearstype = [];
-                    for (i = 0; i < types.length; i++) {
-                        yearstype.push([]);
-                    }
-                    for (i = 0; i < resp.length; i++) {
-                        var type = resp[i]['type'];
-                        var year = moment(resp[i]['timeCreation'], "DD-MM-YYYY HH:mm:SS").format("YYYY")
-
-                        if (years.indexOf(year) == -1) {
-                            years.push(year)
-                            for (var j = 0; j < types.length; j++) {
-                                yearstype[j].push(0);
-                            }
-                        }
-                        var p = years.indexOf(year);
-                        yearstype[type][p] += resp[i]['eventConfirm'];
-                    }
-                }
-                var cols = years;
-                cols.unshift("x");
-                cols = [cols];
-                for (i = 0; i < types.length; i++) {
-                    cols.push([types[i]].concat(yearstype[i]));
-                }
-                makechart(cols, null, null, 'x', '%Y', [types], 'timeseries', '%Y')
-                break;
-        }
-    }
-}
-function makechart(columns, categories, height, x, xformat, groups, type, tickformat) {
-    chart = c3.generate({
-        size: {
-            height: height,
-        },
-        data: {
-            x: x,
-            xFormat: xformat,
-            columns: columns,
-            type: 'bar',
-            groups: groups
-        },
-        bar: {
-            width: {
-                ratio: 0.4
-            }
-        },
-        axis: {
-            x: {
-                type: type,
-                tick: {
-                    culling: false,
-                    rotate: 45,
-                    format: tickformat
-                },
-                categories: categories
-
-            }
-        }
+    UPDATE_BUTTON.click(function(){
+        myFunction(true);
     });
-}
 
-
-function updateDate(n) {
-    switch (n) {
-        case 1:
-            $('#date_init').data("DateTimePicker").date(moment());
-            $('#date_end').data("DateTimePicker").date(moment());
-            break;
-        case 2:
-            $('#date_init').data("DateTimePicker").date(moment().subtract(1, 'months'));
-            $('#date_end').data("DateTimePicker").date(moment());
-            break;
-        case 3:
-            $('#date_init').data("DateTimePicker").date(moment().subtract(3, 'months'));
-            $('#date_end').data("DateTimePicker").date(moment());
-            break;
-    }
-}
-
-
-function myFunction(refresh) {
-    var Dataurl = "http://" + location.host + "/carriers/getPhysicalData/";
-    var data = {
-        date_init: $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD"),
-        date_end: $('#date_end').data("DateTimePicker").date().add(1, 'days').format("YYYY-MM-DD"),
+    var resp = null;
+    var types = 0;
+    var chart;
+    var chartdata = {
+        "weekday": null,
+        "plate": null,
+        "service": null,
+        "daily": null,
+        "monthly": null,
+        "yearly": null
     };
 
-    var plate = $(".select2_plate").val();
-    if (plate != null) data['plate'] = JSON.stringify(plate);
+    function reloadchart() {
+        chartdata = {
+            "weekday": null,
+            "plate": null,
+            "service": null,
+            "daily": null,
+            "monthly": null,
+            "yearly": null
+        };
+    }
 
+    function updatechart() {
+        if (resp !== null) {
+            switch ($("input:checked", "#group").val()) {
+                case "weekday":
+                    if (chartdata["weekday"] === null) {
+                        chartdata["weekday"] = [];
+                        for (i = 0; i < types.length; i++) {
+                            chartdata["weekday"].push([0, 0, 0, 0, 0, 0, 0]);
+                        }
+                        for (i = 0; i < resp.length; i++) {
+                            var type = resp[i]["type"];
+                            var day = (moment(resp[i]["timeCreation"], "DD-MM-YYYY HH:mm:SS").day() + 6) % 7;
+                            chartdata["weekday"][type][day] += resp[i]["eventConfirm"];
+                        }
+                    }
+                    var cols = [];
+                    for (i = 0; i < types.length; i++) {
+                        cols.push([types[i]].concat(chartdata["weekday"][i]));
+                    }
+                    makechart(cols, ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"], null, null, null, [], "category", null);
+                    break;
 
-    $.getJSON(Dataurl, data)
-        .done(function (data) {
-            console.log(data);
-            if (refresh) {
-                $(".select2_plate").find("option").remove().val("");
-                $("#plate").val(null).trigger("change");
+                case "plate":
+                    if (chartdata["plate"] === null) {
+                        chartdata["plate"] = {
+                            "plates": [],
+                            "platetype": types.map(function(){ return []; })
+                        };
+                        for (i = 0; i < resp.length; i++) {
+                            var type = resp[i]["type"];
+                            var plate = resp[i]["plate"];
+                            if (chartdata["plate"]["plates"].indexOf(plate) === -1) {
+                                chartdata["plate"]["plates"].push(plate);
+                                for (var j = 0; j < types.length; j++) {
+                                    chartdata["plate"]["platetype"][j].push(0);
+                                }
+                            }
+                            var p = chartdata["plate"]["plates"].indexOf(plate);
+                            chartdata["plate"]["platetype"][type][p] += resp[i]["eventConfirm"];
+                        }
+                    }
+                    var cols = [];
+                    for (i = 0; i < types.length; i++) {
+                        cols.push([types[i]].concat(chartdata["plate"]["platetype"][i]));
+                    }
+                    makechart(cols, chartdata["plate"]["plates"], null, undefined, null, [], "category", null);
+                    break;
 
-                $('.select2_plate').append($('<option>', {
-                    value: "Todas las patentes",
-                    text: "Todas las patentes",
-                }));
-                var top = [];
-                var bottom = [];
-                $.each(data.allplates, function (key, value) {
-                    if (value) {
-                        top.push(key);
+                case "service":
+                    if (chartdata["service"] === null) {
+                        var services = [];
+                        var servicetype = types.map(function(){ return []; });
+                        for (i = 0; i < resp.length; i++) {
+                            var type = resp[i]["type"];
+                            var service = resp[i]["service"];
+                            if (services.indexOf(service) === -1) {
+                                services.push(service);
+                                for (var j = 0; j < types.length; j++) {
+                                    servicetype[j].push(0);
+                                }
+                            }
+                            var p = services.indexOf(service);
+                            servicetype[type][p] += resp[i]["eventConfirm"];
+                        }
                     }
-                    else {
-                        bottom.push(key);
+                    var cols = [];
+                    for (i = 0; i < types.length; i++) {
+                        cols.push([types[i]].concat(servicetype[i]));
                     }
-                });
-                top.sort();
-                values = [];
-                $.each(top, function (index, value) {
-                    if ($.inArray(value, plate) >= 0) {
-                        values.push(value);
+                    makechart(cols, services, null, undefined, null, [], "category", null);
+                    break;
+
+                case "daily":
+                    if (chartdata["daily"] === null) {
+                        var days = [];
+                        var daystype = types.map(function(){ return []; });
+                        for (i = 0; i < resp.length; i++) {
+                            var type = resp[i]["type"];
+                            var day = moment(resp[i]["timeCreation"], "DD-MM-YYYY HH:mm:SS").format("DD-MM-YYYY");
+
+                            if (days.indexOf(day) === -1) {
+                                days.push(day)
+                                for (var j = 0; j < types.length; j++) {
+                                    daystype[j].push(0);
+                                }
+                            }
+                            var p = days.indexOf(day);
+                            daystype[type][p] += resp[i]["eventConfirm"];
+                        }
                     }
-                    ;
-                    $('.select2_plate').append($('<option>', {
-                        value: value,
-                        text: value,
-                    }));
-                });
-                bottom.sort();
-                $.each(bottom, function (index, value) {
-                    $('.select2_plate').append($('<option>', {
-                        value: value,
-                        text: value + " (No hay datos)",
-                    }));
-                });
-                $("#plate").val(values).trigger("change");
+                    var cols = days;
+                    cols.unshift("x");
+                    cols = [cols];
+                    for (i = 0; i < types.length; i++) {
+                        cols.push([types[i]].concat(daystype[i]));
+                    }
+                    makechart(cols, null, null, "x", "%d-%m-%Y", [types], "timeseries", "%d-%m-%Y");
+                    break;
+                case "monthly":
+                    if (chartdata["monthly"] === null) {
+                        var months = [];
+                        var monthstype = types.map(function(){ return []; });
+                        for (i = 0; i < resp.length; i++) {
+                            var type = resp[i]["type"];
+                            var month = moment(resp[i]["timeCreation"], "DD-MM-YYYY HH:mm:SS").format("MM-YYYY");
+
+                            if (months.indexOf(month) === -1) {
+                                months.push(month);
+                                for (var j = 0; j < types.length; j++) {
+                                    monthstype[j].push(0);
+                                }
+                            }
+                            var p = months.indexOf(month);
+                            monthstype[type][p] += resp[i]["eventConfirm"];
+                        }
+                    }
+                    var cols = months;
+                    cols.unshift("x");
+                    cols = [cols];
+                    for (i = 0; i < types.length; i++) {
+                        cols.push([types[i]].concat(monthstype[i]));
+                    }
+                    makechart(cols, null, null, "x", "%m-%Y", [types], "timeseries", "%m-%Y");
+                    break;
+                case "yearly":
+                    if (chartdata["yearly"] === null) {
+                        var years = [];
+                        var yearstype = types.map(function(){ return []; });
+                        for (i = 0; i < resp.length; i++) {
+                            var type = resp[i]["type"];
+                            var year = moment(resp[i]["timeCreation"], "DD-MM-YYYY HH:mm:SS").format("YYYY");
+
+                            if (years.indexOf(year) === -1) {
+                                years.push(year)
+                                for (var j = 0; j < types.length; j++) {
+                                    yearstype[j].push(0);
+                                }
+                            }
+                            var p = years.indexOf(year);
+                            yearstype[type][p] += resp[i]["eventConfirm"];
+                        }
+                    }
+                    var cols = years;
+                    cols.unshift("x");
+                    cols = [cols];
+                    for (i = 0; i < types.length; i++) {
+                        cols.push([types[i]].concat(yearstype[i]));
+                    }
+                    makechart(cols, null, null, "x", "%Y", [types], "timeseries", "%Y");
+                    break;
             }
-            reloadchart();
-            resp = data.reports;
-            types = data.types;
-            updatechart();
+        }
+    }
+    function makechart(columns, categories, height, x, xformat, groups, type, tickformat) {
+        chart = c3.generate({
+            size: {
+                height: height
+            },
+            data: {
+                x: x,
+                xFormat: xformat,
+                columns: columns,
+                type: 'bar',
+                groups: groups
+            },
+            bar: {
+                width: {
+                    ratio: 0.4
+                }
+            },
+            axis: {
+                x: {
+                    type: type,
+                    tick: {
+                        culling: false,
+                        rotate: 45,
+                        format: tickformat
+                    },
+                    categories: categories
+
+                }
+            }
         });
-}
-function headers() {
-    var Dataurl = "http://" + location.host + "/carriers/getPhysicalHeaders/";
-    $.getJSON(Dataurl)
-        .done(function (data) {
-            var html = ''
-            $.each(data, function (key, number) {
-                html += '<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">';
-                html += '<span class="count_top" title="' + key + '">' + key + '</span>';
-                html += '<div class="count" style="text-align:center">' + number + '</div>'
-                html += '</div>'
+    }
+
+    var target = document.getElementsByClassName("x_content")[0];
+    var spinner = new Spinner(spinnerOpt);
+
+    function myFunction(refresh) {
+        var Dataurl = "/carriers/getPhysicalData/";
+
+        var data = {
+            date_init: DATE_RANGE_INPUT.data("daterangepicker").startDate.format(),
+            date_end: DATE_RANGE_INPUT.data("daterangepicker").endDate.format()
+        };
+        var licensePlates = LICENSE_PLATE_SELECT.val();
+        console.log(licensePlates);
+        if (licensePlates !== null) {
+            data["license_plates[]"] = licensePlates;
+        }
+
+        // activate spinner
+        spinner.spin(target);
+        $.getJSON(Dataurl, data)
+            .done(function (data) {
+                console.log(data);
+                if (refresh) {
+                    $(".select2_plate").find("option").remove().val("");
+                    //$("#plate").val(null).trigger("change");
+                    var top = [];
+                    var bottom = [];
+                    $.each(data.allplates, function (key, value) {
+                        if (value) {
+                            top.push(key);
+                        }
+                        else {
+                            bottom.push(key);
+                        }
+                    });
+                    top.sort();
+                    values = [];
+                    $.each(top, function (index, value) {
+                        if ($.inArray(value, licensePlates) >= 0) {
+                            values.push(value);
+                        }
+                        LICENSE_PLATE_SELECT.append($("<option>", {
+                            value: value,
+                            text: value
+                        }));
+                    });
+                    /*
+                    bottom.sort();
+                    $.each(bottom, function (index, value) {
+                        $('.select2_plate').append($('<option>', {
+                            value: value,
+                            text: value + " (No hay datos)",
+                        }));
+                    });
+                    $("#plate").val(values).trigger("change");*/
+                }
+                reloadchart();
+                resp = data.reports;
+                types = data.types;
+                updatechart();
+            }).always(function(){
+                // hide spinner
+                spinner.stop();
             });
-            $("#headers").html(html);
-        });
-};
-headers();
-setInterval(function () {
+    }
+    function headers() {
+        var URL = "/carriers/getPhysicalHeaders/";
+        $.getJSON(URL)
+            .done(function (data) {
+                var html = '';
+                $.each(data, function (key, number) {
+                    html += '<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">';
+                    html += '<span class="count_top" title="' + key + '">' + key + '</span>';
+                    html += '<div class="count" style="text-align:center">' + number + '</div>';
+                    html += '</div>'
+                });
+                $("#headers").html(html);
+            });
+    }
     headers();
-}, 30000);
+    UPDATE_BUTTON.click();
+});

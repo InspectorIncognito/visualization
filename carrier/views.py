@@ -7,14 +7,14 @@ from django.db.models import Q, Count
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import CharField, ExpressionWrapper, F
 from django.utils.dateparse import parse_datetime
-
+from django.utils import timezone
 from collections import defaultdict
 
 from datetime import datetime, date, timedelta
 
 import json
 
-from AndroidRequests.models import *
+from AndroidRequests.models import Event, Service, EventForBusv2, Busassignment, ReportInfo, TimePeriod
 
 def filter(request):
     user = request.user.getUser()
@@ -88,13 +88,10 @@ def getDriversReport(request):
             return dict
 
         # params of requests
-        date_init = request.GET.get('date_init')
-        date_end = request.GET.get('date_end')
-        licensePlates = request.GET.get('licensePlates')
-        routes = request.GET.get('routes')
-
-        date_init = parse_datetime(date_init)
-        date_end = parse_datetime(date_end)
+        date_init = parse_datetime(request.GET.get('date_init'))
+        date_end = parse_datetime(request.GET.get('date_end'))
+        licensePlates = request.GET.getlist('licensePlates[]')
+        routes = request.GET.getlist('routes[]')
 
         query = EventForBusv2.objects.filter(event__category="conductor", timeCreation__range=[date_init, date_end]).\
             exclude(busassignment__uuid__registrationPlate__icontains="No Info.")
@@ -103,7 +100,6 @@ def getDriversReport(request):
             exclude(uuid__registrationPlate__icontains="No Info.").distinct("uuid__registrationPlate")
 
         if routes:
-            routes = json.loads(routes)
             query = query.filter(busassignment__service__in=routes)
             busassignment = busassignment.filter(service__in=routes)
         else:
@@ -120,7 +116,6 @@ def getDriversReport(request):
         # print(allplates)
 
         if licensePlates:
-            licensePlates = json.loads(licensePlates)
             query = query.filter(busassignment__uuid__registrationPlate__in=licensePlates)
 
         data = {
@@ -134,8 +129,8 @@ def getDriversReport(request):
 
 @login_required
 def driversTable(request):
-    template = loader.get_template('carrier/driversTable.html')
-    return HttpResponse(template.render(request=request))
+    template = 'carrier/driversTable.html'
+    return render(request, template, {})
 
 
 @login_required
@@ -163,19 +158,16 @@ def getDriversTable(request):
 
 @login_required
 def busReports(request):
-    template = loader.get_template('carrier/busReports.html')
-    return HttpResponse(template.render(request=request))
+    template = 'carrier/busReports.html'
+    return render(request, template, {})
 
 
 @login_required
 def getBusReports(request):
     if request.method == 'GET':
         services = Service.objects.filter(filter(request)).values_list("service", flat=True)
-        date_init = request.GET.get('date_init')
-        date_end = request.GET.get('date_end')
-
-        date_init = parse_datetime(date_init)
-        date_end = parse_datetime(date_end)
+        date_init = parse_datetime(request.GET.get('date_init'))
+        date_end = parse_datetime(request.GET.get('date_end'))
 
         query = ReportInfo.objects.filter(reportType=ReportInfo.BUS, report__timeStamp__range=[date_init, date_end])
         query = query.filter(service__in=services)
@@ -187,29 +179,21 @@ def getBusReports(request):
 
 @login_required
 def physical(request):
-    template = loader.get_template('carrier/physical.html')
-    services = Service.objects.filter(filter(request))
+    template = 'carrier/physical.html'
     context = {
-        'services': services
+        'services': Service.objects.filter(filter(request))
     }
-    return HttpResponse(template.render(context, request))
+    return render(request, template, context)
 
 
 @login_required
 def getPhysicalHeaders(request):
-    events = Event.objects.filter(category="estado físico", eventType="bus").exclude(id="evn00225")
-    events = [event.name for event in events]
-    headerInfo = EventForBusv2.objects.filter(event__category='estado físico').exclude(event__id="evn00225")
-    headerInfo = headerInfo.filter(
-        busassignment__service__in=[service.service for service in Service.objects.filter(filter(request))])
-    today = date.today()
-    year = today.year
-    if today.month <= 3:
-        last_month = today.month + 12 - 3
-        year = year - 1
-    else:
-        last_month = today.month - 3
-    headerInfo = headerInfo.filter(timeCreation__gte=date(year, last_month, today.day)).exclude(
+    events = Event.objects.filter(category="estado físico", eventType="bus").exclude(id="evn00225").values_list("name", flat=True)
+    routeList = Service.objects.filter(filter(request)).values_list("service", flat=True)
+    headerInfo = EventForBusv2.objects.filter(event__category='estado físico',
+                                              busassignment__service__in=routeList).exclude(event__id="evn00225")
+    threeMonthsBefore = timezone.now() - timedelta(days=90)
+    headerInfo = headerInfo.filter(timeCreation__gte=threeMonthsBefore).exclude(
         busassignment__uuid__registrationPlate__icontains="No Info.")
     response = {}
     for ev in events:
@@ -240,8 +224,7 @@ def getPhysicalTable(request):
     else:
         last_month = today.month - 3
 
-    events = Event.objects.filter(eventType="bus", category= "estado físico").exclude(id="evn00225")
-    events = events.distinct("name")
+    #events = Event.objects.filter(eventType="bus", category= "estado físico").exclude(id="evn00225").distinct("name")
 
     query = query.filter(timeCreation__gte=date(year, last_month, today.day)).exclude(
         busassignment__uuid__registrationPlate__icontains="No Info.")
@@ -262,54 +245,46 @@ def getPhysicalTable(request):
 @login_required
 def getPhysicalReport(request):
     if request.method == 'GET':
-        events = Event.objects.filter(category="estado físico", eventType="bus")
-        events = [event.name for event in events]
-        pos = range(0, len(events))
-        eventToPos = {name: pos for name, pos in zip(events, pos)}
+        events = list(Event.objects.filter(category="estado físico", eventType="bus").values_list("name", flat=True))
+        eventToPos = {name: pos for pos, name in enumerate(events)}
 
         def change(dict):
             dict["type"] = eventToPos[dict["type"]]
             return dict
 
-        date_init = request.GET.get('date_init')
-        date_end = request.GET.get('date_end')
-        # hour1 = int(request.GET.get('hour1'))
-        # hour2 = int(request.GET.get('hour2'))
-        plates = request.GET.get('plate')
-        serv = request.GET.get('service')
-        # hour2 = (hour2 + 24) if hour2 < hour1 else hour2
-        # hours = [hour % 24 for hour in range(hour1, hour2 + 1)]
-        services = [service.service for service in Service.objects.filter(filter(request))]
-        query = EventForBusv2.objects.filter(
-            busassignment__service__in=services)
-        query = query.filter(event__category="estado físico", fixed=False)
-        query = query.filter(timeCreation__range=[date_init, date_end])
-        query = query.exclude(busassignment__uuid__registrationPlate__icontains="No Info")
+        # request params
+        date_init = parse_datetime(request.GET.get('date_init'))
+        date_end = parse_datetime(request.GET.get('date_end'))
+        plates = request.GET.getlist('license_plates[]')
+        #routes = request.GET.getlist('routes')
 
-        busassignment = Busassignment.objects.filter(service__in=services).exclude(
-            uuid__registrationPlate__icontains="No Info.").select_related('uuid').distinct("uuid__registrationPlate")
-        allplates = {ba.uuid.registrationPlate: False for ba in busassignment}
-        query2 = query.distinct("busassignment__uuid__registrationPlate").select_related("busassignment__uuid")
-        for report in query2:
-            plate = report.busassignment.uuid.registrationPlate
-            allplates[plate] = True
+        reports = EventForBusv2.objects.filter(event__category="estado físico", fixed=False,
+                                               timeCreation__range=[date_init, date_end]).\
+            exclude(busassignment__uuid__registrationPlate__icontains="No Info")
+        routeList = Service.objects.filter(filter(request)).values_list("service", flat=True)
+        #if routes:
+        #    routeList = routes
+        #reports = reports.filter(busassignment__service__in=routeList)
 
         if plates:
-            plates = json.loads(plates)
-            plateFilter = reduce(lambda x, y: x | y,
-                                 [Q(busassignment__uuid__registrationPlate__icontains=plate) for plate in plates])
-            query = query.filter(plateFilter)
-        if serv:
-            serv = json.loads(serv)
-            serviceFilter = reduce(lambda x, y: x | y, [Q(busassignment__service=ser) for ser in serv])
-            query = query.filter(serviceFilter)
-        # hourFilter = reduce(lambda x, y: x | y, [Q(timeCreation__hour=h) for h in hours])
-        # query = query.filter(hourFilter)
+            reports = reports.filter(busassignment__uuid__registrationPlate__in=plates)
+
+        licensePlateList = Busassignment.objects.filter(service__in=routeList).\
+            exclude(uuid__registrationPlate__icontains="No Info.").\
+            values_list("uuid__registrationPlate", flat=True).distinct("uuid__registrationPlate")
+
+        allplates = {licensePlate: False for licensePlate in licensePlateList}
+        query2 = reports.values_list("busassignment__uuid__registrationPlate", flat=True).\
+            distinct("busassignment__uuid__registrationPlate")
+        for plate in query2:
+            allplates[plate] = True
+
         data = {
-            "reports": [change(report.getDictionary()) for report in query],
+            "reports": [change(report.getDictionary()) for report in reports],
             "types": events,
             "allplates": allplates
         }
+
         return JsonResponse(data, safe=False)
 
 

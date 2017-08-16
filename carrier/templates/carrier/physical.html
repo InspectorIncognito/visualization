@@ -1,173 +1,86 @@
 {% extends "admin/base_site.html" %}
-{% load staticfiles %}
-{% block title %}
-    <title>Visualizador TranSapp</title>
-{% endblock title %}
+{% load staticfiles header panel inline_input inline_select columns update_button %}
+{% block title %}Visualizador TranSapp{% endblock title %}
 
-{% block topimports %}
-    <!-- Select2 -->
-    <link href="{% static 'components/gentelella/vendors/select2/dist/css/select2.min.css' %}" rel="stylesheet">
-    <!-- jQuery Script -->
-    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+{% block css %}
+    {% with "components/gentelella/vendors/" as gentelella_static %}
+        <!-- Select2 -->
+        <link href="{% static gentelella_static|add:'select2/dist/css/select2.min.css' %}" rel="stylesheet">
+        <!-- Datetimepicker -->
+        <link href="{% static gentelella_static|add:'bootstrap-daterangepicker/daterangepicker.css' %}" rel="stylesheet">
+    {% endwith %}
+
     <!-- C3 -->
     <link href="{% static 'components/c3/c3.min.css' %}" rel="stylesheet">
-    <!-- Datetimepicker -->
-    <link href="{% static 'components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css' %}"
-          rel="stylesheet">
-    <!-- DataTables -->
-    <link rel="stylesheet" type="text/css"
-          href="https://cdn.datatables.net/v/bs/dt-1.10.12/r-2.1.0/datatables.min.css"/>
+{% endblock %}
 
-{% endblock topimports %}
-
-{% block toptiles %}
+{% block content %}
+    <!-- {% header "Reportes de estado físico" %} -->
     <h4>Eventos sin arreglar de los últimos 3 meses</h4>
     <div id="headers" class="row tile_count">
     </div>
-{% endblock toptiles %}
-
-{% block maincontent %}
     <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
-            <div class="x_panel">
-                <div class="x_title">
-                    <h2>Reportes Estado Físico</h2>
-                    <ul class="nav navbar-right panel_toolbox">
-                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                        </li>
-                    </ul>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="x_content">
-                    <div class="x_panel">
-                        <div class="x_title">
-                            <h2>Filtros</h2>
-                            <ul class="nav navbar-right panel_toolbox">
-                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                </li>
-                            </ul>
-                            <div class="clearfix"></div>
-                        </div>
-                        <div class="x_content">
-                            <div class="dashboard-widget-content">
-                                <div id="filters" class="container">
-                                    <div class="form">
-                                        <div class="row form-inline">
-                                            <div class='col-sm-4 col-xs-12'>
-                                                <div class="form-group">
-                                                    <label for="date_init">Fecha Inicio:</label>
-                                                    <input type='text' class="form-control"
-                                                           id="date_init"/>
-                                                </div>
-                                            </div>
-                                            <div class='col-sm-4 col-xs-12'>
-                                                <div class="form-group">
-                                                    <label for="date_end">Fecha Fin:</label>
-                                                    <input type='text' class="form-control"
-                                                           id="date_end"/>
-                                                </div>
-                                            </div>
-                                            <div class='col-sm-4 col-xs-12'>
-                                                <div class="form-group">
-                                                    <button class="btn" onclick="updateDate(1)">Hoy</button>
-                                                    <button class="btn" onclick="updateDate(2)">Ultimo mes</button>
-                                                    <button class="btn" onclick="updateDate(3)">3 Meses</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!--<div class="row">
-                                            <div class='col-sm-2'>
-                                                <div class="form-group">
-                                                    <label for="hour1">Desde</label>
-                                                    <input type='text' onchange="myFunction()"
-                                                           class="form-control" id="hour1"/>
-                                                </div>
-                                            </div>
-                                            <div class='col-sm-2'>
-                                                <div class="form-group">
-                                                    <label for="hour2">Hasta</label>
-                                                    <input type='text' class="form-control"
-                                                           id="hour2"/>
-                                                </div>
-                                            </div>-->
-                                        <!--<div class='col-sm-4'>
-                                            <div class="form-group">
-                                                <label for="service">Recorrido</label>
-                                                <select class="select2_multiple form-control"
-                                                        id='service' multiple="multiple">
-                                                    {% for service in services %}
-                                                    <option>{{ service.service }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </div>
-                                        </div>-->
-                                        <div class='col-sm-4 col-xs-12'>
-                                            <div class="form-group">
-                                                <label for="plate">Patente</label>
-                                                <select class="select2_plate form-control"
-                                                        id='plate' multiple="multiple">
-                                                    <option>Todas las patentes</option>
-                                                    {% for plate in plates %}
-                                                        <option>{{ plate }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
+            {% inline_input "Rango de días" "dateRange" as input1 %}
+            {% columns 4 4 12 input1 as first_element %}
+
+            {% inline_select "Patente(s) <span class='badge'>*Solo patentes que contienen datos</span>" "licensePlates" plates as select_input2 %}
+            {% columns 4 4 12 select_input2 as second_element %}
+
+            {% update_button "btnUpdateData" "Actualizar datos" as button %}
+            {% columns 12 12 12 button as third_element %}
+
+            {% panel "fa-filter" "Filtros" first_element|add:second_element|add:third_element %}
+
+            <div class="container">
+                Agrupar por:
+                <div id="group" class="btn-toolbar" role="toolbar" data-toggle="buttons">
+                    <div class="btn-group">
+                        <!--<label class="btn btn-default active">
+                            <input type="radio" name="groups" value="weekday" checked> Dia semana
+                        </label>-->
+                        <!--<label class="btn btn-default ">
+                            <input type="radio" name="groups" value="plate"> Patente
+                        </label>-->
+                        <!--<label class="btn btn-default ">
+                            <input type="radio" name="groups" value="service"> Recorrido
+                        </label>-->
+                    </div>
+                    <div class="btn-group">
+                        <label class="btn btn-default active">
+                            <input type="radio" name="groups" value="daily" checked> Dia
+                        </label>
+                        <label class="btn btn-default ">
+                            <input type="radio" name="groups" value="monthly"> Mes
+                        </label>
+                        <label class="btn btn-default ">
+                            <input type="radio" name="groups" value="yearly"> Año
+                        </label>
                     </div>
                 </div>
-                <div class="dashboard-widget-content">
-                    <div class="container">
-                        Agrupar por:
-                        <div id="group" class="btn-toolbar" role="toolbar" data-toggle="buttons">
-                            <div class="btn-group">
-                                <!--<label class="btn btn-default active">
-                                    <input type="radio" name="groups" value="weekday" checked> Dia semana
-                                </label>-->
-                                <!--<label class="btn btn-default ">
-                                    <input type="radio" name="groups" value="plate"> Patente
-                                </label>-->
-                                <!--<label class="btn btn-default ">
-                                    <input type="radio" name="groups" value="service"> Recorrido
-                                </label>-->
-                            </div>
-                            <div class="btn-group">
-                                <label class="btn btn-default active">
-                                    <input type="radio" name="groups" value="daily" checked> Dia
-                                </label>
-                                <label class="btn btn-default ">
-                                    <input type="radio" name="groups" value="monthly"> Mes
-                                </label>
-                                <label class="btn btn-default ">
-                                    <input type="radio" name="groups" value="yearly"> Año
-                                </label>
-                            </div>
-                        </div>
-                        <hr>
-                        <div id="chart"></div>
-                    </div>
-                </div>
+                <hr>
+                <div id="chart"></div>
             </div>
         </div>
     </div>
+{% endblock %}
 
-{% endblock maincontent %}
-
-{% block bottomimports %}
+{% block extrajs %}
     <!-- C3 -->
     <script src="{% static 'components/c3/c3.min.js' %}"></script>
     <script src="{% static 'components/d3/d3.min.js' %}"></script>
-    <!-- bootstrap-datetimepicker -->
-    <script src="{% static 'components/gentelella/vendors/moment/min/moment.min.js' %}"></script>
-    <script src="{% static 'components/gentelella/vendors/moment/locale/es.js' %}"></script>
-    <script src="{% static 'components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js' %}"></script>
-    <!-- Select2 -->
-    <script src="{% static 'components/gentelella/vendors/select2/dist/js/select2.full.min.js' %}"></script>
-    <!-- DataTables -->
-    <script type="text/javascript" src="https://cdn.datatables.net/v/bs/dt-1.10.12/r-2.1.0/datatables.min.js"></script>
+
+    {% with "components/gentelella/vendors/" as gentelella_static %}
+        <!-- bootstrap-datetimepicker -->
+        <script src="{% static gentelella_static|add:'moment/min/moment.min.js' %}"></script>
+        <script src="{% static gentelella_static|add:'moment/locale/es.js' %}"></script>
+        <script src="{% static gentelella_static|add:'bootstrap-daterangepicker/daterangepicker.js' %}"></script>
+        <!-- Select2 -->
+        <script src="{% static gentelella_static|add:'select2/dist/js/select2.full.min.js' %}"></script>
+    {% endwith %}
+
+    <script src="{% static 'js/dateRangePickerOpt.js' %}"></script>
 
     <script src="{% static 'carrier/js/physical.js' %}"></script>
-{% endblock bottomimports %}
+{% endblock %}
