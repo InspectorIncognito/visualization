@@ -1,8 +1,8 @@
 
-DATE_RANGE_INPUT = $("#dateRange");
-LICENSE_PLATE_SELECT = $("#licensePlates");
-ROUTE_SELECT = $("#routes");
-UPDATE_BUTTON = $("#btnUpdateData");
+var DATE_RANGE_INPUT = $("#dateRange");
+var LICENSE_PLATE_SELECT = $("#licensePlates");
+var ROUTE_SELECT = $("#routes");
+var UPDATE_BUTTON = $("#btnUpdateData");
 
 $(function () {
     DATE_RANGE_INPUT.daterangepicker(optionDateRangePicker);
@@ -380,7 +380,7 @@ function makeChart(columns, categories, height, x, xFormat, groups, type, tickFo
 }
 
 var target = document.getElementById("filters");
-var spinner = new Spinner(spinnerOpt).spin(target);
+var spinner = new Spinner(spinnerOpt);
 
 function myFunction(refresh) {
     const URL = "/carriers/getDriversData/";
@@ -393,10 +393,10 @@ function myFunction(refresh) {
     var routes = ROUTE_SELECT.val();
     var licensePlates = LICENSE_PLATE_SELECT.val();
     if (routes !== null) {
-        data["routes"] = JSON.stringify(routes);
+        data["routes[]"] = routes;
     }
     if (licensePlates !== null) {
-        data["licensePlates"] = JSON.stringify(licensePlates);
+        data["licensePlates[]"] = licensePlates;
     }
 
     // activate spinner

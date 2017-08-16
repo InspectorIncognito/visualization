@@ -8,7 +8,7 @@
     <!-- C3 -->
     <link href="{% static 'components/c3/c3.min.css' %}" rel="stylesheet">
     {% with "components/gentelella/vendors/" as gentelella_static %}
-        <!-- Datetimepicker -->
+        <!-- Daterangepicker -->
         <link href="{% static gentelella_static|add:'bootstrap-daterangepicker/daterangepicker.css' %}" rel="stylesheet">
         <!-- Select2 -->
         <link href="{% static gentelella_static|add:'select2/dist/css/select2.min.css' %}" rel="stylesheet">
@@ -36,7 +36,7 @@
                     {% inline_select "Patente(s) <span class='badge'>*Solo patentes que contienen datos</span>" "licensePlates" plates as select_input2 %}
                     {% columns 4 4 12 select_input2 %}
 
-                    {% update_button "btnUpdateDate" "Actualizar datos" as button %}
+                    {% update_button "btnUpdateData" "Actualizar datos" as button %}
                     {% columns 12 12 12 button %}
                 </div>
             </div>
@@ -93,9 +93,6 @@
     <!-- C3 -->
     <script src="{% static 'components/c3/c3.min.js' %}"></script>
     <script src="{% static 'components/d3/d3.min.js' %}"></script>
-    <!-- spin js -->
-    <script src="{% static 'components/spin.js/spin.min.js' %}"></script>
-    <script src="{% static 'js/spinnerOpt.js' %}"></script>
 
     <script src="{% static 'carrier/js/drivers.js' %}"></script>
 {% endblock %}
