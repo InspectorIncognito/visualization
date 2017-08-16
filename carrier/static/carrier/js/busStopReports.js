@@ -1,86 +1,58 @@
 
 $(function () {
-    $('#date_init').datetimepicker({
-        defaultDate: moment().subtract(3, 'months'),
-        format: 'LL'
-    });
-    $('#date_end').datetimepicker({
-        defaultDate: moment(),
-        format: 'LL'
-    });
-    $("#filters :input").change(function () {
-        myFunction();
-    });
-    $("#filters").on("dp.change", function () {
-        myFunction();
-    });
-    init();
-});
+    var DATE_RANGE_INPUT = $("#dateRange");
+    var TABLE = $("#bus-stop-reports-table");
 
-var table;
-var url = 'http://' + location.host + '/carriers/getBusStopReports/';
+    optionDateRangePicker.startDate = moment().subtract(3, "months");
+    DATE_RANGE_INPUT.daterangepicker(optionDateRangePicker);
 
-var date = moment();
-var dateString = date.format("YYYY-MM-DD");
-var exportFileName = "ReportesLibresDeParaderos_" + dateString;
+    function getURL() {
+        var URL = "/carriers/getBusStopReports/?";
+        var data = {
+            date_init: DATE_RANGE_INPUT.data("daterangepicker").startDate.format(),
+            date_end: DATE_RANGE_INPUT.data("daterangepicker").endDate.format()
+        };
+        return URL + $.param(data);
+    }
 
-function init() {
-    var date_init = $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD");
-    var date_end = $('#date_end').data("DateTimePicker").date().add(1, 'days').format("YYYY-MM-DD");
-    var params = '?date_init=' + date_init + '&date_end=' + date_end;
-    $.fn.dataTable.moment('DD-MM-YYYY HH:mm:ss');
+    var table;
 
-    table = $('#bus-stop-reports-table').DataTable({
+    var target = document.getElementsByClassName("x_content")[0];
+    var spinner = new Spinner(spinnerOpt).spin(target);
+
+    var dateString = moment().format("YYYY-MM-DD");
+    var exportFileName = "ReportesLibresDeParaderos_" + dateString;
+    $.fn.dataTable.moment("DD-MM-YYYY HH:mm:ss");
+
+    var dataTableOpts = {
         scrollX: true,
         pageLength: 15,
         order: [[0, "desc"]],
-        dom: 'Bfrtip',
+        dom: "Bfrtip",
         buttons: [
-            $.extend(true, {}, exportButtonCommon, {
-                extend: 'copy',
-                text: 'Copiar'
-            }),
-            $.extend(true, {}, exportButtonCommon, {
-                extend: 'csv',
-                filename: exportFileName
-            }),
-            $.extend(true, {}, exportButtonCommon, {
-                extend: 'excel',
-                filename: exportFileName
-            })
+            {extend: "copy", text: "Copiar"},
+            {extend: "csv",  filename: exportFileName},
+            {extend: "excel", filename: exportFileName}
         ],
-        ajax: url + params,
+        ajax: getURL(),
         columns: [
-            {
-                title: "Fecha",
-                data: 'timeStamp'
-            },
-            {
-                title: "Mensaje",
-                data: 'message',
+            {title: "Fecha", data: "timeStamp"},
+            {title: "Mensaje", data: "message",
                 render: $.fn.dataTable.render.ellipsis(40, true, false)
             },
-            {
-                title: "Paradero",
-                data: 'busStopCode'
-            },
-            {
-                title: "Ubicación",
-                data: 'busStopName',
+            {title: "Paradero", data: "busStopCode"},
+            {title: "Ubicación", data: "busStopName",
                 render: $.fn.dataTable.render.ellipsis(30, true, false)
             },
-            {
-                title: "Mapa",
-                class: "text-center",
+            {title: "Mapa", class: "text-center",
                 render: function (data, type, row) {
                     try {
-                        if (type == 'export') {
+                        if (type === "export") {
                             // export as JSON {user: [-33.2423, -70.23234], bus_stop: [-33.2423, -70.23234]}
-                            return '{user: [' + row.userLatitude + ', ' + row.userLongitude + '], bus_stop: [' +
-                                        row.latitude + ', ' + row.longitude + ']}';
+                            return "{user: [" + row.userLatitude + ", " + row.userLongitude + "], bus_stop: [" +
+                                        row.latitude + ", " + row.longitude + "]}";
                         }
-                        return '<a ' +
-                                    'class="btn btn-default" ' +
+                        return "<a class='btn btn-default' " +
                                     'onclick="openMapModal(' +
                                         row.userLatitude + ',' + row.userLongitude + ',' +
                                         row.latitude + ',' + row.longitude +
@@ -93,22 +65,17 @@ function init() {
                     }
                 }
             },
-            {
-                title: "Comuna",
-                data: 'commune'
-            },
-            {
-                title: 'Imagen',
-                class: "text-center",
+            {title: "Comuna", data: "commune"},
+            {title: "Imagen", class: "text-center",
                 render: function (data, type, row) {
                     var image_filename = row.imageName;
-                    if (type == 'export') {
-                        if (image_filename != "no image") {
+                    if (type === "export") {
+                        if (image_filename !== "no image") {
                             return image_filename;
                         }
                         return "";
                     }
-                    if (image_filename != "no image") {
+                    if (image_filename !== "no image") {
                         // export only imageName
                         return '<button ' +
                                     'type="button" ' +
@@ -126,44 +93,31 @@ function init() {
         language: {
             "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json",
             buttons: {
-                copyTitle: 'Copiar al portapapeles',
+                copyTitle: "Copiar al portapapeles",
                 copySuccess: {
-                    _: 'Copiadas %d filas',
-                    1: 'Copiada 1 fila'
+                    _: "Copiadas %d filas",
+                    1: "Copiada 1 fila"
                 }
             }
         }
-    }).on("init.dt", function () { spinner.stop(); });
-}
+    };
+
+    // activate spinner
+    spinner.spin(target);
+    table = TABLE.DataTable(dataTableOpts).on("init.dt", function () { spinner.stop(); });
+    spinner.stop();
+
+    DATE_RANGE_INPUT.on("apply.daterangepicker", function(){
+        // activate spinner
+        spinner.spin(target);
+        table.ajax.url(getURL()).load();
+        spinner.stop();
+    });
+});
 
 var modal_map = null;
 var bus_stop_marker = null;
 var user_marker = null;
-
-// bus stop marker
-var bus_stop_icon = L.icon({
-    iconUrl: '/static/carrier/images/paradero.png',
-    shadowUrl: null,
-
-    iconSize:     [32, 48], // size of the icon
-    shadowSize:   [ 0,  0], // size of the shadow
-    iconAnchor:   [16, 48], // point of the icon which will correspond to marker's location
-    shadowAnchor: [ 0,  0],  // the same for the shadow
-    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-});
-
-// user marker
-var user_icon = L.icon({
-    iconUrl: '/static/carrier/images/usuario.png',
-    shadowUrl: null,
-
-    iconSize:     [30, 38], // size of the icon
-    shadowSize:   [ 0,  0], // size of the shadow
-    iconAnchor:   [15, 38], // point of the icon which will correspond to marker's location
-    shadowAnchor: [ 0,  0],  // the same for the shadow
-    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-});
-
 
 function openMapModal(user_lat, user_lon, bus_stop_lat, bus_stop_lon) {
 
@@ -180,7 +134,7 @@ function openMapModal(user_lat, user_lon, bus_stop_lat, bus_stop_lon) {
 
     // distance bus_stop - user
     var user_bus_stop_distance = user_lat_lng.distanceTo(bus_stop_lat_lng);
-    $('#modal-map-distance-info')
+    $("#modal-map-distance-info")
         .text(Number(user_bus_stop_distance).toFixed(1))
         .parent()
         .removeClass("text-info")
@@ -193,10 +147,10 @@ function openMapModal(user_lat, user_lon, bus_stop_lat, bus_stop_lon) {
         });
 
     // bus_stop and user coordinates
-    $('#modal-bus-stop-lat').text(bus_stop_lat);
-    $('#modal-bus-stop-lon').text(bus_stop_lon);
-    $('#modal-user-lat').text(user_lat);
-    $('#modal-user-lon').text(user_lon);
+    $("#modal-bus-stop-lat").text(bus_stop_lat);
+    $("#modal-bus-stop-lon").text(bus_stop_lon);
+    $("#modal-user-lat").text(user_lat);
+    $("#modal-user-lon").text(user_lon);
 
 
     // RENDER MODAL MAP
@@ -204,20 +158,20 @@ function openMapModal(user_lat, user_lon, bus_stop_lat, bus_stop_lon) {
 
     // make sure the map recomputes the modal size, otherwise some tiles
     // will not be shown
-    var modal_map_view = $('#modal-map-view');
-    modal_map_view.on('shown.bs.modal', function () {
+    var modal_map_view = $("#modal-map-view");
+    modal_map_view.on("shown.bs.modal", function () {
         modal_map.invalidateSize();
         modal_map.fitBounds(map_bounding_box);
     });
     modal_map_view.modal();
 
     // create map on request
-    if (modal_map == null) {
+    if (modal_map === null) {
 
-        modal_map = L.map('modal-map-leaflet').setView(map_bounding_box.getCenter(), 17);
+        modal_map = L.map("modal-map-leaflet").setView(map_bounding_box.getCenter(), 17);
 
         function loadDefaultMapboxTiles(options) {
-            L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}?access_token={accessToken}', {
+            L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}?access_token={accessToken}", {
                 attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, Imagery © <a href="http://mapbox.com">Mapbox</a>',
                 maxZoom: 18,
                 accessToken: options.token
@@ -242,13 +196,6 @@ function openMapModal(user_lat, user_lon, bus_stop_lat, bus_stop_lon) {
 }
 
 function openImageModal(imageName) {
-    $('#modal-image-content').html('<img src="' + imageName + '" alt="No se puede cargar la imagen" style="display:block; margin: auto; width: auto; max-width: 100%; height: auto; max-height: 400px"/>');
+    $("#modal-image-content").html('<img src="' + imageName + '" alt="No se puede cargar la imagen" style="display:block; margin: auto; width: auto; max-width: 100%; height: auto; max-height: 400px"/>');
     $("#modal-image-view").modal();
-}
-
-function myFunction() {
-    var date_init = $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD");
-    var date_end = $('#date_end').data("DateTimePicker").date().add(1, 'days').format("YYYY-MM-DD");
-    var params = '?date_init=' + date_init + '&date_end=' + date_end;
-    table.ajax.url(url + params).load();
 }
