@@ -239,7 +239,6 @@ $(document).ready(function () {
             date_end: DATE_RANGE_INPUT.data("daterangepicker").endDate.format()
         };
         var licensePlates = LICENSE_PLATE_SELECT.val();
-        console.log(licensePlates);
         if (licensePlates !== null) {
             data["license_plates[]"] = licensePlates;
         }

@@ -1,5 +1,5 @@
 
-$(function () {
+$(document).ready(function () {
     var DATE_RANGE_INPUT = $("#dateRange");
     var TABLE = $("#bus-stop-reports-table");
 
@@ -15,10 +15,8 @@ $(function () {
         return URL + $.param(data);
     }
 
-    var table;
-
-    var target = document.getElementsByClassName("x_content")[0];
-    var spinner = new Spinner(spinnerOpt).spin(target);
+    var target = document.getElementsByClassName("x_panel")[0];
+    var spinner = new Spinner(spinnerOpt);
 
     var dateString = moment().format("YYYY-MM-DD");
     var exportFileName = "ReportesLibresDeParaderos_" + dateString;
@@ -104,8 +102,9 @@ $(function () {
 
     // activate spinner
     spinner.spin(target);
-    table = TABLE.DataTable(dataTableOpts).on("init.dt", function () { spinner.stop(); });
-    spinner.stop();
+    var table = TABLE.DataTable(dataTableOpts).on("init.dt", function () {
+        spinner.stop();
+    });
 
     DATE_RANGE_INPUT.on("apply.daterangepicker", function(){
         // activate spinner
