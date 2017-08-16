@@ -14,7 +14,8 @@ from datetime import datetime, date, timedelta
 
 import json
 
-from AndroidRequests.models import Event, Service, EventForBusv2, Busassignment, ReportInfo, TimePeriod
+from AndroidRequests.models import Event, Service, EventForBusv2, Busassignment, ReportInfo, TimePeriod, \
+    ZonificationTransantiago, StadisticDataFromRegistrationBus, StadisticDataFromRegistrationBusStop
 
 def filter(request):
     user = request.user.getUser()
