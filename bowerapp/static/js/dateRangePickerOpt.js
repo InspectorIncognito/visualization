@@ -1,5 +1,5 @@
 var optionDateRangePicker = {
-    startDate: moment().subtract(29, "days"),
+    startDate: moment().subtract(1, "months"),
     endDate: moment(),
     alwaysShowCalendars: true,
     showCustomRangeLabel: false,
