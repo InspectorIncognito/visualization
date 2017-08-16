@@ -1,3 +1,4 @@
+var table;
 $(document).ready(function () {
     var name;
     var headerids = {};
@@ -41,12 +42,9 @@ $(document).ready(function () {
 
     var id;
     var text;
-    var table;
 
     var stringDate = moment().format("YYYY-MM-DD");
     var exportFileName = "EventosDeBuses_" + stringDate;
-
-    var modal_data = null;
 
     var target = document.getElementsByClassName("x_panel")[0];
     var spinner = new Spinner(spinnerOpt);
@@ -134,28 +132,27 @@ $(document).ready(function () {
             }
         }
     }).on("init.dt", function () { spinner.stop(); });
+
+    function openEventModal(type, plate) {
+        $("#modal-physical-event").text(type);
+        $("#modal-physical-plate").text(plate);
+        $("#modal-event-confirmation").modal()
+    }
+
+    function fix() {
+        var url = "/carriers/updatePhysical/";
+        $.getJSON(url, {"id": id})
+            .done(function (data) {
+                if (data === "True") {
+                    table.ajax.reload();
+                    updateHeaders();
+                }
+                // else {
+                //     console.log("Un error ocurrió");
+                // }
+            });
+    }
 });
-
-function openEventModal(type, plate) {
-    $("#modal-physical-event").text(type);
-    $("#modal-physical-plate").text(plate);
-    $("#modal-event-confirmation").modal()
-}
-
-function fix() {
-    var url = "/carriers/updatePhysical/";
-    $.getJSON(url, {"id": id})
-        .done(function (data) {
-            if (data === "True") {
-                table.ajax.reload();
-                updateHeaders();
-            }
-            // else {
-            //     console.log("Un error ocurrió");
-            // }
-        });
-}
-
 function changeUrl(key) {
     table.ajax.url("/carriers/getPhysicalTable/?name=" + key).load();
 }
