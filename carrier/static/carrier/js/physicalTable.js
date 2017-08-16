@@ -1,87 +1,89 @@
-var name;
-var headerids = {};
-function createheaders() {
-    var Dataurl = "http://" + location.host + "/carriers/getPhysicalHeaders/";
-    $.getJSON(Dataurl)
-        .done(function (data) {
-            var n = 0;
-            var total = 0;
-
-            var header_selector = $("#headers ul");
-            header_selector.html("");
-            $.each(data, function (key, number) {
-                n++;
-                total += number;
-                headerids[key] = "header" + n;
-                header_selector.append(
-                    '<li id="' + headerids[key] + '" role="presentation">' +
-                        '<a href="#" data-toggle="tab" onclick="changeUrl(\'' + key + '\')">' +
-                            key + ' (<span id="number">' + number + '</span>)');
-            });
-            header_selector.prepend(
-                '<li id="all" role="presentation" class="active">' +
-                    '<a href="#" data-toggle="tab" onclick="changeUrl(\'all\')">' +
-                        'Total (<span id="number">' + total + '</span>)');
-
-            // console.log(name);
-        });
-}
-function updateheaders() {
-    var Dataurl = "http://" + location.host + "/carriers/getPhysicalHeaders/";
-    $.getJSON(Dataurl)
-        .done(function (data) {
-            var total = 0;
-            $.each(data, function (key, number) {
-                total += number;
-                $("#" + headerids[key] + " #number").text(number)
-            });
-            $("#all #number").text(total)
-
-        });
-}
-
-
-var id;
-var text;
-var table;
-
-var date = moment();
-var dateString = date.format("YYYY-MM-DD");
-var exportFileName = "EventosDeBuses_" + dateString;
-
-var modal_data = null;
 $(document).ready(function () {
-    createheaders();
-    $.fn.dataTable.moment('DD-MM-YYYY HH:mm:ss');
+    var name;
+    var headerids = {};
+
+    function fillHeaders() {
+        var URL = "/carriers/getPhysicalHeaders/";
+        $.getJSON(URL)
+            .done(function (data) {
+                var n = 0;
+                var total = 0;
+
+                var header_selector = $("#headers ul");
+                header_selector.html("");
+                $.each(data, function (key, number) {
+                    n++;
+                    total += number;
+                    headerids[key] = "header" + n;
+                    header_selector.append(
+                        '<li id="' + headerids[key] + '" role="presentation">' +
+                            '<a href="#" data-toggle="tab" onclick="changeUrl(\'' + key + '\')">' +
+                                key + ' (<span id="number">' + number + '</span>)');
+                });
+                header_selector.prepend(
+                    '<li id="all" role="presentation" class="active">' +
+                        '<a href="#" data-toggle="tab" onclick="changeUrl(\'all\')">' +
+                            'Total (<span id="number">' + total + '</span>)');
+            });
+    }
+    function updateHeaders() {
+        var URL = "/carriers/getPhysicalHeaders/";
+        $.getJSON(URL)
+            .done(function (data) {
+                var total = 0;
+                $.each(data, function (key, number) {
+                    total += number;
+                    $("#" + headerids[key] + " #number").text(number);
+                });
+                $("#all #number").text(total);
+            });
+    }
+
+    var id;
+    var text;
+    var table;
+
+    var stringDate = moment().format("YYYY-MM-DD");
+    var exportFileName = "EventosDeBuses_" + stringDate;
+
+    var modal_data = null;
+
+    var target = document.getElementsByClassName("x_panel")[0];
+    var spinner = new Spinner(spinnerOpt);
+
+    // activate spinner
+    spinner.spin(target);
+    fillHeaders();
+    $.fn.dataTable.moment("DD-MM-YYYY HH:mm:ss");
     table = $("#bus-events-table").DataTable({
         scrollX: true,
         pageLength: 15,
-        dom: 'Bfrtip',
+        dom: "Bfrtip",
         buttons: [
-            $.extend(true, {}, exportButtonCommon, {
-                extend: 'copy',
-                text: 'Copiar',
+            {
+                extend: "copy",
+                text: "Copiar",
                 exportOptions: {
                     columns: [ 0, 2, 4, 3 ]
                 }
-            }),
-            $.extend(true, {}, exportButtonCommon, {
-                extend: 'csv',
+            },
+            {
+                extend: "csv",
                 filename: exportFileName,
                 exportOptions: {
                     columns: [ 1, 2, 4, 3 ]
                 }
-            }),
-            $.extend(true, {}, exportButtonCommon, {
-                extend: 'excel',
+            },
+            {
+                extend: "excel",
                 filename: exportFileName,
                 exportOptions: {
                     columns: [ 1, 2, 4, 3 ]
                 }
-            })
+            }
         ],
-        order: [[2, 'desc']],
-        ajax: 'http://' + location.host + '/carriers/getPhysicalTable/?name=all',
+        order: [[2, "desc"]],
+        ajax: "/carriers/getPhysicalTable/?name=all",
         columns: [
             {
                 // copy
@@ -99,11 +101,11 @@ $(document).ready(function () {
             },
             {
                 title: "Fecha",
-                data: 'timeCreation',
+                data: "timeCreation",
                 width: "20%"
             },
-            {title: "Evento Reportado", data: 'type'},
-            {title: "Patente", data: 'plate'},
+            {title: "Evento Reportado", data: "type"},
+            {title: "Patente", data: "plate"},
             {
                 title: "Arreglar",
                 class: "text-center",
@@ -124,10 +126,10 @@ $(document).ready(function () {
         language: {
             "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json",
             buttons: {
-                copyTitle: 'Copiar al portapapeles',
+                copyTitle: "Copiar al portapapeles",
                 copySuccess: {
-                    _: 'Copiadas %d filas',
-                    1: 'Copiada 1 fila'
+                    _: "Copiadas %d filas",
+                    1: "Copiada 1 fila"
                 }
             }
         }
@@ -141,23 +143,19 @@ function openEventModal(type, plate) {
 }
 
 function fix() {
-    var url = "http://" + location.host + "/carriers/updatePhysical/";
+    var url = "/carriers/updatePhysical/";
     $.getJSON(url, {"id": id})
         .done(function (data) {
-            if (data == 'True') {
+            if (data === "True") {
                 table.ajax.reload();
-                updateheaders();
+                updateHeaders();
             }
             // else {
             //     console.log("Un error ocurrió");
             // }
         });
 }
-setInterval(function () {
-    pdateheaders();
-    table.ajax.reload();
-}, 300000);
 
 function changeUrl(key) {
-    table.ajax.url('http://' + location.host + '/carriers/getPhysicalTable/?name=' + key).load();
+    table.ajax.url("/carriers/getPhysicalTable/?name=" + key).load();
 }
