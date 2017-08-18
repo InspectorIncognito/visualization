@@ -77,7 +77,7 @@ var options;
                         $.getJSON(pathToOptionsFile, function (data) {
                             GTFS.options = data;
                             console.log('options data loaded successfully');
-                            successFunction()
+                            successFunction();
 
                         }).fail(function () {
                             console.log("we could not load options file.");
@@ -118,7 +118,7 @@ var options;
             "Gris": grayStyle,
             "Negro": blackStyle,
             "satelite": satelliteStyle,
-            "outdoor": outdoorStyle,
+            "outdoor": outdoorStyle
         };
         // revisar porque no funciona
         //L.control.layers(baseMaps, {}).addTo(map);

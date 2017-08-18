@@ -1,93 +1,90 @@
-$(function () {
-    $('#date_init').datetimepicker({
-        defaultDate: moment().subtract(3, 'months'),
-        format: 'LL'
-    });
-    $('#date_end').datetimepicker({
-        defaultDate: moment(),
-        format: 'LL'
-    });
-    $("#filters :input").change(function () {
-        myFunction();
-    });
-    $("#filters").on("dp.change", function (e) {
-        myFunction();
-    });
-    $('#types').on("select2:select", function () {
-        if ($(".select2_multiple").val()[0] == "Todos los tipos") {
-            $("#types").select2("val", "");
-        }
-    });
-    init();
-});
 
 $(document).ready(function () {
-    $(".select2_multiple").select2({
+    var DATE_RANGE_INPUT = $("#dateRange");
+    var REPORT_TYPES = $("#reportTypes");
+    var UPDATE_BUTTON = $("#btnUpdateData");
+
+    var target = document.getElementsByClassName("x_panel")[0];
+
+    function getURL() {
+        var data = {
+            date_init: DATE_RANGE_INPUT.data("daterangepicker").startDate.format(),
+            date_end: DATE_RANGE_INPUT.data("daterangepicker").endDate.format()
+        };
+        var types = REPORT_TYPES.val();
+        if (types !== null) {
+            data["types[]"] = types;
+        }
+        var params = $.param(data);
+        var url = "/carriers/getFullTableBus/?";
+        return url + params;
+    }
+
+    function initializeTable() {
+        var fileName = "Todos los reportes";
+        $.fn.dataTable.moment("DD-MM-YYYY HH:mm:ss");
+        var dataTableOpts = {
+            scrollX: true,
+            pageLength: 15,
+            order: [[1, "desc"]],
+            dom: "Bfrtip",
+            buttons: [
+                {extend: "copy", text: "Copiar"},
+                {extend: "csv",  filename: fileName},
+                {extend: "excel", filename: fileName}
+            ],
+            ajax: getURL(),
+            columns: [
+                {title: "Tipo de Reporte ", data: "category"},
+                {title: "Fecha", data: "timeCreation"},
+                {title: "Reporte ", data: "type"},
+                {title: "Verdaderos", data: "eventConfirm"},
+                {title: "Falsos", data: "eventDecline"},
+                {title: "Tipo de día", data: "typeOfDay"},
+                {title: "Período media hora", data: "periodHour"},
+                {title: "Servicio", data: "service"},
+                {title: "Dirección", data: "direction"},
+                {title: "Patente", data: "plate"},
+                {title: "Comuna", data: "commune"},
+                {title: "Paradero más cercano 1", data: "busStop1"},
+                {title: "Paradero más cercano 2", data: "busStop2"},
+                {title: "Zona 777", data: "zone777"},
+                {title: "Período Transantiago", data: "periodTransantiago"}
+            ],
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json",
+                buttons: {
+                    copyTitle: "Copiar al portapapeles",
+                    copySuccess: {
+                        _: "Copiadas %d filas",
+                        1: "Copiada 1 fila"
+                    }
+                }
+            },
+            fnInitComplete: function () {
+              $(target).spin(false);
+            }
+        };
+        $(target).spin(spinnerOpt);
+        return $("#datatable").dataTable(dataTableOpts);
+    }
+
+    // Initialize inputs
+    DATE_RANGE_INPUT.daterangepicker(optionDateRangePicker);
+    REPORT_TYPES.select2({
         placeholder: "Todos los tipos",
         allowClear: true
     });
-});
 
-var table;
-var fileName = "Todos los reportes";
-var url = 'http://' + location.host + '/carriers/getFullTableBus/';
+    var table;
 
-function init() {
-    var date_init = $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD");
-    var date_end = $('#date_end').data("DateTimePicker").date().format("YYYY-MM-DD");
-    var types = $(".select2_multiple").val();
-    var params = '?date_init=' + date_init + '&date_end=' + date_end;
-    if (types != null) params += '&types=' + JSON.stringify(types);
-    $.fn.dataTable.moment('DD-MM-YYYY HH:mm:ss');
-    table = $('#example').dataTable({
-        scrollX: true,
-        pageLength: 15,
-        order: [[1, "desc"]],
-        dom: 'Bfrtip',
-        buttons: [
-            {extend: 'copy', text: 'Copiar'}, {
-                extend: 'csv',
-                filename: fileName
-            }, {extend: 'excel', filename: fileName},
-
-        ],
-        ajax: url + params,
-        columns: [
-            {title: "Tipo de Reporte ", data: 'category'},
-            {title: "Fecha", data: 'timeCreation'},
-            {title: "Reporte ", data: 'type'},
-            {title: "Verdaderos", data: 'eventConfirm'},
-            {title: "Falsos", data: 'eventDecline'},
-            {title: "Tipo de día", data: 'typeOfDay'},
-            {title: "Período media hora", data: 'periodHour'},
-            {title: "Servicio", data: 'service'},
-            {title: "Dirección", data: 'direction'},
-            {title: "Patente", data: 'plate'},
-            {title: "Comuna", data: 'commune'},
-            {title: "Paradero más cercano 1", data: 'busStop1'},
-            {title: "Paradero más cercano 2", data: 'busStop2'},
-            {title: "Zona 777-lugar", data: 'zone777'},
-            {title: "Período Transantiago", data: 'periodTransantiago'},
-        ],
-        language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json",
-            buttons: {
-                copyTitle: 'Copiar al portapapeles',
-                copySuccess: {
-                    _: 'Copiadas %d filas',
-                    1: 'Copiada 1 fila'
-                }
-            }
-        }
+    UPDATE_BUTTON.click(function(){
+        // activate spinner
+        $(target).spin(spinnerOpt);
+        table.api().ajax.url(getURL()).load(function(){
+            $(target).spin(false)
+        });
     });
-}
 
-function myFunction() {
-
-    var date_init = $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD");
-    var date_end = $('#date_end').data("DateTimePicker").date().add(1, 'days').format("YYYY-MM-DD");
-    var types = $(".select2_multiple").val();
-    var params = '?date_init=' + date_init + '&date_end=' + date_end;
-    if (types != null) params += '&types=' + JSON.stringify(types);
-    table.api().ajax.url(url + params).load();
-}
+    table = initializeTable();
+});

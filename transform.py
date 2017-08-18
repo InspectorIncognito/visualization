@@ -18,6 +18,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "visualization.settings")
 
 django.setup()
 
+WITHOUT_LICENSE_PLATE= "No Info."
+
 def add_time_periods(timestamp, minutes_to_filter):
     counter = 0
 
@@ -97,7 +99,7 @@ def validate_plates():
     for bus in Busv2.objects.filter(
             Q(transformed=False) | Q(transformed__isnull=True)):
         if bus.registrationPlate.upper() == 'DUMMYLPT':
-            bus.registrationPlate = "No Info."
+            bus.registrationPlate = WITHOUT_LICENSE_PLATE
             counter += 1
             bus.transformed = True
             bus.save()
@@ -194,7 +196,7 @@ def add_report_info(timestamp, minutes_to_filter):
                     busUUID = Busv2.objects.get(registrationPlate=plate).uuid
 
             if report_json['bus']['licensePlate'].upper() == "DUMMYLPT":
-                plate = report_json['bus']['licensePlate'] = 'No Info.'
+                plate = report_json['bus']['licensePlate'] = WITHOUT_LICENSE_PLATE
             if len(report_json['bus']['service']) > 5:
                 report_json['bus']['service'] = 'JAVA'
 

@@ -1,0 +1,71 @@
+{% extends "admin/base_site.html" %}
+{% load staticfiles header panel inline_input inline_select columns update_button %}
+{% block title %}Visualizador TranSapp{% endblock %}
+
+{% block css %}
+    {% with "components/gentelella/vendors/" as gentelella_static %}
+        <!-- Select2 -->
+        <link href="{% static gentelella_static|add:"select2/dist/css/select2.min.css" %}" rel="stylesheet">
+        <!-- Daterangepicker -->
+        <link href="{% static gentelella_static|add:'bootstrap-daterangepicker/daterangepicker.css' %}" rel="stylesheet">
+        <!-- DataTables -->
+        <link href="{% static gentelella_static|add:"datatables.net-bs/css/dataTables.bootstrap.min.css" %}" rel="stylesheet">
+        <link href="{% static gentelella_static|add:"datatables.net-buttons-bs/css/buttons.bootstrap.min.css" %}" rel="stylesheet">
+        <link href="{% static gentelella_static|add:"datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" %}" rel="stylesheet">
+        <link href="{% static gentelella_static|add:"datatables.net-responsive-bs/css/responsive.bootstrap.min.css" %}" rel="stylesheet">
+        <link href="{% static gentelella_static|add:"datatables.net-scroller-bs/css/scroller.bootstrap.min.css" %}" rel="stylesheet">
+    {% endwith %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        {% header "Descarga de datos" %}
+
+        {% inline_input "Rango de días" "dateRange" as input1 %}
+        {% columns 4 4 12 input1 as col1 %}
+
+        {% inline_select "Tipo(s) de reporte" "reportTypes" types as select_input1 %}
+        {% columns 4 4 12 select_input1 as col2 %}
+
+        {% update_button "btnUpdateData" "Actualizar datos" as button %}
+        {% columns 12 12 12 button as col3 %}
+
+        {% panel "fa-filter" "Filtros" col1|add:col2|add:col3 %}
+
+        {% with table='<table id="datatable" class="table table-striped table-bordered nowrap" cellspacing="0" width="100%"></table>' %}
+            {% panel "" "" table %}
+        {% endwith %}
+    </div>
+    </div>
+{% endblock %}
+
+{% block extrajs %}
+    {% with "components/gentelella/vendors/" as gentelella_static %}
+        <!-- bootstrap-daterangepicker -->
+        <script src="{% static gentelella_static|add:'moment/min/moment.min.js' %}"></script>
+        <script src="{% static gentelella_static|add:'moment/locale/es.js' %}"></script>
+        <script src="{% static gentelella_static|add:'bootstrap-daterangepicker/daterangepicker.js' %}"></script>
+
+        <!-- Select2 -->
+        <script src="{% static gentelella_static|add:'select2/dist/js/select2.full.min.js' %}"></script>
+
+        <!-- DataTables -->
+        <script src="{% static gentelella_static|add:"datatables.net/js/jquery.dataTables.min.js" %}"></script>
+        <script src="{% static gentelella_static|add:"datatables.net-bs/js/dataTables.bootstrap.min.js" %}"></script>
+        <script src="{% static gentelella_static|add:"datatables.net-buttons/js/dataTables.buttons.min.js" %}"></script>
+        <script src="{% static gentelella_static|add:"datatables.net-buttons-bs/js/buttons.bootstrap.min.js" %}"></script>
+        <script src="{% static gentelella_static|add:"datatables.net-buttons/js/buttons.flash.min.js" %}"></script>
+        <script src="{% static gentelella_static|add:"datatables.net-buttons/js/buttons.html5.min.js" %}"></script>
+        <script src="{% static gentelella_static|add:"datatables.net-buttons/js/buttons.print.min.js" %}"></script>
+        <script src="{% static gentelella_static|add:"datatables.net-fixedheader/js/dataTables.fixedHeader.min.js" %}"></script>
+        <script src="{% static gentelella_static|add:"datatables.net-responsive/js/dataTables.responsive.min.js" %}"></script>
+        <script src="{% static gentelella_static|add:"datatables.net-responsive-bs/js/responsive.bootstrap.js" %}"></script>
+        <script src="{% static gentelella_static|add:"datatables.net-scroller/js/dataTables.scroller.min.js" %}"></script>
+        <script src="{% static gentelella_static|add:"jszip/dist/jszip.min.js" %}"></script>
+    {% endwith %}
+
+    <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script>
+
+    <script src="{% static "js/dateRangePickerOpt.js" %}"></script>
+{% endblock %}
