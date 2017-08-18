@@ -1,15 +1,11 @@
 import uuid
-from django.contrib.gis.db import models
 from django.utils import timezone
-from random import uniform
 from django.contrib.gis.db import models
 import pytz
 
 import logging
 
-
-# Create your models here.
-# Remember to add new models to admin.py
+WHITOUT_DATA_LABEL = "No Info."
 
 class ReportInfo(models.Model):
     """ Table for the report info data in Report """
@@ -47,11 +43,11 @@ class ReportInfo(models.Model):
 
     def getDictionary(self):
         res = dict()
-        res["registrationPlate"] = self.registrationPlate if self.registrationPlate else "No Info."
-        res["service"] = self.service if self.service else "No Info."
+        res["registrationPlate"] = self.registrationPlate if self.registrationPlate else WHITOUT_DATA_LABEL
+        res["service"] = self.service if self.service else WHITOUT_DATA_LABEL
 
-        res["busStopCode"] = "No Info."
-        res["busStopName"] = "No Info."
+        res["busStopCode"] = WHITOUT_DATA_LABEL
+        res["busStopName"] = WHITOUT_DATA_LABEL
         if self.stopCode is not None:
             busStopName = BusStop.objects.filter(code=self.stopCode).order_by('-gtfs__timeCreation').first().name
             res["busStopCode"] = self.stopCode
@@ -66,8 +62,8 @@ class ReportInfo(models.Model):
         res["longitude"] = self.userLongitude
         res["userLatitude"] = self.userLatitude
         res["userLongitude"] = self.userLongitude
-        res["commune"] = self.zonification.comuna if self.zonification else "No Info."
-        res["direction"] = self.direction if self.direction else "No Info."
+        res["commune"] = self.zonification.comuna if self.zonification else WHITOUT_DATA_LABEL
+        res["direction"] = self.direction if self.direction else WHITOUT_DATA_LABEL
         return res
 
 
@@ -261,12 +257,12 @@ class EventForBusStop(EventRegistration):
         dictionary['stopCode'] = self.stopCode
         dictionary['fixed'] = "Si" if self.fixed else "No"
         dictionary['category'] = self.event.category.capitalize()
-        dictionary['zone777'] = self.zonification.zona if self.zonification else "No info."
-        dictionary['commune'] = self.zonification.comuna if self.zonification else "No info."
-        dictionary['typeOfDay'] = self.timePeriod.day_type if self.timePeriod else "No info."
-        dictionary['periodHour'] = self.halfHourPeriod.name if self.halfHourPeriod else "No info."
-        dictionary['periodTransantiago'] = self.timePeriod.name if self.timePeriod else "No info."
-        dictionary['additionalInfo'] = self.aditionalInfo if self.aditionalInfo else "No info."
+        dictionary['zone777'] = self.zonification.zona if self.zonification else WHITOUT_DATA_LABEL
+        dictionary['commune'] = self.zonification.comuna if self.zonification else WHITOUT_DATA_LABEL
+        dictionary['typeOfDay'] = self.timePeriod.day_type if self.timePeriod else WHITOUT_DATA_LABEL
+        dictionary['periodHour'] = self.halfHourPeriod.name if self.halfHourPeriod else WHITOUT_DATA_LABEL
+        dictionary['periodTransantiago'] = self.timePeriod.name if self.timePeriod else WHITOUT_DATA_LABEL
+        dictionary['additionalInfo'] = self.aditionalInfo if self.aditionalInfo else WHITOUT_DATA_LABEL
 
         return dictionary
 
@@ -299,21 +295,21 @@ class EventForBusv2(EventRegistration):
         stamp = timezone.localtime(self.timeStamp, pytz.timezone('Chile/Continental'))
         dictionary['timeCreation'] = creation.strftime("%d-%m-%Y %H:%M:%S")
         dictionary['timeStamp'] = stamp.strftime("%d-%m-%Y %H:%M:%S")
-        dictionary['service'] = self.busassignment.service if self.busassignment else "No info."
-        dictionary['plate'] = self.busassignment.uuid.registrationPlate if self.busassignment else "No info."
+        dictionary['service'] = self.busassignment.service if self.busassignment else WHITOUT_DATA_LABEL
+        dictionary['plate'] = self.busassignment.uuid.registrationPlate if self.busassignment else WHITOUT_DATA_LABEL
         dictionary['type'] = self.event.name.capitalize()
-        dictionary['busStop1'] = self.busStop1#.name if self.busStop1 else "No info."
-        dictionary['busStop2'] = self.busStop2#.name if self.busStop2 else "No info."
+        dictionary['busStop1'] = self.busStop1#.name if self.busStop1 else WHITOUT_DATA_LABEL
+        dictionary['busStop2'] = self.busStop2#.name if self.busStop2 else WHITOUT_DATA_LABEL
         dictionary['fixed'] = "Si" if self.fixed else "No"
         dictionary['id'] = self.id
         dictionary['category'] = self.event.category.capitalize()
-        dictionary['zone777'] = self.zonification.zona if self.zonification else "No info."
-        dictionary['commune'] = self.zonification.comuna if self.zonification else "No info."
-        dictionary['typeOfDay'] = self.timePeriod.day_type if self.timePeriod else "No info."
-        dictionary['periodHour'] = self.halfHourPeriod.name if self.halfHourPeriod else "No info."
-        dictionary['periodTransantiago'] = self.timePeriod.name if self.timePeriod else "No info."
+        dictionary['zone777'] = self.zonification.zona if self.zonification else WHITOUT_DATA_LABEL
+        dictionary['commune'] = self.zonification.comuna if self.zonification else WHITOUT_DATA_LABEL
+        dictionary['typeOfDay'] = self.timePeriod.day_type if self.timePeriod else WHITOUT_DATA_LABEL
+        dictionary['periodHour'] = self.halfHourPeriod.name if self.halfHourPeriod else WHITOUT_DATA_LABEL
+        dictionary['periodTransantiago'] = self.timePeriod.name if self.timePeriod else WHITOUT_DATA_LABEL
 
-        dictionary['direction'] = self.direction if self.direction else "No info."
+        dictionary['direction'] = self.direction if self.direction else WHITOUT_DATA_LABEL
 
         return dictionary
 
