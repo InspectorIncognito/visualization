@@ -320,11 +320,8 @@ def busMap(request):
 
 @login_required
 def getBusMapParameters(request):
+
     routeList = Service.objects.filter(filter(request)).values_list("service", flat=True).distinct()
-    licensePlates = Busassignment.objects.filter(service__in=routeList).\
-        exclude(uuid__registrationPlate=WITHOUT_LICENSE_PLATE).values_list("uuid__registrationPlate", flat=True).\
-        distinct()
-    communes = ZonificationTransantiago.objects.values_list("comuna", flat=True).distinct().order_by("comuna")
 
     events = Event.objects.filter(eventType="bus").exclude(category="estado físico")
     categories = events.distinct("category")
@@ -333,8 +330,6 @@ def getBusMapParameters(request):
         types[event.category.capitalize()].append(event.name.capitalize())
     data = {
         "services": list(routeList),
-        "plates": list(licensePlates),
-        "comunas": list(communes),
         'types': types,
     }
 
@@ -345,7 +340,7 @@ def getBusMap(request):
     date_init = parse_datetime(request.GET.get('date_init'))
     date_end = parse_datetime(request.GET.get('date_end'))
     routes = request.GET.getlist('routes[]')
-    licensePlates = request.GET.getlist('licesePlates[]')
+    licensePlates = request.GET.getlist('licensePlates[]')
     communes = request.GET.getlist('communes[]')
 
     routeList = Service.objects.filter(filter(request)).values_list("service", flat=True).distinct()
