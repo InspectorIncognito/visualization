@@ -11,7 +11,7 @@
     {% endwith %}
 
     <!-- Leaflet -->
-    <link href="{% static "components/leaflet/dist/leaflet.css" %} rel="stylesheet"/>
+    <link href="{% static "components/leaflet/dist/leaflet.css" %}" rel="stylesheet">
 
     <!-- groupedlayercontrol Script -->
     <link href="{% static 'components/leaflet-groupedlayercontrol/dist/leaflet.groupedlayercontrol.min.css' %}"
@@ -20,6 +20,9 @@
     <style>
         .map {
             height: 600px;
+        }
+        .leaflet-control-layers-group-name {
+            font-size: 150%;
         }
     </style>
 {% endblock %}
@@ -30,16 +33,16 @@
             {% header "Mapa de reportes" %}
 
             {% inline_input "Rango de días" "dateRange" as input1 %}
-            {% columns 12 12 12 input1 as col1 %}
+            {% columns 3 6 12 input1 as col1 %}
 
-            {% inline_select "Recorrido(s)" "routes" services as select_input1 %}
-            {% columns 4 4 12 select_input1 as col2 %}
+            {% inline_select "Recorrido(s)" "routes" routes as select_input1 %}
+            {% columns 3 6 12 select_input1 as col2 %}
 
-            {% inline_select "Patente(s) <span class='badge'>*Solo patentes que contienen datos</span>" "licensePlates" plates as select_input2 %}
-            {% columns 4 4 12 select_input2 as col3 %}
+            {% inline_select "Patente(s) <span class='badge'>*Solo patentes que contienen datos</span>" "licensePlates" licensePlates as select_input2 %}
+            {% columns 3 6 12 select_input2 as col3 %}
 
             {% inline_select "Comuna(s)" "communes" communes as select_input3 %}
-            {% columns 4 4 12 select_input3 as col4 %}
+            {% columns 3 6 12 select_input3 as col4 %}
 
             {% update_button "btnUpdateData" "Actualizar datos" as button %}
             {% columns 12 12 12 button as row1 %}
