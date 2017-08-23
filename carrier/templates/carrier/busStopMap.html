@@ -1,77 +1,52 @@
 {% extends "admin/base_site.html" %}
-{% load staticfiles %}
-{% block title %}
-    <title>Mapa de Paraderos - TranSapp</title>
-{% endblock title %}
+{% load staticfiles header panel inline_input columns %}
+{% block title %}Mapa de Paraderos - TranSapp{% endblock %}
 
-{% block topimports %}
-
-    <!-- Select2 -->
-    <link href="{% static 'components/gentelella/vendors/select2/dist/css/select2.min.css' %}" rel="stylesheet">
+{% block css %}
+    {% with "components/gentelella/vendors/" as gentelella_static %}
+        <!-- Daterangepicker -->
+        <link href="{% static gentelella_static|add:'bootstrap-daterangepicker/daterangepicker.css' %}" rel="stylesheet">
+        <!-- Select2 -->
+        <link href="{% static gentelella_static|add:'select2/dist/css/select2.min.css' %}" rel="stylesheet">
+    {% endwith %}
 
     <!-- Leaflet -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.css"/>
+    <link href="{% static "components/leaflet/dist/leaflet.css" %}" rel="stylesheet">
+{% endblock %}
 
-{% endblock topimports %}
-
-{% block toptiles %}
-{% endblock toptiles %}
-
-{% block maincontent %}
+{% block content %}
     <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
-            <div class="x_title">
-                <h2 style="margin-top: 24px;">Mapa de Paraderos</h2>
-                <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
-                <div class="dashboard-widget-content">
-                    <div id="filters" class="container">
-                        <div class="form">
-                            <div class="row form-inline">
-                                <div class='col-sm-4 col-xs-12'>
-                                    <div class="form-group">
-                                        <label for="date_init">Fecha Inicio:</label>
-                                        <input type='text' class="form-control"
-                                               id="date_init"/>
-                                    </div>
-                                </div>
-                                <div class='col-sm-4 col-xs-12'>
-                                    <div class="form-group">
-                                        <label for="date_end">Fecha Fin:</label>
-                                        <input type='text' class="form-control"
-                                               id="date_end"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="container">
-                        <div id="map_id" style="margin-top: 20px; height: 600px;">
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% header "Mapa de paraderos con eventos" %}
+
+            {% inline_input "Rango de días" "dateRange" as input1 %}
+            {% columns 4 4 12 input1 as col1 %}
+
+            {% panel "fa-filter" "Filtro" col1 %}
+
+            {% with table='<div id="map_id" style="margin-top: 20px; height: 600px;">' %}
+                {% panel "" "" table %}
+            {% endwith %}
         </div>
     </div>
-{% endblock maincontent %}
+{% endblock  %}
 
-{% block bottomimports %}
-    <!-- bootstrap-datetimepicker -->
-    <script src="{% static 'components/gentelella/vendors/moment/min/moment.min.js' %}"></script>
-    <script src="{% static 'components/gentelella/vendors/moment/locale/es.js' %}"></script>
-    <script src="{% static 'components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js' %}"></script>
+{% block extrajs %}
+    {% with "components/gentelella/vendors/" as gentelella_static %}
+        <!-- bootstrap-daterangepicker -->
+        <script src="{% static gentelella_static|add:'moment/min/moment.min.js' %}"></script>
+        <script src="{% static gentelella_static|add:'moment/locale/es.js' %}"></script>
+        <script src="{% static gentelella_static|add:'bootstrap-daterangepicker/daterangepicker.js' %}"></script>
 
-    <!-- Select2 -->
-    <script src="{% static 'components/gentelella/vendors/select2/dist/js/select2.full.min.js' %}"></script>
+        <!-- Select2 -->
+        <script src="{% static gentelella_static|add:'select2/dist/js/select2.full.min.js' %}"></script>
+    {% endwith %}
 
     <!-- Leaflet -->
-    <script src="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.js"></script>
+    <script src="{% static 'components/leaflet/dist/leaflet.js' %}"></script>
 
-    <!-- TranSapp baseline -->
-    <script src="{% static 'carrier/js/baseline.js' %}"></script>
+    <script src="{% static 'js/dateRangePickerOpt.js' %}"></script>
+    <script src="{% static 'js/mapFunctions.js' %}"></script>
 
-    <!-- This view -->
     <script src="{% static 'carrier/js/busStopMap.js' %}"></script>
-
-{% endblock bottomimports %}
+{% endblock %}

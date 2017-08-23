@@ -388,7 +388,8 @@ def getBusStopReports(request):
         return JsonResponse(data, safe=False)
 
 
-@user_passes_test(is_transapp)
+#@user_passes_test(is_transapp)
+@login_required
 def getBusStopInfo(request):
     if request.method == 'GET':
         date_init = parse_datetime(request.GET.get('date_init'))

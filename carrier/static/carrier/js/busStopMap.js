@@ -1,25 +1,25 @@
 
-$(function () {
-    $('#date_init').datetimepicker({
-        defaultDate: moment().subtract(1, 'months'),
-        format: 'LL'
-    });
-    $('#date_end').datetimepicker({
-        defaultDate: moment(),
-        format: 'LL'
-    });
-    $("#filters").on("dp.change", function (e) {
-        loadData();
-    });
-});
+var DATE_RANGE_INPUT = $("#dateRange");
 
-
-$(document).ready(function () {
-    createMap();
-});
+var target = document.getElementsByClassName("x_panel")[0];
+var spinner = new Spinner(spinnerOpt).spin(target);
 
 var map;
 var gtfs_bus_stops;
+
+$(document).ready(function () {
+
+    DATE_RANGE_INPUT.daterangepicker(optionDateRangePicker);
+    DATE_RANGE_INPUT.on("apply.daterangepicker", function(){
+        loadData();
+    });
+
+    // activate spinner
+    spinner.spin(target);
+    createMap();
+    spinner.stop();
+});
+
 function createMap() {
     var santiagoLocation = L.latLng(-33.459229, -70.645348);
     map = L.map("map_id").setView(santiagoLocation, 12);
@@ -37,19 +37,6 @@ function createMap() {
         loadGTFSOptions(loadDefaultMapboxTiles, null);
     }, null);
 }
-
-
-// bus stop icon
-var bus_stop_icon = L.icon({
-    iconUrl: '/static/carrier/images/paradero.png',
-    shadowUrl: null,
-
-    iconSize:     [32, 48], // size of the icon
-    shadowSize:   [ 0,  0], // size of the shadow
-    iconAnchor:   [16, 48], // point of the icon which will correspond to marker's location
-    shadowAnchor: [ 0,  0],  // the same for the shadow
-    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-});
 
 var cur_markers = {};
 function drawBusStop(code, name, lat, lon, services, app_data) {
@@ -80,22 +67,22 @@ function drawBusStop(code, name, lat, lon, services, app_data) {
 }
 
 function loadData() {
-    var data_url = 'http://' + location.host + '/carriers/getBusStopInfo/';
+    // activate spinner
+    spinner.spin(target);
+
     var data = {
-        date_init: $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD") + "T00:00:00",
-        date_end: $('#date_end').data("DateTimePicker").date().add(1, 'days').format("YYYY-MM-DD") + "T00:00:00"
+        date_init: DATE_RANGE_INPUT.data("daterangepicker").startDate.format(),
+        date_end: DATE_RANGE_INPUT.data("daterangepicker").endDate.format()
     };
 
-    console.log("Retrieving data from: " + data_url);
-    $.getJSON(data_url, data)
+    var URL = "/carriers/getBusStopInfo/";
+    console.log("Retrieving data from: " + URL);
+    $.getJSON(URL, data)
         .done(function (data) {
-            // console.log("... data retrieved");
-
-            // console.log("... drawing");
             var i = 0;
 
             // remove old markers
-            for (var marker_code in cur_markers) {
+            for(var marker_code in cur_markers) {
                 // // only removes unused markers
                 // if (!data.hasOwnProperty(marker_code))  {
                 //     // console.log("Marker to be removed: " + marker_code);
@@ -127,7 +114,7 @@ function loadData() {
                 i++;
             }
             console.log("Loaded " + i + " bus stop markers");
-
+        }).always(function() {
             // console.log("... done. Stopping spinner");
             spinner.stop();
         });
