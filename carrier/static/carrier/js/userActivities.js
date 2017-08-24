@@ -1,110 +1,55 @@
 
-$(function () {
-    $('#date_init').datetimepicker({
-        defaultDate: moment().subtract(1, 'months'),
-        format: 'LL'
-    });
-    $('#date_end').datetimepicker({
-        defaultDate: moment(),
-        format: 'LL'
-    });
-    $("#filters :input").change(function () {
-        myFunction();
-    });
-    $("#filters").on("dp.change", function () {
-        myFunction();
-    });
-    init();
-});
+$(document).ready(function () {
+    var target = document.getElementsByClassName("x_panel")[0];
 
-var table;
-var url = 'http://' + location.host + '/carriers/getUsersActivities/';
+    var table = null;
+    var DATE_RANGE_INPUT = $("#dateRange");
 
-var date = moment();
-var dateString = date.format("YYYY-MM-DD");
-var exportFileName = "TablaDeActividadDeUsuarios" + dateString;
+    DATE_RANGE_INPUT.daterangepicker(optionDateRangePicker);
 
-function init() {
-    var date_init = $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD") + "T00:00:00";
-    var date_end = $('#date_end').data("DateTimePicker").date().add(1, 'days').format("YYYY-MM-DD") + "T00:00:00";
-    var params = '?date_init=' + date_init + '&date_end=' + date_end;
+    DATE_RANGE_INPUT.on("apply.daterangepicker", function(){
+        $(target).spin(spinnerOpt);
+        table.ajax.url(getURL()).load(function(){
+            $(target).spin(false);
+        });
+    });
+
+    function getURL() {
+        var URL = "/carriers/getUsersActivities/?";
+        var data = {
+            date_init: DATE_RANGE_INPUT.data("daterangepicker").startDate.format(),
+            date_end: DATE_RANGE_INPUT.data("daterangepicker").endDate.format()
+        };
+        return URL + $.param(data);
+    }
+
+    var dateString = moment().format("YYYY-MM-DD");
+    var exportFileName = "TablaDeActividadDeUsuarios" + dateString;
+
     $.fn.dataTable.moment('DD-MM-YYYY HH:mm:ss');
-
-    table = $('#bus-stop-reports-table').DataTable({
+    var datatableOpts = {
         scrollX: true,
         pageLength: 15,
         order: [[1, "desc"]],
         dom: 'Bfrtip',
         buttons: [
-            $.extend(true, {}, exportButtonCommon, {
-                extend: 'copy',
-                text: 'Copiar'
-            }),
-            $.extend(true, {}, exportButtonCommon, {
-                extend: 'csv',
-                filename: exportFileName
-            }),
-            $.extend(true, {}, exportButtonCommon, {
-                extend: 'excel',
-                filename: exportFileName
-            })
+            { extend: 'copy', text: 'Copiar' },
+            { extend: 'csv', filename: exportFileName },
+            { extend: 'excel', filename: exportFileName }
         ],
-        ajax: url + params,
+        ajax: getURL(),
         columns: [
-            {
-                title: "Dispositivo",
-                data: "device_id"
-            },
-            {
-                title: "Viajes",
-                data: "tokenCount",
-                class: "text-right"
-            },
-            {
-                title: "GPS",
-                data: "devicePositionInTimeCount",
-                class: "text-right"
-            },
-            {
-                title: "R",
-                data: "reportCount",
-                class: "text-right"
-            },
-            {
-                title: "ECB",
-                data: "busEventCreationCount",
-                class: "text-right"
-            },
-            {
-                title: "ECP",
-                data: "busStopEventCreationCount",
-                class: "text-right"
-            },
-            {
-                title: "B+",
-                data: "confirmBusCount",
-                class: "text-right"
-            },
-            {
-                title: "B-",
-                data: "declineBusCount",
-                class: "text-right"
-            },
-            {
-                title: "P+",
-                data: "confirmBusStopCount",
-                class: "text-right"
-            },
-            {
-                title: "P-",
-                data: "declineBusStopCount",
-                class: "text-right"
-            },
-            {
-                title: "VP",
-                data: "busStopCheckCount",
-                class: "text-right"
-            }
+            { title: "Dispositivo", data: "device_id" },
+            { title: "Viajes", data: "tokenCount", class: "text-right" },
+            { title: "GPS", data: "devicePositionInTimeCount", class: "text-right" },
+            { title: "R",  data: "reportCount", class: "text-right" },
+            { title: "ECB", data: "busEventCreationCount", class: "text-right" },
+            { title: "ECP", data: "busStopEventCreationCount", class: "text-right" },
+            { title: "B+", data: "confirmBusCount", class: "text-right" },
+            { title: "B-", data: "declineBusCount", class: "text-right" },
+            { title: "P+", data: "confirmBusStopCount", class: "text-right" },
+            { title: "P-", data: "declineBusStopCount", class: "text-right" },
+            { title: "VP", data: "busStopCheckCount", class: "text-right" }
         ],
         language: {
             "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Spanish.json",
@@ -116,12 +61,9 @@ function init() {
                 }
             }
         }
-    }).on("init.dt", function () { spinner.stop(); });
-}
-
-function myFunction() {
-    var date_init = $('#date_init').data("DateTimePicker").date().format("YYYY-MM-DD") + "T00:00:00";
-    var date_end = $('#date_end').data("DateTimePicker").date().add(1, 'days').format("YYYY-MM-DD") + "T00:00:00";
-    var params = '?date_init=' + date_init + '&date_end=' + date_end;
-    table.ajax.url(url + params).load();
-}
+    };
+    $(target).spin(spinnerOpt);
+    table = $("#datatable").DataTable(datatableOpts).on("init.dt", function () {
+        $(target).spin(false);
+    });
+});

@@ -15,7 +15,7 @@ from transform import WITHOUT_LICENSE_PLATE
 
 from AndroidRequests.models import Event, Service, EventForBusv2, Busassignment, ReportInfo, TimePeriod, \
     ZonificationTransantiago, StadisticDataFromRegistrationBus, StadisticDataFromRegistrationBusStop, \
-    EventForBusStop, NearByBusesLog
+    EventForBusStop, NearByBusesLog, DevicePositionInTime, PoseInTrajectoryOfToken, Token, Report
 
 def filter(request):
     user = request.user.getUser()
@@ -487,15 +487,12 @@ def usersTravelMap(request):
     return HttpResponse(template.render(request=request))
 
 
-@user_passes_test(is_transapp)
+#@user_passes_test(is_transapp)
+@login_required
 def getUsersActivities(request):
     if request.method == 'GET':
-        date_init = datetime.strptime(request.GET.get('date_init'), "%Y-%m-%dT%H:%M:%S")
-        date_end = datetime.strptime(request.GET.get('date_end'), "%Y-%m-%dT%H:%M:%S")
-
-        pytz.timezone('America/Santiago').localize(date_init)
-        pytz.timezone('America/Santiago').localize(date_end)
-        # ADD TIMEZONE
+        date_init = parse_datetime(request.GET.get('date_init'))
+        date_end = parse_datetime(request.GET.get('date_end'))
 
         # Per user id get:
         # devicePositionInTime count
@@ -636,7 +633,8 @@ def getUsersActivities(request):
         return JsonResponse({"data": response}, safe=False)
 
 
-@user_passes_test(is_transapp)
+#@user_passes_test(is_transapp)
+@login_required
 def getActiveUsers(request):
     if request.method == 'GET':
         tz = timezone('Chile/Continental')
@@ -686,7 +684,8 @@ def getActiveUsers(request):
         return JsonResponse(data, safe=False)
 
 
-@user_passes_test(is_transapp)
+#@user_passes_test(is_transapp)
+@login_required
 def getUsersPositions(request):
     if request.method == 'GET':
         date_init = datetime.strptime(request.GET.get('date_init'), "%Y-%m-%dT%H:%M:%S")
@@ -723,7 +722,8 @@ def getUsersPositions(request):
         return JsonResponse(response, safe=False)
 
 
-@user_passes_test(is_transapp)
+#@user_passes_test(is_transapp)
+@login_required
 def getUsersTravelMap(request):
     if request.method == 'GET':
         date_init = datetime.strptime(request.GET.get('date_init'), "%Y-%m-%dT%H:%M:%S")

@@ -16,6 +16,5 @@ def header(title, subtitle="", right=""):
         </div>
       </div>
       <div class="clearfix"></div>
-      <br />
     """
     return format_html(content, title, subtitle, right)
