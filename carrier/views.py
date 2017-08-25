@@ -722,17 +722,13 @@ def getUsersPositions(request):
 @login_required
 def getUsersTravelMap(request):
     if request.method == 'GET':
-        date_init = datetime.strptime(request.GET.get('date_init'), "%Y-%m-%dT%H:%M:%S")
-        date_end = datetime.strptime(request.GET.get('date_end'), "%Y-%m-%dT%H:%M:%S")
-
-        pytz.timezone('America/Santiago').localize(date_init)
-        pytz.timezone('America/Santiago').localize(date_end)
+        date_init = parse_datetime(request.GET.get('date_init'))
+        date_end = parse_datetime(request.GET.get('date_end'))
 
         response = {}
         
-        tokenposes = PoseInTrajectoryOfToken.objects.filter(timeStamp__range=[date_init, date_end]).order_by(
-            'token_id',
-            'timeStamp'). \
+        tokenposes = PoseInTrajectoryOfToken.objects.filter(timeStamp__range=[date_init, date_end]).\
+            order_by('token_id', 'timeStamp'). \
             annotate(service=ExpressionWrapper(F('token__busassignment__service'), output_field=CharField())). \
             values('latitude', 'longitude', 'timeStamp', 'token_id', 'service')
         
@@ -743,17 +739,13 @@ def getUsersTravelMap(request):
                                                                    'longitude': tokenpose['longitude'],
                                                                    'timeStamp': tokenpose['timeStamp']}}
         
-        tokenposes = PoseInTrajectoryOfToken.objects.filter(token_id__in=response).order_by('token_id',
-                                                                                            '-timeStamp')
+        tokenposes = PoseInTrajectoryOfToken.objects.filter(token_id__in=response).order_by('token_id', '-timeStamp')
 
         for resp in response:
             response[resp].update({'destination': {'latitude': tokenposes.filter(token_id=resp).first().latitude,
                                                    'longitude': tokenposes.filter(token_id=resp).first().longitude,
-                                                   'timeStamp': tokenposes.filter(
-                                                       token_id=resp).first().timeStamp}})
-        
+                                                   'timeStamp': tokenposes.filter(token_id=resp).first().timeStamp}})
         return JsonResponse(response, safe=False)
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # TOOLS
