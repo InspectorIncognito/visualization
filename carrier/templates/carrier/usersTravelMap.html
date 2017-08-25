@@ -4,17 +4,13 @@
     <title>Mapa de Viajes de Usuarios - TranSapp</title>
 {% endblock title %}
 
-{% block topimports %}
-
+{% block css %}
     <!-- Select2 -->
     <link href="{% static 'components/gentelella/vendors/select2/dist/css/select2.min.css' %}" rel="stylesheet">
-
     <!-- toggle button -->
     <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
-
     <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.css"/>
-
     <style>
         .info_div {
             padding: 6px 8px;
@@ -30,13 +26,9 @@
             font-weight: bold;
         }
     </style>
+{% endblock %}
 
-{% endblock topimports %}
-
-{% block toptiles %}
-{% endblock toptiles %}
-
-{% block maincontent %}
+{% block content %}
     <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="x_title">
@@ -108,14 +100,13 @@
             </div>
         </div>
     </div>
-{% endblock maincontent %}
+{% endblock %}
 
-{% block bottomimports %}
+{% block extrajs %}
     <!-- bootstrap-datetimepicker -->
     <script src="{% static 'components/gentelella/vendors/moment/min/moment.min.js' %}"></script>
     <script src="{% static 'components/gentelella/vendors/moment/locale/es.js' %}"></script>
     <script src="{% static 'components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js' %}"></script>
-
     <!-- bootstrap button -->
     <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
@@ -131,4 +122,4 @@
     <!-- This view -->
     <script src="{% static 'carrier/js/usersTravelMap.js' %}"></script>
 
-{% endblock bottomimports %}
+{% endblock %}

@@ -688,15 +688,11 @@ def getActiveUsers(request):
 @login_required
 def getUsersPositions(request):
     if request.method == 'GET':
-        date_init = datetime.strptime(request.GET.get('date_init'), "%Y-%m-%dT%H:%M:%S")
-        date_end = datetime.strptime(request.GET.get('date_end'), "%Y-%m-%dT%H:%M:%S")
+        date_init = parse_datetime(request.GET.get('date_init'))
+        date_end = parse_datetime(request.GET.get('date_end'))
 
-        pytz.timezone('America/Santiago').localize(date_init)
-        pytz.timezone('America/Santiago').localize(date_end)
-
-        devices = DevicePositionInTime.objects.filter(
-            timeStamp__range=[date_init, date_end]
-        ).order_by('phoneId', 'timeStamp').values()
+        devices = DevicePositionInTime.objects.filter(timeStamp__range=[date_init, date_end]).\
+            order_by('phoneId', 'timeStamp').values()
 
         response = {}
         for device in devices:
