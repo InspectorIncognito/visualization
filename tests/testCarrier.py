@@ -14,6 +14,37 @@ class URLStatusTestCase(TestCase):
         reverse("getCount"),
         reverse("driversTable"),
         reverse("getDriversTable"),
+        reverse("drivers"),
+        # it receives date_init, date_end, licensePlates[], routes[]
+        reverse("getDriversReport"),
+        reverse("physicalTable"),
+        reverse("getPhysicalTable"),
+        reverse("updatePhysical"),
+        reverse("getPhysicalHeaders"),
+        # it receives date_init, date_end, licensePlates[]
+        reverse("gePhysicalReport"),
+        reverse("physical"),
+        reverse("busMap"),
+        reverse("getBusMap"),
+        reverse("getBusMapParameters"),
+        reverse("busReports"),
+        reverse("getBusReports"),
+        reverse("busStopReports"),
+        reverse("getBusStopReports"),
+        reverse("busStopMap"),
+        reverse("getBusStopInfo"),
+        reverse("userActivities"),
+        reverse("getUsersActivities"),
+        reverse("activeUsers"),
+        reverse("getActiveUsers"),
+        reverse("busStopViewsMap"),
+        reverse("getUsersPositions"),
+        reverse("usersTravelMap"),
+        reverse("getUsersTravelMap"),
+        reverse("fullTableBus"),
+        reverse("getFullTableBus"),
+        reverse("fullTableStop"),
+        reverse("getFullTableStop")
     ]
     POST_URLS = [
     ]
