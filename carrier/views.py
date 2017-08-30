@@ -10,14 +10,18 @@ from django.utils.dateparse import parse_datetime
 from django.utils import timezone
 from collections import defaultdict
 
-from datetime import datetime, date, timedelta
+from datetime import datetime, timedelta
 from transform import WITHOUT_LICENSE_PLATE
 
 from AndroidRequests.models import Event, Service, EventForBusv2, Busassignment, ReportInfo, TimePeriod, \
     ZonificationTransantiago, StadisticDataFromRegistrationBus, StadisticDataFromRegistrationBusStop, \
     EventForBusStop, NearByBusesLog, DevicePositionInTime, PoseInTrajectoryOfToken, Token, Report
 
-def filter(request):
+import itertools
+import time
+
+
+def filter_by_operator(request):
     user = request.user.getUser()
     return user.color()
 
@@ -42,7 +46,7 @@ def index(request):
 @login_required
 def getCount(request):
     categories = Event.objects.filter(eventType=Event.BUS).values_list("category", flat=True).distinct()
-    routeList = Service.objects.filter(filter(request)).values_list("service", flat=True).distinct()
+    routeList = Service.objects.filter(filter_by_operator(request)).values_list("service", flat=True).distinct()
     query = EventForBusv2.objects.filter(busassignment__service__in=routeList).\
         exclude(busassignment__uuid__registrationPlate=WITHOUT_LICENSE_PLATE)
 
@@ -70,7 +74,7 @@ def getCount(request):
 @login_required
 def drivers(request):
     template = "carrier/drivers.html"
-    services = Service.objects.filter(filter(request)).values_list("service", flat=True).distinct()
+    services = Service.objects.filter(filter_by_operator(request)).values_list("service", flat=True).distinct()
     context = {
         'services': services,
     }
@@ -104,7 +108,7 @@ def getDriversReport(request):
             query = query.filter(busassignment__service__in=routes)
             busassignment = busassignment.filter(service__in=routes)
         else:
-            routeList = Service.objects.filter(filter(request)).values_list("service", flat=True).distinct()
+            routeList = Service.objects.filter(filter_by_operator(request)).values_list("service", flat=True).distinct()
             query = query.filter(busassignment__service__in=routeList)
             busassignment = busassignment.filter(service__in=routeList)
 
@@ -136,7 +140,7 @@ def driversTable(request):
 
 @login_required
 def getDriversTable(request):
-    routeList = Service.objects.filter(filter(request)).values_list("service", flat=True).distinct()
+    routeList = Service.objects.filter(filter_by_operator(request)).values_list("service", flat=True).distinct()
     query = EventForBusv2.objects.filter(
         busassignment__service__in=routeList)
     query = query.filter(event__category="conductor")
@@ -167,12 +171,12 @@ def busReports(request):
 @login_required
 def getBusReports(request):
     if request.method == 'GET':
-        services = Service.objects.filter(filter(request)).values_list("service", flat=True).distinct()
+        routeList = Service.objects.filter(filter_by_operator(request)).values_list("service", flat=True).distinct()
         date_init = parse_datetime(request.GET.get('date_init'))
         date_end = parse_datetime(request.GET.get('date_end'))
 
         query = ReportInfo.objects.filter(reportType=ReportInfo.BUS, report__timeStamp__range=[date_init, date_end])
-        query = query.filter(service__in=services)
+        query = query.filter(service__in=routeList)
         data = {
             'data': [q.getDictionary() for q in query]
         }
@@ -183,7 +187,7 @@ def getBusReports(request):
 def physical(request):
     template = 'carrier/physical.html'
     context = {
-        'services': Service.objects.filter(filter(request)).distinct()
+        'services': Service.objects.filter(filter_by_operator(request)).distinct()
     }
     return render(request, template, context)
 
@@ -191,7 +195,7 @@ def physical(request):
 @login_required
 def getPhysicalHeaders(request):
     events = Event.objects.filter(category="estado físico", eventType="bus").exclude(id="evn00225").values_list("name", flat=True)
-    routeList = Service.objects.filter(filter(request)).values_list("service", flat=True).distinct()
+    routeList = Service.objects.filter(filter_by_operator(request)).values_list("service", flat=True).distinct()
     headerInfo = EventForBusv2.objects.filter(event__category='estado físico',
                                               busassignment__service__in=routeList).exclude(event__id="evn00225")
 
@@ -218,7 +222,7 @@ def physicalTable(request):
 
 @login_required
 def getPhysicalTable(request):
-    routeList = Service.objects.filter(filter(request)).values_list("service", flat=True).distinct()
+    routeList = Service.objects.filter(filter_by_operator(request)).values_list("service", flat=True).distinct()
     query = EventForBusv2.objects.filter(busassignment__service__in=routeList, event__category="estado físico").\
         exclude(event__id="evn00225")
 
@@ -261,7 +265,7 @@ def getPhysicalReport(request):
         reports = EventForBusv2.objects.filter(event__category="estado físico", fixed=False,
                                                timeCreation__range=[date_init, date_end]).\
             exclude(busassignment__uuid__registrationPlate__icontains="No Info")
-        routeList = Service.objects.filter(filter(request)).values_list("service", flat=True).distinct()
+        routeList = Service.objects.filter(filter_by_operator(request)).values_list("service", flat=True).distinct()
         #if routes:
         #    routeList = routes
         #reports = reports.filter(busassignment__service__in=routeList)
@@ -305,7 +309,7 @@ def updatePhysical(request):
 @login_required
 def busMap(request):
     template = 'carrier/busMap.html'
-    routeList = Service.objects.filter(filter(request)).values_list("service", flat=True).distinct()
+    routeList = Service.objects.filter(filter_by_operator(request)).values_list("service", flat=True).distinct()
     licensePlates = Busassignment.objects.filter(service__in=routeList).\
         exclude(uuid__registrationPlate=WITHOUT_LICENSE_PLATE).values_list("uuid__registrationPlate", flat=True).\
         distinct()
@@ -321,7 +325,7 @@ def busMap(request):
 @login_required
 def getBusMapParameters(request):
 
-    routeList = Service.objects.filter(filter(request)).values_list("service", flat=True).distinct()
+    routeList = Service.objects.filter(filter_by_operator(request)).values_list("service", flat=True).distinct()
 
     events = Event.objects.filter(eventType="bus").exclude(category="estado físico")
     categories = events.distinct("category")
@@ -343,7 +347,7 @@ def getBusMap(request):
     licensePlates = request.GET.getlist('licensePlates[]')
     communes = request.GET.getlist('communes[]')
 
-    routeList = Service.objects.filter(filter(request)).values_list("service", flat=True).distinct()
+    routeList = Service.objects.filter(filter_by_operator(request)).values_list("service", flat=True).distinct()
     query = StadisticDataFromRegistrationBus.objects.filter(
         reportOfEvent__timeCreation__range=[date_init, date_end]).exclude(
         reportOfEvent__event__category="estado físico")
@@ -637,50 +641,87 @@ def getUsersActivities(request):
 @login_required
 def getActiveUsers(request):
     if request.method == 'GET':
-        tz = timezone('Chile/Continental')
-        date = request.GET.get('date')
-        date_start = datetime.strptime(date + " 00:00:00", "%Y-%m-%d %H:%M:%S")
-        date_start = tz.localize(date_start)
-        date_finish = datetime.strptime(date + " 23:59:59", "%Y-%m-%d %H:%M:%S")
-        date_finish = tz.localize(date_finish)
-        positions = DevicePositionInTime.objects.filter(timeStamp__range=[date_start, date_finish])
-        highest_lifespan = Event.objects.all().order_by("-lifespam")[0].lifespam
-        busevents = EventForBusv2.objects.filter(timeCreation__gte=(date_start - timedelta(highest_lifespan)))
-        busstopevents = EventForBusStop.objects.filter(timeCreation__gte=(date_start - timedelta(highest_lifespan)))
+        date_init = parse_datetime(request.GET.get("date_init"))
+        date_end = parse_datetime(request.GET.get("date_end"))
+        range = [date_init, date_end]
 
+        active_phones = DevicePositionInTime.objects.filter(timeStamp__range=range).\
+            values_list("timeStamp", "phoneId").order_by("timeStamp")
+        active_phones_stop_events = EventForBusStop.objects.filter(timeCreation__range=range).\
+            values_list("timeCreation", "expireTime", "phoneId")
+        active_phones_bus_events = EventForBusv2.objects.filter(timeCreation__range=range).\
+            values_list("timeCreation", "expireTime", "phoneId")
+
+        ref_dict = {}
         data = {
             "half_hours": []
         }
 
-        for x in xrange(1, 49):
-            period_positions = positions.filter(
-                timeStamp__range=[date_start + timedelta(minutes=30 * (x - 1)), date_start + timedelta(minutes=30 * x)])
-            period_bus_stop_events = busstopevents.filter(
-                timeCreation__range=[date_start + timedelta(minutes=30 * (x - 1)),
-                                     date_start + timedelta(minutes=30 * x)])
-            period_bus_events = busevents.filter(timeCreation__range=[date_start + timedelta(minutes=30 * (x - 1)),
-                                                                      date_start + timedelta(minutes=30 * x)])
+        init = timezone.now()
 
-            bus_active_events = []
-            bus_stop_active_events = []
+        def date_hour(timestamp):
+            timestamp = timezone.localtime(timestamp)
+            """
+            if timestamp.minute <= 30:
+                return timestamp.strftime("%Y-%m-%dT%H:00:00%z")
+            else:
+                return timestamp.strftime("%Y-%m-%dT%H:00:00%z")
+            """
+            return timestamp.strftime("%Y-%m-%dT%H:00:00%z")
 
-            for be in busevents:
-                if be.timeStamp > (date_start + timedelta(minutes=30 * x) - timedelta(minutes=be.event.lifespam)):
-                    bus_active_events.append(be)
-            for bse in busstopevents:
-                if bse.timeStamp > (date_start + timedelta(minutes=30 * x) - timedelta(minutes=bse.event.lifespam)):
-                    bus_stop_active_events.append(bse)
+        groups = itertools.groupby(active_phones, lambda x: date_hour(x[0]))
+        for group, matches in groups:
+            half_hour = group
+            active_users = len(set(match[1] for match in matches))
+            raw_data = {
+                #"half_hour": half_hour.strftime("%Y-%m-%dT%H:%M:%S%z"),
+                "half_hour": time.mktime(parse_datetime(half_hour).timetuple()),
+                "active_users": active_users, "reporting_users": 0, "reports": 0
+            }
+            ref_dict[half_hour] = len(data["half_hours"])
+            data["half_hours"].append(raw_data)
 
-            data["half_hours"].append({
-                "half_hour": str(date_start + timedelta(minutes=30 * (x - 1))) + " " + str(
-                    date_finish + timedelta(minutes=30 * (x))),
-                "active_users": len(list(set([position.phoneId for position in period_positions]))),
-                "reporting_users": len(list(set(
-                    [event.phoneId for event in period_bus_stop_events] + [event.phoneId for event in
-                                                                          period_bus_events]))),
-                "reports": len(period_bus_stop_events) + len(period_bus_events),
-                "active_events": len(bus_active_events) + len(bus_stop_active_events)
-            })
+        groups = itertools.groupby(active_phones_stop_events, lambda x: date_hour(x[0]))
+        for (group, matches_stop_events) in groups:
+            half_hour = group
+            reporting_users = set()
+            reports = 0
+            for match in matches_stop_events:
+                reporting_users.add(match[2])
+                reports += 1
+
+            if not half_hour in ref_dict:
+                raw_data = {
+                    "half_hour": time.mktime(parse_datetime(half_hour).timetuple()),
+                    "active_users": 0, "reporting_users": 0, "reports": 0
+                }
+                ref_dict[half_hour] = len(data["half_hours"])
+                data["half_hours"].append(raw_data)
+
+            data["half_hours"][ref_dict[half_hour]]["reporting_users"] = len(reporting_users)
+            data["half_hours"][ref_dict[half_hour]]["reports"] = reports
+
+        groups = itertools.groupby(active_phones_bus_events, lambda x: date_hour(x[0]))
+        for group, matches_bus_events in groups:
+            half_hour = group
+            reporting_users = set()
+            reports = 0
+            for match in matches_bus_events:
+                reporting_users.add(match[2])
+                reports += 1
+
+            if not half_hour in ref_dict:
+                raw_data = {
+                    "half_hour": time.mktime(parse_datetime(half_hour).timetuple()),
+                    "active_users": 0, "reporting_users": 0, "reports": 0
+                }
+                ref_dict[half_hour] = len(data["half_hours"])
+                data["half_hours"].append(raw_data)
+
+            data["half_hours"][ref_dict[half_hour]]["reporting_users"] += len(reporting_users)
+            data["half_hours"][ref_dict[half_hour]]["reports"] += reports
+
+        print(timezone.now()-init)
         return JsonResponse(data, safe=False)
 
 
@@ -771,7 +812,7 @@ def getFullTableBus(request):
         date_end = parse_datetime(request.GET.get('date_end'))
         types = request.GET.getlist('types[]')
 
-        routeList = Service.objects.filter(filter(request)).values_list("service", flat=True).distinct()
+        routeList = Service.objects.filter(filter_by_operator(request)).values_list("service", flat=True).distinct()
         query = EventForBusv2.objects.filter(busassignment__service__in=routeList,
                                              timeCreation__range=[date_init, date_end]).\
             exclude(busassignment__uuid__registrationPlate=WITHOUT_LICENSE_PLATE)

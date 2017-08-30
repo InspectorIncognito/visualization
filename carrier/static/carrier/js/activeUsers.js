@@ -1,108 +1,81 @@
-$(function () {
-    $('#date_filter').datetimepicker({
-        defaultDate: moment().subtract(3, 'months'),
-        // defaultDate: moment(),
-        format: 'LL'
-    });
-    $("#filters").on("dp.change", function (e) {
-        myFunction(true);
-    });
-    myFunction(true);
-});
+$(document).ready(function () {
 
+    var target = document.getElementsByClassName("x_panel")[0];
+    var chart;
 
-var resp = null;
-var types = 0;
-var chartdata = {
-    'weekday': null,
-    'daytype': null,
-    'periodHour': null,
-    'periodTransantiago': null,
-    'plate': null,
-    'service': null,
-    'daily': null,
-    'monthly': null,
-    'yearly': null
-};
-var chart;
-function reloadchart() {
-    chartdata = {
-        'weekday': null,
-        'daytype': null,
-        'periodHour': null,
-        'periodTransantiago': null,
-        'plate': null,
-        'service': null,
-        'daily': null,
-        'monthly': null,
-        'yearly': null
-    };
-}
-
-function updatechart() {
-    if (resp != null) {
-
-    }
-}
-
-function makechart(columns, categories, height, x, xformat, groups, type, tickformat) {
-    chart = c3.generate({
-        size: {
-            height: height,
-        },
-        data: {
-            x: x,
-            xFormat: xformat,
-            columns: columns,
-            type: 'bar',
-            groups: groups
-        },
-        bar: {
-            width: {
-                ratio: 0.4
-            }
-        },
-        axis: {
-            x: {
-                type: type,
-                tick: {
-                    culling: false,
-                    rotate: 45,
-                    format: tickformat
-                },
-                categories: categories
-
-            }
+    function updatechart(data, update) {
+        if (update) {
+            chart.load({
+                data: data
+            });
+        } else {
+            makechart(data, 600);
         }
-    });
-}
+    }
 
-
-// # http://localhost/carriers/getActiveUsers/?date=2016-10-24
-// # {
-// #   "half_hours": [
-// #       {
-// #           "half_hour": "2016-10-24 00:00:00-03:00 2016-10-25 00:29:59-03:00",
-// #           "active_events": 1419,
-// #           "active_users": 2,
-// #           "reporting_users": 0,
-// #           "reports": 0
-// #       },
-// #       ...
-// # ]}
-function myFunction(refresh) {
-    var url = "http://" + location.host + "/carriers/getActiveUsers/";
-    var url_opts = {
-        date_init: $('#date_filter').data("DateTimePicker").date().format("YYYY-MM-DD")
-    };
-
-    $.getJSON(url, url_opts)
-        .done(function (data) {
-            if (refresh) {
-
+    function makechart(data, height) {
+        var opts = {
+            size: {
+                height: height
+            },
+            //xFormat: "%Y-%m-%dT%H:%M:%S%Z",
+            //xFormat: null,
+            data: {
+                json: data,
+                keys: {
+                    x: "half_hour",
+                    value: ["active_users", "reporting_users", "reports"]
+                },
+                type: "line",
+                names: {
+                    active_users: "Usuarios activos",
+                    reporting_users: "Usuarios que reportan",
+                    reports: "Eventos reportados"
+                }
+            },
+            bar: {
+                width: {
+                    ratio: 0.4
+                }
+            },
+            axis: {
+                x: {
+                    type: "timeseries",
+                    localtime: true,
+                    tick: {
+                        culling: true,
+                        rotate: 45,
+                        format: "%Y-%m-%d %H:%M:%S"
+                    }
+                }
             }
-            console.log(data);
-            reloadchart();
-            updatechart();
-        });
-}
+        };
+        opts = Object.assign({}, opts);
+        chart = c3.generate(opts);
+    }
+
+    function updateDays(update) {
+        var url = "/carriers/getActiveUsers/";
+        var data = {
+            date_init: DATE_RANGE_INPUT.data("daterangepicker").startDate.format(),
+            date_end: DATE_RANGE_INPUT.data("daterangepicker").endDate.format()
+        };
+
+        $(target).spin(spinnerOpt);
+        $.getJSON(url, data)
+            .done(function (data) {
+                updatechart(data["half_hours"], update);
+            }).always(function(){
+                $(target).spin(false);
+            });
+    }
+
+    var DATE_RANGE_INPUT = $("#dateRange");
+
+    optionDateRangePicker.startDate = moment().subtract(1, "days");
+    DATE_RANGE_INPUT.daterangepicker(optionDateRangePicker);
+    DATE_RANGE_INPUT.on("apply.daterangepicker", function() {
+        updateDays(true);
+    });
+    updateDays(false);
+});

@@ -16,35 +16,46 @@ class URLStatusTestCase(TestCase):
         reverse("getDriversTable"),
         reverse("drivers"),
         # it receives date_init, date_end, licensePlates[], routes[]
-        reverse("getDriversReport"),
+        #reverse("getDriversReport"),
         reverse("physicalTable"),
-        reverse("getPhysicalTable"),
-        reverse("updatePhysical"),
+        # it receives name
+        #reverse("getPhysicalTable"),
+        # it receives event id
+        #reverse("updatePhysical"),
         reverse("getPhysicalHeaders"),
         # it receives date_init, date_end, licensePlates[]
-        reverse("gePhysicalReport"),
+        #reverse("gePhysicalReport"),
         reverse("physical"),
         reverse("busMap"),
-        reverse("getBusMap"),
+        # it receives date_init, date_end, routes[], licensePlates[], communes[]
+        #reverse("getBusMap"),
         reverse("getBusMapParameters"),
         reverse("busReports"),
-        reverse("getBusReports"),
+        # it receives date_init, date_end
+        #reverse("getBusReports"),
         reverse("busStopReports"),
         reverse("getBusStopReports"),
         reverse("busStopMap"),
-        reverse("getBusStopInfo"),
+        # it receives date_init, date_end
+        #reverse("getBusStopInfo"),
         reverse("userActivities"),
-        reverse("getUsersActivities"),
+        # it receives date_init, date_end
+        #reverse("getUsersActivities"),
         reverse("activeUsers"),
-        reverse("getActiveUsers"),
+        # it receives date
+        #reverse("getActiveUsers"),
         reverse("busStopViewsMap"),
-        reverse("getUsersPositions"),
+        # it receives date_init, date_end
+        #reverse("getUsersPositions"),
         reverse("usersTravelMap"),
-        reverse("getUsersTravelMap"),
+        # it receives date_init, date_end
+        #reverse("getUsersTravelMap"),
         reverse("fullTableBus"),
-        reverse("getFullTableBus"),
+        # it receives date_init, date_end, types[]
+        #reverse("getFullTableBus"),
         reverse("fullTableStop"),
-        reverse("getFullTableStop")
+        # it receives date_init, date_end, types[]
+        #reverse("getFullTableStop")
     ]
     POST_URLS = [
     ]
