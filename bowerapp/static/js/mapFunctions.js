@@ -55,6 +55,18 @@ var user_icon = L.icon({
     popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 });
 
+// bus marker
+var bus_icon = L.icon({
+    iconUrl: "/static/carrier/images/usuario.png",
+    shadowUrl: null,
+
+    iconSize:     [30, 38], // size of the icon
+    shadowSize:   [ 0,  0], // size of the shadow
+    iconAnchor:   [15, 38], // point of the icon which will correspond to marker"s location
+    shadowAnchor: [ 0,  0],  // the same for the shadow
+    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
+
 var origin_icon = L.icon({
     iconUrl: "/static/carrier/images/circulo_inicio.png",
     shadowUrl: null,
