@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from django.utils import timezone
 
 from django.db import models, migrations
 
@@ -9,14 +10,14 @@ def fill_tables(apps, schema_editor):
     hhperiods = apps.get_model('AndroidRequests', 'HalfHourPeriod')
     
     for ev in eventsforbusv2.objects.all():
-        time = ev.timeCreation.time().replace(microsecond=0)
-        hhperiod = hhperiods.objects.get(initial_time__lte = time , end_time__gte = time)
+        creationTime = timezone.localtime(ev.timeCreation).time().replace(microsecond=0)
+        hhperiod = hhperiods.objects.get(initial_time__lte = creationTime , end_time__gte = creationTime)
         ev.halfHourPeriod = hhperiod
         ev.save()
 
     for ev in eventsforbusstop.objects.all():
-        time = ev.timeCreation.time().replace(microsecond=0)
-        hhperiod = hhperiods.objects.get(initial_time__lte = time , end_time__gte = time)
+        creationTime = timezone.localtime(ev.timeCreation).time().replace(microsecond=0)
+        hhperiod = hhperiods.objects.get(initial_time__lte = creationTime , end_time__gte = creationTime)
         ev.halfHourPeriod = hhperiod
         ev.save()
 
