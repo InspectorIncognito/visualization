@@ -12,7 +12,7 @@ def fill_tables(apps, schema_editor):
     for bus in buses.objects.all():
         if bus.registrationPlate.upper() == 'DUMMYLPT':
             bus.registrationPlate = "No Info."
-        elif regex.match(bus.registrationPlate.upper()) != None :
+        elif regex.match(bus.registrationPlate.upper()) is not None:
             aa = bus.registrationPlate[:2].upper()
             bb = bus.registrationPlate[2:4].upper()
             num = bus.registrationPlate[4:]
