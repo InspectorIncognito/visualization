@@ -96,21 +96,17 @@ def validate_plates():
     ex = r"\A[a-zA-Z]{4}[0-9]{2}\Z|\A[a-zA-Z]{2}[0-9]{4}\Z"
     regex = re.compile(ex)
     counter = 0
-    for bus in Busv2.objects.filter(
-            Q(transformed=False) | Q(transformed__isnull=True)):
+    for bus in Busv2.objects.filter(Q(transformed=False) | Q(transformed__isnull=True)):
         if bus.registrationPlate.upper() == 'DUMMYLPT':
             bus.registrationPlate = WITHOUT_LICENSE_PLATE
-            counter += 1
-            bus.transformed = True
-            bus.save()
         elif regex.match(bus.registrationPlate.upper()) is not None:
-            aa = bus.registrationPlate[:2].upper()
-            bb = bus.registrationPlate[2:4].upper()
-            num = bus.registrationPlate[4:]
-            bus.registrationPlate = aa + " " + bb + " " + num
-            counter += 1
-            bus.transformed = True
-            bus.save()
+            bus.registrationPlate = license_plate_formatter(bus.registrationPlate)
+        else:
+            pass
+
+        counter += 1
+        bus.transformed = True
+        bus.save()
 
     sys.stdout.write("\n Bus rows modified: " + str(counter) + "\n")
     sys.stdout.flush()
@@ -119,8 +115,7 @@ def validate_plates():
 def add_half_hour_periods(timestamp, minutes_to_filter):
     
     counter = 0
-    for event in EventForBusv2.objects.filter(
-            Q(transformed=False) | Q(transformed__isnull=True),
+    for event in EventForBusv2.objects.filter(Q(transformed=False) | Q(transformed__isnull=True),
             timeStamp__gt=timestamp - timedelta(minutes=minutes_to_filter)):
 
         creationTime = timezone.localtime(event.timeCreation).time().replace(microsecond=0)
@@ -149,25 +144,34 @@ def add_half_hour_periods(timestamp, minutes_to_filter):
     sys.stdout.flush()
 
 
+def license_plate_formatter(license_plate):
+    """ give format 'XX XX XX' to license plate"""
+    aa = license_plate[:2].upper()
+    bb = license_plate[2:4].upper()
+    num = license_plate[4:]
+    license_plate = "{} {} {}".format(aa, bb, num)
+
+    return license_plate
+
+
 def add_report_info(timestamp, minutes_to_filter):
     """
 
     """
     counter = 0
-    for report1 in Report.objects.filter(
-            Q(transformed=False) | Q(transformed__isnull=True),
+    for report1 in Report.objects.filter(Q(transformed=False) | Q(transformed__isnull=True),
             timeStamp__gt=timestamp - timedelta(minutes=minutes_to_filter)):
 
-        try:
-            report_json = json.loads(report1.reportInfo)
-        except ValueError:
-            report_json = {}
+        if report1.reportInfo is None or report1.reportInfo == "":
+            continue
+
+        reportJson = json.loads(report1.reportInfo)
 
         # user location fields
         userLatitude = None
         userLongitude = None
-        if 'locationUser' in report_json:
-            userLocation = report_json['locationUser']
+        if 'locationUser' in reportJson:
+            userLocation = reportJson['locationUser']
             if 'latitude' in userLocation:
                 strLat = userLocation['latitude']
                 try:
@@ -182,59 +186,60 @@ def add_report_info(timestamp, minutes_to_filter):
                 except:
                     pass
 
-        # bus and bus stop fields
-        if 'bus' in report_json:
-            aa = report_json['bus']['licensePlate'][:2].upper()
-            bb = report_json['bus']['licensePlate'][2:4].upper()
-            num = report_json['bus']['licensePlate'][4:]
-            plate = aa + " " + bb + " " + num
-            busUUID = None
-            try:
-                busUUID = report_json['bus']['machineId']
-            except:
-                if report_json['bus']['licensePlate'].upper() != "DUMMYLPT":
-                    busUUID = Busv2.objects.get(registrationPlate=plate).uuid
+        if "bus" in reportJson:
+            licensePlate = reportJson['bus']['licensePlate'].upper()
+            if reportJson['bus']['licensePlate'].upper() == "DUMMYLPT":
+                plate = WITHOUT_LICENSE_PLATE
+            elif licensePlate[2] == " " and licensePlate[5] == " ":
+                plate = licensePlate.upper()
+            else:
+                plate = license_plate_formatter(licensePlate)
 
-            if report_json['bus']['licensePlate'].upper() == "DUMMYLPT":
-                plate = report_json['bus']['licensePlate'] = WITHOUT_LICENSE_PLATE
-            if len(report_json['bus']['service']) > 5:
-                report_json['bus']['service'] = 'JAVA'
+            if "machineId" in reportJson["bus"] and reportJson['bus']['machineId'] != "":
+                busUUIDn = reportJson['bus']['machineId']
+            elif Busv2.objects.filter(registrationPlate = plate).count() == 1:
+                busUUIDn = Busv2.objects.filter(registrationPlate=plate).values_list("uuid", flat=True)[0]
+            else:
+                busUUIDn = None
+
+            if busUUIDn is not None:
+                plate = Busv2.objects.filter(uuid=busUUIDn).values_list("registrationPlate", flat=True)[0]
+
+            if len(reportJson['bus']['service']) > 5:
+                reportJson['bus']['service'] = '-'
 
             ReportInfo.objects.create(
-                reportType=ReportInfo.BUS,
-                busUUID=busUUID,
-                service=report_json['bus']['service'],
-                registrationPlate=plate,
-                latitude=report_json['bus']['latitude'],
-                longitude=report_json['bus']['longitude'],
-                userLatitude=userLatitude,
+                reportType = 'bus',
+                busUUID = busUUIDn,
+                service = reportJson['bus']['service'],
+                registrationPlate = plate,
+                latitude = reportJson['bus']['latitude'],
+                longitude = reportJson['bus']['longitude'],
                 userLongitude=userLongitude,
-                report=report1,
-            )
+                userLatitude=userLatitude,
+                report = report1)
             counter += 1
 
-        elif 'bus_stop' in report_json:
+        elif 'bus_stop' in reportJson:
             ReportInfo.objects.create(
-                reportType=ReportInfo.STOP,
-                stopCode=report_json['bus_stop']['id'],
-                latitude=report_json['bus_stop']['latitude'],
-                longitude=report_json['bus_stop']['longitude'],
-                userLatitude=userLatitude,
+                reportType = 'busStop',
+                stopCode = reportJson['bus_stop']['id'],
+                latitude = reportJson['bus_stop']['latitude'],
+                longitude = reportJson['bus_stop']['longitude'],
                 userLongitude=userLongitude,
-                report=report1,
-            )
+                userLatitude=userLatitude,
+                report = report1)
             counter += 1
 
-        elif 'busStop' in report_json:
+        elif 'busStop' in reportJson:
             ReportInfo.objects.create(
-                reportType=ReportInfo.STOP,
-                stopCode=report_json['busStop']['id'],
-                latitude=report_json['busStop']['latitude'],
-                longitude=report_json['busStop']['longitude'],
-                userLatitude=userLatitude,
+                reportType = 'busStop',
+                stopCode = reportJson['busStop']['id'],
+                latitude = reportJson['busStop']['latitude'],
+                longitude = reportJson['busStop']['longitude'],
                 userLongitude=userLongitude,
-                report=report1,
-            )
+                userLatitude=userLatitude,
+                report = report1)
             counter += 1
 
         report1.transformed = True
@@ -434,6 +439,7 @@ if __name__ == '__main__':
     add_time_periods(dttz, arg_minutes_to_filter)
     validate_plates()
     add_half_hour_periods(dttz, arg_minutes_to_filter)
+    # alwas add_report_info has to be done after validate_plates method
     add_report_info(dttz, arg_minutes_to_filter)
     add_county(dttz, arg_minutes_to_filter)
     add_direction_eventforbus_reportinfo(dttz, arg_minutes_to_filter)

@@ -196,9 +196,9 @@ class AddReportInfoTestCase(TestCase):
         self.imageName = "no image"
 
     def test_reportWithBadReportInfo(self):
-        """ user send report with bad report info """
+        """ user send report without info """
 
-        reportInfo = "{this is a bad json format ]"
+        reportInfo = "{}"
 
         report = self.test.createReport(message=self.message, timestamp=self.days[0], phoneId=self.phoneId,
                                         imageName=self.imageName, reportInfo=reportInfo)
@@ -251,26 +251,30 @@ class AddReportInfoTestCase(TestCase):
             ReportInfo.objects.all().delete()
 
     def test_reportOfBus(self):
-        """ user send report of  field on reportInfo """
+        """ user sends report field on reportInfo """
 
+        licensePlate = "BJFT69"
+        formattedLicensePlate = "BJ FT 69"
+        machine_id = "90939da7-034b-404c-80e5-959457b79bc9"
         additionalInfoTemplate = {
             "bus": {
                 "service": "301",
-                "licensePlate": "BJFT69",
-                "machineId": "90939da7-034b-404c-80e5-959457b79bc9",
+                "licensePlate": licensePlate,
+                "machineId": machine_id,
                 "latitude": -33.4588248,
                 "longitude": -70.6492881
             }
         }
         additionalInfo = json.dumps(additionalInfoTemplate)
 
+        self.test.createBus(machine_id, formattedLicensePlate)
         self.test.createReport(message=self.message, timestamp=self.days[0], phoneId=self.phoneId,
                                imageName=self.imageName, reportInfo=additionalInfo)
 
         t.add_report_info(self.transformTime, self.minutesWindow)
 
         reportInfo = ReportInfo.objects.first()
-        self.assertEqual(reportInfo.registrationPlate, "BJ FT 69")
+        self.assertEqual(reportInfo.registrationPlate, formattedLicensePlate)
         self.assertEqual(str(reportInfo.busUUID), additionalInfoTemplate["bus"]["machineId"])
         self.assertEqual(reportInfo.latitude, additionalInfoTemplate["bus"]["latitude"])
         self.assertEqual(reportInfo.longitude, additionalInfoTemplate["bus"]["longitude"])
@@ -306,14 +310,15 @@ class AddReportInfoTestCase(TestCase):
         self.assertIsNotNone(reportInfo.report)
 
     def test_reportOfBusWithDummyLicensePlate(self):
-        """ report without dummy license plate """
+        """ report with dummy license plate """
         licensePlate = "DUMMYLPT"
-        formattedLicensePlate = "No Info."
+        formattedLicensePlate = t.WITHOUT_LICENSE_PLATE
         self.test.createBus(self.phoneId, formattedLicensePlate)
         additionalInfoTemplate = {
             "bus": {
                 "service": "this is a wrong service name",
                 "licensePlate": licensePlate,
+                "machineId": self.phoneId,
                 "latitude": -33.4588248,
                 "longitude": -70.6492881
             }
@@ -327,10 +332,10 @@ class AddReportInfoTestCase(TestCase):
 
         reportInfo = ReportInfo.objects.first()
         self.assertEqual(reportInfo.registrationPlate, formattedLicensePlate)
-        self.assertEqual(reportInfo.busUUID, None)
+        self.assertEqual(str(reportInfo.busUUID), self.phoneId)
         self.assertEqual(reportInfo.latitude, additionalInfoTemplate["bus"]["latitude"])
         self.assertEqual(reportInfo.longitude, additionalInfoTemplate["bus"]["longitude"])
-        self.assertEqual(reportInfo.service, "JAVA")
+        self.assertEqual(reportInfo.service, "-")
         self.assertIsNotNone(reportInfo.report)
 
     def test_reportOfStopWithNewStopId(self):
