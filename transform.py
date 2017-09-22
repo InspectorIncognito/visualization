@@ -15,7 +15,6 @@ import sys
 import os
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "visualization.settings")
-
 django.setup()
 
 WITHOUT_LICENSE_PLATE= "No Info."
