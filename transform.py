@@ -169,33 +169,33 @@ def add_report_info(timestamp, minutes_to_filter):
         # user location fields
         userLatitude = None
         userLongitude = None
-        if 'locationUser' in reportJson:
-            userLocation = reportJson['locationUser']
-            if 'latitude' in userLocation:
-                strLat = userLocation['latitude']
+        if "locationUser" in reportJson:
+            userLocation = reportJson["locationUser"]
+            if "latitude" in userLocation:
+                strLat = userLocation["latitude"]
                 try:
                     userLatitude = float(strLat[2:])
                 except:
                     pass
 
-            if 'longitude' in userLocation:
-                strLon = userLocation['longitude']
+            if "longitude" in userLocation:
+                strLon = userLocation["longitude"]
                 try:
                     userLongitude = float(strLon[2:])
                 except:
                     pass
 
         if "bus" in reportJson:
-            licensePlate = reportJson['bus']['licensePlate'].upper()
-            if reportJson['bus']['licensePlate'].upper() == "DUMMYLPT":
+            licensePlate = reportJson["bus"]["licensePlate"].upper()
+            if reportJson["bus"]["licensePlate"].upper() == "DUMMYLPT":
                 plate = WITHOUT_LICENSE_PLATE
             elif licensePlate[2] == " " and licensePlate[5] == " ":
                 plate = licensePlate.upper()
             else:
                 plate = license_plate_formatter(licensePlate)
 
-            if "machineId" in reportJson["bus"] and reportJson['bus']['machineId'] != "":
-                busUUIDn = reportJson['bus']['machineId']
+            if "machineId" in reportJson["bus"] and reportJson["bus"]["machineId"] != "":
+                busUUIDn = reportJson["bus"]["machineId"]
             elif Busv2.objects.filter(registrationPlate = plate).count() == 1:
                 busUUIDn = Busv2.objects.filter(registrationPlate=plate).values_list("uuid", flat=True)[0]
             else:
@@ -204,38 +204,38 @@ def add_report_info(timestamp, minutes_to_filter):
             if busUUIDn is not None:
                 plate = Busv2.objects.filter(uuid=busUUIDn).values_list("registrationPlate", flat=True)[0]
 
-            if len(reportJson['bus']['service']) > 5:
-                reportJson['bus']['service'] = '-'
+            if len(reportJson["bus"]["service"]) > 5:
+                reportJson["bus"]["service"] = "-"
 
             ReportInfo.objects.create(
-                reportType = 'bus',
+                reportType = "bus",
                 busUUID = busUUIDn,
-                service = reportJson['bus']['service'],
+                service = reportJson["bus"]["service"],
                 registrationPlate = plate,
-                latitude = reportJson['bus']['latitude'],
-                longitude = reportJson['bus']['longitude'],
+                latitude = reportJson["bus"]["latitude"],
+                longitude = reportJson["bus"]["longitude"],
                 userLongitude=userLongitude,
                 userLatitude=userLatitude,
                 report = report1)
             counter += 1
 
-        elif 'bus_stop' in reportJson:
+        elif "bus_stop" in reportJson:
             ReportInfo.objects.create(
-                reportType = 'busStop',
-                stopCode = reportJson['bus_stop']['id'],
-                latitude = reportJson['bus_stop']['latitude'],
-                longitude = reportJson['bus_stop']['longitude'],
+                reportType = "busStop",
+                stopCode = reportJson["bus_stop"]["id"],
+                latitude = reportJson["bus_stop"]["latitude"],
+                longitude = reportJson["bus_stop"]["longitude"],
                 userLongitude=userLongitude,
                 userLatitude=userLatitude,
                 report = report1)
             counter += 1
 
-        elif 'busStop' in reportJson:
+        elif "busStop" in reportJson:
             ReportInfo.objects.create(
-                reportType = 'busStop',
-                stopCode = reportJson['busStop']['id'],
-                latitude = reportJson['busStop']['latitude'],
-                longitude = reportJson['busStop']['longitude'],
+                reportType = "busStop",
+                stopCode = reportJson["busStop"]["id"],
+                latitude = reportJson["busStop"]["latitude"],
+                longitude = reportJson["busStop"]["longitude"],
                 userLongitude=userLongitude,
                 userLatitude=userLatitude,
                 report = report1)
@@ -256,7 +256,7 @@ def add_county(timestamp, minutes_to_filter):
             timeStamp__gt=timestamp-timedelta(minutes=minutes_to_filter)):
 
         try:
-            statistic_data = StadisticDataFromRegistrationBus.objects.filter(reportOfEvent=ev).order_by('-timeStamp')[0]
+            statistic_data = StadisticDataFromRegistrationBus.objects.filter(reportOfEvent=ev).order_by("-timeStamp")[0]
             evLat = statistic_data.latitude
             evLong = statistic_data.longitude
             pnt = Point(evLong, evLat)
@@ -278,7 +278,7 @@ def add_county(timestamp, minutes_to_filter):
         try:
             statistic_data = StadisticDataFromRegistrationBusStop.objects.filter(
                 reportOfEvent=ev
-            ).order_by('-timeStamp')[0]
+            ).order_by("-timeStamp")[0]
 
             evLat = statistic_data.latitude
             evLong = statistic_data.longitude
@@ -323,7 +323,7 @@ def add_direction_eventforbus_reportinfo(timestamp, minutes_to_filter):
         direction = None
         pose = PoseInTrajectoryOfToken.objects.filter(
             timeStamp__lte=ev.timeStamp,
-            token__phoneId=ev.phoneId).order_by('-timeStamp').first()
+            token__phoneId=ev.phoneId).order_by("-timeStamp").first()
         try:
             direction = pose.token.direction
             counter += 1
@@ -337,12 +337,12 @@ def add_direction_eventforbus_reportinfo(timestamp, minutes_to_filter):
     counter = 0
     for report in ReportInfo.objects.filter(
             Q(transformed=False) | Q(transformed__isnull=True),
-            reportType='bus'):
+            reportType="bus"):
 
         direction = None
         pose = PoseInTrajectoryOfToken.objects.filter(
             timeStamp__lte=report.report.timeStamp,
-            token__phoneId=report.report.phoneId).order_by('-timeStamp').first()
+            token__phoneId=report.report.phoneId).order_by("-timeStamp").first()
         try:
             direction = pose.token.direction
             counter += 1
@@ -364,7 +364,7 @@ def add_nearest_busstops(timestamp, minutes_to_filter):
     counter = 0
     last_bus_stop_events = EventForBusStop.objects.filter(
         timeStamp__gt=timestamp - timedelta(minutes=minutes_to_filter)
-    ).values_list('busStop_id', flat=True)
+    ).values_list("busStop_id", flat=True)
 
     for stop in BusStop.objects.filter(
             Q(transformed=False) | Q(transformed__isnull=True),
@@ -389,16 +389,16 @@ def add_nearest_busstops(timestamp, minutes_to_filter):
             Q(transformed=False) | Q(transformed__isnull=True),
             timeStamp__gt=timestamp - timedelta(minutes=minutes_to_filter)):
 
-        statistic_data = StadisticDataFromRegistrationBus.objects.filter(reportOfEvent=ev).order_by('-timeStamp')[0]
+        statistic_data = StadisticDataFromRegistrationBus.objects.filter(reportOfEvent=ev).order_by("-timeStamp")[0]
         evLat = statistic_data.latitude
         evLong = statistic_data.longitude
         evpoint = Point(evLong, evLat)
         for stop in busstopsdict:
-            stop["distance"] = stop['point'].distance(evpoint)
+            stop["distance"] = stop["point"].distance(evpoint)
 
-        nearest = sorted(busstopsdict, key=lambda a_bus_stop: a_bus_stop['distance'])
-        ev.busStop1 = BusStop.objects.get(code=nearest[0]['code'])
-        ev.busStop2 = BusStop.objects.get(code=nearest[1]['code'])
+        nearest = sorted(busstopsdict, key=lambda a_bus_stop: a_bus_stop["distance"])
+        ev.busStop1 = BusStop.objects.get(code=nearest[0]["code"])
+        ev.busStop2 = BusStop.objects.get(code=nearest[1]["code"])
         ev.transformed = True
         ev.save()
         counter += 1
@@ -410,18 +410,18 @@ def add_nearest_busstops(timestamp, minutes_to_filter):
     sys.stdout.write("\n Total rows modified: " + str(counter) + "\n")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
-    ts1 = sys.argv[1].split('.')[0]
-    ts2 = ts1.split('__')[0]
-    ts_time = ts1.split('__')[1]
-    ts_date = ts2.split('_')[1]
-    year = ts_date.split('-')[0]
-    month = ts_date.split('-')[1]
-    day = ts_date.split('-')[2]
-    hour = ts_time.split('_')[0]
-    minute = ts_time.split('_')[1]
-    second = ts_time.split('_')[2]
+    ts1 = sys.argv[1].split(".")[0]
+    ts2 = ts1.split("__")[0]
+    ts_time = ts1.split("__")[1]
+    ts_date = ts2.split("_")[1]
+    year = ts_date.split("-")[0]
+    month = ts_date.split("-")[1]
+    day = ts_date.split("-")[2]
+    hour = ts_time.split("_")[0]
+    minute = ts_time.split("_")[1]
+    second = ts_time.split("_")[2]
 
     arg_minutes_to_filter = int(sys.argv[2])
 
